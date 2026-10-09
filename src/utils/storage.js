@@ -309,23 +309,20 @@ export function addReplyToPost(postId, reply) {
 // ================= DOCTOR SESSION =================
 export function getCurrentDoctor() {
   try {
+    // One-time cleanup of legacy auto-login default doctor
+    const legacyCleaned = localStorage.getItem('mos_legacy_auto_doc_cleared');
+    if (!legacyCleaned) {
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+      localStorage.setItem('mos_legacy_auto_doc_cleared', 'true');
+      return null;
+    }
+
     const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_DOCTOR);
     if (saved) {
       return JSON.parse(saved);
     }
   } catch (e) {
     console.error('Error reading doctor from localStorage', e);
-  }
-  const defaultDoc = mosMembers[0]; // Dr. Vinita Chintaman More (#3761)
-  if (defaultDoc) {
-    const docSession = {
-      ...defaultDoc,
-      isVerified: true,
-      role: 'doctor',
-      lastLogin: new Date().toISOString()
-    };
-    localStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(docSession));
-    return docSession;
   }
   return null;
 }
