@@ -19,9 +19,11 @@ import {
   Sparkles,
   Award,
   Layers,
-  FileText
+  FileText,
+  Lock
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
+import { maskPhone, maskEmail, maskMembershipNo } from '../utils/masking';
 
 export default function JobsPage({ 
   jobs, 
@@ -311,6 +313,33 @@ export default function JobsPage({
       {/* TAB 1: BROWSE PUBLIC JOBS */}
       {activeTab === 'browse' && (
         <div>
+          {/* Guest Mode Notice Strip */}
+          {!currentDoctor && (
+            <div className="guest-mode-notice-banner">
+              <div className="guest-notice-left">
+                <div className="guest-notice-icon">
+                  <Lock size={20} />
+                </div>
+                <div>
+                  <div className="guest-notice-title">
+                    Guest Mode — Hospital & HR Contact Information Masked
+                  </div>
+                  <div className="guest-notice-sub">
+                    All ophthalmic job openings, specialties, and requirements are viewable. Direct hospital phone numbers, emails, and WhatsApp application links are protected for MOS members.
+                  </div>
+                </div>
+              </div>
+              <button 
+                className="btn-guest-unlock"
+                onClick={onOpenAuth}
+                id="btn-guest-unlock-jobs"
+              >
+                <ShieldCheck size={16} />
+                <span>Log In with MOS ID</span>
+              </button>
+            </div>
+          )}
+
           {/* Search & Filters */}
           <div className="filter-search-container">
             <div className="search-input-row">
@@ -444,39 +473,76 @@ export default function JobsPage({
                     </p>
 
                     <div style={{ marginTop: 'auto', borderTop: '1px solid #f1f5f9', paddingTop: '14px', display: 'flex', gap: '8px' }}>
-                      {waPhone && (
-                        <a 
-                          href={`https://wa.me/91${waPhone.slice(-10)}?text=${waText}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="btn-pluckcard-wa"
-                          style={{ flex: 1, padding: '9px 10px', fontSize: '0.82rem' }}
-                        >
-                          <WhatsAppIcon size={16} />
-                          <span>WhatsApp</span>
-                        </a>
-                      )}
+                      {currentDoctor ? (
+                        <>
+                          {waPhone && (
+                            <a 
+                              href={`https://wa.me/91${waPhone.slice(-10)}?text=${waText}`}
+                              target="_blank" 
+                              rel="noopener noreferrer" 
+                              className="btn-pluckcard-wa"
+                              style={{ flex: 1, padding: '9px 10px', fontSize: '0.82rem' }}
+                            >
+                              <WhatsAppIcon size={16} />
+                              <span>WhatsApp</span>
+                            </a>
+                          )}
 
-                      {cleanPhone && (
-                        <a 
-                          href={`tel:+91${cleanPhone.slice(-10)}`}
-                          className="btn-pluckcard-call"
-                          style={{ padding: '9px 12px' }}
-                          title="Call Hospital / Doctor"
-                        >
-                          <Phone size={15} />
-                        </a>
-                      )}
+                          {cleanPhone && (
+                            <a 
+                              href={`tel:+91${cleanPhone.slice(-10)}`}
+                              className="btn-pluckcard-call"
+                              style={{ padding: '9px 12px' }}
+                              title="Call Hospital / Doctor"
+                            >
+                              <Phone size={15} />
+                            </a>
+                          )}
 
-                      {job.contactEmail && (
-                        <a 
-                          href={`mailto:${job.contactEmail}?subject=${encodeURIComponent(`Application: ${job.title} - via MOS Connect`)}`}
-                          className="btn-pluckcard-call"
-                          style={{ padding: '9px 12px' }}
-                          title="Email CV"
-                        >
-                          <Mail size={15} />
-                        </a>
+                          {job.contactEmail && (
+                            <a 
+                              href={`mailto:${job.contactEmail}?subject=${encodeURIComponent(`Application: ${job.title} - via MOS Connect`)}`}
+                              className="btn-pluckcard-call"
+                              style={{ padding: '9px 12px' }}
+                              title="Email CV"
+                            >
+                              <Mail size={15} />
+                            </a>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <button 
+                            type="button"
+                            className="btn-pluckcard-wa"
+                            style={{ flex: 1, padding: '9px 10px', fontSize: '0.82rem' }}
+                            onClick={onOpenAuth}
+                            title="Log in with MOS credentials to apply on WhatsApp"
+                          >
+                            <Lock size={14} />
+                            <span>WhatsApp</span>
+                          </button>
+
+                          <button 
+                            type="button"
+                            className="btn-pluckcard-call"
+                            style={{ padding: '9px 12px' }}
+                            onClick={onOpenAuth}
+                            title="Log in with MOS credentials to call hospital"
+                          >
+                            <Lock size={13} />
+                          </button>
+
+                          <button 
+                            type="button"
+                            className="btn-pluckcard-call"
+                            style={{ padding: '9px 12px' }}
+                            onClick={onOpenAuth}
+                            title="Log in with MOS credentials to email CV"
+                          >
+                            <Mail size={14} />
+                          </button>
+                        </>
                       )}
 
                       <button 
@@ -836,33 +902,60 @@ export default function JobsPage({
               )}
 
               <div style={{ padding: '12px 16px', background: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '10px', marginBottom: '20px', fontSize: '0.82rem', color: '#0d9488' }}>
-                Verified Posting by: <strong>{selectedJobDetail.postedBy?.name}</strong> (MOS #{selectedJobDetail.postedBy?.membershipNo})
+                <div>Verified Posting by: <strong>{selectedJobDetail.postedBy?.name}</strong> (MOS #{maskMembershipNo(selectedJobDetail.postedBy?.membershipNo, !!currentDoctor)})</div>
+                <div style={{ marginTop: '4px', color: '#334155', fontSize: '0.8rem' }}>
+                  Contact: {maskPhone(selectedJobDetail.contactPhone, !!currentDoctor)} • {maskEmail(selectedJobDetail.contactEmail, !!currentDoctor)}
+                </div>
               </div>
 
               {/* Direct Apply Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                {selectedJobDetail.contactWhatsApp && (
-                  <a 
-                    href={`https://wa.me/91${selectedJobDetail.contactWhatsApp.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hello, I saw your job opening "${selectedJobDetail.title}" at ${selectedJobDetail.hospital} on MOS Connect.`)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-vendor-wa"
-                  >
-                    <WhatsAppIcon size={18} />
-                    <span>Apply via WhatsApp</span>
-                  </a>
-                )}
+              {currentDoctor ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  {selectedJobDetail.contactWhatsApp && (
+                    <a 
+                      href={`https://wa.me/91${selectedJobDetail.contactWhatsApp.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Hello, I saw your job opening "${selectedJobDetail.title}" at ${selectedJobDetail.hospital} on MOS Connect.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-vendor-wa"
+                    >
+                      <WhatsAppIcon size={18} />
+                      <span>Apply via WhatsApp</span>
+                    </a>
+                  )}
 
-                {selectedJobDetail.contactPhone && (
-                  <a 
-                    href={`tel:+91${selectedJobDetail.contactPhone.replace(/\D/g, '').slice(-10)}`}
-                    className="btn-vendor-call"
+                  {selectedJobDetail.contactPhone && (
+                    <a 
+                      href={`tel:+91${selectedJobDetail.contactPhone.replace(/\D/g, '').slice(-10)}`}
+                      className="btn-vendor-call"
+                    >
+                      <Phone size={17} />
+                      <span>Call Hospital</span>
+                    </a>
+                  )}
+                </div>
+              ) : (
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', textAlign: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px' }}>
+                    <Lock size={16} color="#0284c7" />
+                    <span>Hospital Contact Information Protected</span>
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#64748b', marginBottom: '14px', maxWidth: '420px', margin: '0 auto 14px auto' }}>
+                    Direct phone numbers, hospital HR contacts, and WhatsApp apply links are reserved for verified ophthalmologists.
+                  </p>
+                  <button 
+                    className="btn-guest-unlock"
+                    onClick={() => {
+                      setSelectedJobDetail(null);
+                      onOpenAuth();
+                    }}
+                    style={{ width: '100%', padding: '12px', justifyContent: 'center', fontSize: '0.95rem' }}
+                    id="btn-job-modal-login"
                   >
-                    <Phone size={17} />
-                    <span>Call Hospital</span>
-                  </a>
-                )}
-              </div>
+                    <ShieldCheck size={18} />
+                    <span>Log In with MOS ID to Apply Directly</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

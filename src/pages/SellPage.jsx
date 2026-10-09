@@ -15,7 +15,8 @@ import {
   MapPin,
   Camera,
   Layers,
-  ArrowRight
+  ArrowRight,
+  Lock
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
 
@@ -243,10 +244,38 @@ export default function SellPage({
 
       {/* VIEW 1: POST NEW AD FORM WITH LIVE PLUCKCARD PREVIEW */}
       {activeSubTab === 'post' && (
-        <div className="sell-layout">
-          {/* Form Side */}
-          <div className="sell-form-card">
-            <form onSubmit={handleSubmitAd}>
+        <div>
+          {/* Guest Mode Notice Strip */}
+          {!currentDoctor && (
+            <div className="guest-mode-notice-banner" style={{ marginBottom: '24px' }}>
+              <div className="guest-notice-left">
+                <div className="guest-notice-icon">
+                  <Lock size={20} />
+                </div>
+                <div>
+                  <div className="guest-notice-title">
+                    Guest Mode — Seller Publishing Gated
+                  </div>
+                  <div className="guest-notice-sub">
+                    You can test the equipment form and preview your live Pluckcard below. To publish your listing to the MOS Connect Buy directory, log in with your MOS Credentials.
+                  </div>
+                </div>
+              </div>
+              <button 
+                className="btn-guest-unlock"
+                onClick={onOpenAuth}
+                id="btn-guest-unlock-sell"
+              >
+                <ShieldCheck size={16} />
+                <span>Log In with MOS ID</span>
+              </button>
+            </div>
+          )}
+
+          <div className="sell-layout">
+            {/* Form Side */}
+            <div className="sell-form-card">
+              <form onSubmit={handleSubmitAd}>
               {/* Doctor Session Verification Bar */}
               <div style={{ background: '#f0fdfa', border: '1px solid #99f6e4', padding: '14px 18px', borderRadius: '12px', marginBottom: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
@@ -487,6 +516,7 @@ export default function SellPage({
               onToggleSave={() => {}}
               onOpenDetails={() => {}}
               currentDoctor={currentDoctor}
+              onOpenAuth={onOpenAuth}
             />
 
             <div style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0', fontSize: '0.8rem', color: '#64748b' }}>
@@ -494,6 +524,7 @@ export default function SellPage({
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* VIEW 2: MY EQUIPMENT LISTINGS (SELLER PROFILE DASHBOARD) */}

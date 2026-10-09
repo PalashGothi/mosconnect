@@ -12,12 +12,14 @@ import {
   CheckCircle2,
   SlidersHorizontal,
   ThumbsUp,
-  Award
+  Award,
+  Lock
 } from 'lucide-react';
 import vendorsData from '../data/vendors.json';
 import WhatsAppIcon from '../components/WhatsAppIcon';
+import { maskPhone } from '../utils/masking';
 
-export default function VendorsPage() {
+export default function VendorsPage({ currentDoctor, onOpenAuth }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -167,6 +169,33 @@ export default function VendorsPage() {
         </div>
       </div>
 
+      {/* Guest Mode Notice Strip */}
+      {!currentDoctor && (
+        <div className="guest-mode-notice-banner" style={{ marginTop: '24px' }}>
+          <div className="guest-notice-left">
+            <div className="guest-notice-icon">
+              <Lock size={20} />
+            </div>
+            <div>
+              <div className="guest-notice-title">
+                Guest Mode — Biomedical Engineer Direct Contacts Masked
+              </div>
+              <div className="guest-notice-sub">
+                Browse verified technicians, brand specializations, and service locations. Direct engineer phone numbers and WhatsApp connections are protected for MOS members.
+              </div>
+            </div>
+          </div>
+          <button 
+            className="btn-guest-unlock"
+            onClick={onOpenAuth}
+            id="btn-guest-unlock-vendors"
+          >
+            <ShieldCheck size={16} />
+            <span>Log In with MOS ID</span>
+          </button>
+        </div>
+      )}
+
       {/* Search & Filter Bar */}
       <div className="filter-search-container">
         <div className="search-input-row">
@@ -307,25 +336,55 @@ export default function VendorsPage() {
 
                 {/* Contact Actions */}
                 <div className="vendor-card-footer">
-                  <a 
-                    href={waLink} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="btn-vendor-wa"
-                    id={`btn-wa-vendor-${vendor.id}`}
-                  >
-                    <WhatsAppIcon size={17} />
-                    <span>WhatsApp</span>
-                  </a>
+                  {currentDoctor ? (
+                    <>
+                      <a 
+                        href={waLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="btn-vendor-wa"
+                        id={`btn-wa-vendor-${vendor.id}`}
+                      >
+                        <WhatsAppIcon size={17} />
+                        <span>WhatsApp</span>
+                      </a>
 
-                  <a 
-                    href={callLink}
-                    className="btn-vendor-call"
-                    id={`btn-call-vendor-${vendor.id}`}
-                  >
-                    <Phone size={15} />
-                    <span>Call: {vendor.phones?.[0]?.replace('+91', '') || 'Contact'}</span>
-                  </a>
+                      <a 
+                        href={callLink}
+                        className="btn-vendor-call"
+                        id={`btn-call-vendor-${vendor.id}`}
+                      >
+                        <Phone size={15} />
+                        <span>Call: {vendor.phones?.[0]?.replace('+91', '') || 'Contact'}</span>
+                      </a>
+                    </>
+                  ) : (
+                    <>
+                      <button 
+                        type="button"
+                        className="btn-vendor-wa"
+                        onClick={onOpenAuth}
+                        id={`btn-wa-vendor-${vendor.id}`}
+                        title="Log in with MOS credentials to connect on WhatsApp"
+                        style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                      >
+                        <Lock size={15} />
+                        <span>WhatsApp</span>
+                      </button>
+
+                      <button 
+                        type="button"
+                        className="btn-vendor-call"
+                        onClick={onOpenAuth}
+                        id={`btn-call-vendor-${vendor.id}`}
+                        title="Log in with MOS credentials to call engineer"
+                        style={{ border: 'none', cursor: 'pointer', fontFamily: 'inherit' }}
+                      >
+                        <Lock size={14} />
+                        <span>Call: {maskPhone(primaryPhone, false)}</span>
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             );

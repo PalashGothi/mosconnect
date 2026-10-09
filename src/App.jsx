@@ -208,7 +208,10 @@ export default function App() {
         )}
 
         {activeTab === 'vendors' && (
-          <VendorsPage />
+          <VendorsPage 
+            currentDoctor={currentDoctor}
+            onOpenAuth={() => setIsAuthOpen(true)}
+          />
         )}
 
         {activeTab === 'admin' && currentDoctor?.role === 'admin' && (

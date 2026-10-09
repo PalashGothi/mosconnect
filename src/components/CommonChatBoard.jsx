@@ -11,8 +11,10 @@ import {
   HelpCircle,
   ShieldCheck,
   CornerDownRight,
-  MessageCircle
+  MessageCircle,
+  Lock
 } from 'lucide-react';
+import { maskMembershipNo } from '../utils/masking';
 
 export default function CommonChatBoard({ 
   posts, 
@@ -134,6 +136,33 @@ export default function CommonChatBoard({
         </button>
       </div>
 
+      {/* Guest Mode Notice Strip */}
+      {!currentDoctor && (
+        <div className="guest-mode-notice-banner" style={{ marginTop: '20px', marginBottom: '20px' }}>
+          <div className="guest-notice-left">
+            <div className="guest-notice-icon">
+              <Lock size={20} />
+            </div>
+            <div>
+              <div className="guest-notice-title">
+                Guest Mode — Community Inquiries & Replies Protected
+              </div>
+              <div className="guest-notice-sub">
+                Browse equipment wanted posts across Maharashtra. Log in with your MOS Credentials to post new requirements or reply directly to fellow ophthalmologists.
+              </div>
+            </div>
+          </div>
+          <button 
+            className="btn-guest-unlock"
+            onClick={onOpenAuth}
+            id="btn-guest-unlock-chat"
+          >
+            <ShieldCheck size={16} />
+            <span>Log In with MOS ID</span>
+          </button>
+        </div>
+      )}
+
       {/* Thread Feed */}
       <div className="chat-thread-list">
         {posts.length === 0 ? (
@@ -154,7 +183,7 @@ export default function CommonChatBoard({
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <span className="chat-author-name">{post.doctorName}</span>
                       <span className="mos-seal" style={{ padding: '2px 7px', fontSize: '0.68rem' }}>
-                        MOS #{post.membershipNo}
+                        MOS #{maskMembershipNo(post.membershipNo, !!currentDoctor)}
                       </span>
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
@@ -224,7 +253,7 @@ export default function CommonChatBoard({
                     <div key={rep.id} className="reply-bubble">
                       <div className="reply-header">
                         <span className="reply-author">
-                          {rep.authorName} <span style={{ color: '#059669', fontSize: '0.72rem', fontWeight: 600 }}>({rep.authorMembershipNo?.startsWith('Vendor') ? 'Verified Technician' : `MOS #${rep.authorMembershipNo}`})</span>
+                          {rep.authorName} <span style={{ color: '#059669', fontSize: '0.72rem', fontWeight: 600 }}>({rep.authorMembershipNo?.startsWith('Vendor') ? 'Verified Technician' : `MOS #${maskMembershipNo(rep.authorMembershipNo, !!currentDoctor)}`})</span>
                         </span>
                         <span>{new Date(rep.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
@@ -236,37 +265,54 @@ export default function CommonChatBoard({
 
                   {/* Inline Reply Box */}
                   {activeReplyPostId === post.id && (
-                    <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
-                      <input 
-                        type="text" 
-                        className="form-input"
-                        style={{ padding: '8px 12px', fontSize: '0.85rem' }}
-                        placeholder={`Write reply to ${post.doctorName}...`}
-                        value={replyText}
-                        onChange={e => setReplyText(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter') handleSendReply(post.id); }}
-                        autoFocus
-                        id={`input-reply-${post.id}`}
-                      />
-                      <button 
-                        onClick={() => handleSendReply(post.id)}
-                        style={{
-                          background: '#0284c7',
-                          color: '#ffffff',
-                          padding: '8px 16px',
-                          borderRadius: '8px',
-                          fontWeight: 700,
-                          fontSize: '0.85rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                        id={`btn-send-reply-${post.id}`}
-                      >
-                        <Send size={14} />
-                        <span>Send</span>
-                      </button>
-                    </div>
+                    currentDoctor ? (
+                      <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                        <input 
+                          type="text" 
+                          className="form-input"
+                          style={{ padding: '8px 12px', fontSize: '0.85rem' }}
+                          placeholder={`Write reply to ${post.doctorName}...`}
+                          value={replyText}
+                          onChange={e => setReplyText(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter') handleSendReply(post.id); }}
+                          autoFocus
+                          id={`input-reply-${post.id}`}
+                        />
+                        <button 
+                          onClick={() => handleSendReply(post.id)}
+                          style={{
+                            background: '#0284c7',
+                            color: '#ffffff',
+                            padding: '8px 16px',
+                            borderRadius: '8px',
+                            fontWeight: 700,
+                            fontSize: '0.85rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px'
+                          }}
+                          id={`btn-send-reply-${post.id}`}
+                        >
+                          <Send size={14} />
+                          <span>Send</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '10px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#475569' }}>
+                          <Lock size={15} color="#0284c7" />
+                          <span>Log in with your MOS Credentials to send a reply to this doctor.</span>
+                        </div>
+                        <button 
+                          className="btn-guest-unlock"
+                          onClick={onOpenAuth}
+                          style={{ padding: '6px 14px', fontSize: '0.78rem' }}
+                        >
+                          <ShieldCheck size={14} />
+                          <span>Log In</span>
+                        </button>
+                      </div>
+                    )
                   )}
                 </div>
               )}

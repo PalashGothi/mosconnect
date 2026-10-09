@@ -14,11 +14,13 @@ import {
   X,
   Sparkles,
   Calendar,
-  MapPin
+  MapPin,
+  Lock
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import HeroBannerSwitcher from '../components/HeroBannerSwitcher';
+import { maskPhone, maskMembershipNo } from '../utils/masking';
 
 export default function BuyPage({ 
   listings, 
@@ -202,6 +204,33 @@ export default function BuyPage({
         </button>
       </div>
 
+      {/* Guest Mode Notice Strip */}
+      {!currentDoctor && (
+        <div className="guest-mode-notice-banner">
+          <div className="guest-notice-left">
+            <div className="guest-notice-icon">
+              <Lock size={20} />
+            </div>
+            <div>
+              <div className="guest-notice-title">
+                Guest Mode — Doctor & Engineer Contacts Masked
+              </div>
+              <div className="guest-notice-sub">
+                Equipment photos, clinical specs, and pricing are openly viewable. Direct WhatsApp chat and phone numbers are protected for verified MOS members.
+              </div>
+            </div>
+          </div>
+          <button 
+            className="btn-guest-unlock"
+            onClick={onOpenAuth}
+            id="btn-guest-unlock-buy"
+          >
+            <ShieldCheck size={16} />
+            <span>Log In with MOS ID</span>
+          </button>
+        </div>
+      )}
+
       {/* Pluckcard Equipment Grid */}
       {filteredListings.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
@@ -242,6 +271,7 @@ export default function BuyPage({
               onToggleSave={onToggleSave}
               onOpenDetails={setSelectedDetailListing}
               currentDoctor={currentDoctor}
+              onOpenAuth={onOpenAuth}
             />
           ))}
         </div>
@@ -330,32 +360,59 @@ export default function BuyPage({
                     <div style={{ fontSize: '0.82rem', color: '#334155', marginTop: '2px' }}>
                       {selectedDetailListing.clinicName || 'Ophthalmic Clinic'} • {selectedDetailListing.sellerCity}
                     </div>
+                    <div style={{ fontSize: '0.82rem', color: '#0d9488', marginTop: '4px', fontWeight: 600 }}>
+                      Phone: {maskPhone(selectedDetailListing.sellerMobile, !!currentDoctor)}
+                    </div>
                   </div>
                   <span className="mos-seal">
-                    MOS #{selectedDetailListing.sellerMembershipNo}
+                    MOS #{maskMembershipNo(selectedDetailListing.sellerMembershipNo, !!currentDoctor)}
                   </span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                <a 
-                  href={`https://wa.me/91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${selectedDetailListing.sellerName}, I am contacting you regarding your ${selectedDetailListing.title} on MOS Connect.`)}`}
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="btn-vendor-wa"
-                >
-                  <WhatsAppIcon size={19} />
-                  <span>Connect on WhatsApp</span>
-                </a>
-                <a 
-                  href={`tel:+91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}`}
-                  className="btn-vendor-call"
-                >
-                  <Phone size={18} />
-                  <span>Call Doctor Directly</span>
-                </a>
-              </div>
+              {currentDoctor ? (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <a 
+                    href={`https://wa.me/91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${selectedDetailListing.sellerName}, I am contacting you regarding your ${selectedDetailListing.title} on MOS Connect.`)}`}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn-vendor-wa"
+                  >
+                    <WhatsAppIcon size={19} />
+                    <span>Connect on WhatsApp</span>
+                  </a>
+                  <a 
+                    href={`tel:+91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}`}
+                    className="btn-vendor-call"
+                  >
+                    <Phone size={18} />
+                    <span>Call Doctor Directly</span>
+                  </a>
+                </div>
+              ) : (
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', textAlign: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px' }}>
+                    <Lock size={16} color="#0284c7" />
+                    <span>Doctor Contact Information Protected</span>
+                  </div>
+                  <p style={{ fontSize: '0.84rem', color: '#64748b', marginBottom: '14px', maxWidth: '420px', margin: '0 auto 14px auto' }}>
+                    Direct phone numbers and WhatsApp connections are reserved for verified MOS ophthalmic members.
+                  </p>
+                  <button 
+                    className="btn-guest-unlock"
+                    onClick={() => {
+                      setSelectedDetailListing(null);
+                      onOpenAuth();
+                    }}
+                    style={{ width: '100%', padding: '12px', justifyContent: 'center', fontSize: '0.95rem' }}
+                    id="btn-detail-modal-login"
+                  >
+                    <ShieldCheck size={18} />
+                    <span>Log In with MOS ID to Connect with Doctor</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

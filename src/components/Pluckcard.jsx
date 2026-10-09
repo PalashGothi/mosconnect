@@ -11,16 +11,19 @@ import {
   Calendar,
   Sparkles,
   Building2,
-  X
+  X,
+  Lock
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
+import { maskMembershipNo } from '../utils/masking';
 
 export default function Pluckcard({ 
   listing, 
   isSaved, 
-  onToggleSave,
-  onOpenDetails,
-  currentDoctor
+  onToggleSave, 
+  onOpenDetails, 
+  currentDoctor,
+  onOpenAuth
 }) {
   const [copiedShare, setCopiedShare] = useState(false);
 
@@ -96,7 +99,7 @@ export default function Pluckcard({
           
           <div className="mos-seal">
             <ShieldCheck size={12} />
-            <span>MOS #{listing.sellerMembershipNo}</span>
+            <span>MOS #{maskMembershipNo(listing.sellerMembershipNo, !!currentDoctor)}</span>
           </div>
         </div>
       </div>
@@ -158,27 +161,55 @@ export default function Pluckcard({
 
           {/* Action buttons */}
           <div className="pluckcard-action-bar">
-            <a 
-              href={waUrl} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="btn-pluckcard-wa"
-              title="Chat directly on WhatsApp with doctor"
-              id={`btn-wa-${listing.id}`}
-            >
-              <WhatsAppIcon size={16} />
-              <span>WhatsApp</span>
-            </a>
+            {currentDoctor ? (
+              <>
+                <a 
+                  href={waUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="btn-pluckcard-wa"
+                  title="Chat directly on WhatsApp with doctor"
+                  id={`btn-wa-${listing.id}`}
+                >
+                  <WhatsAppIcon size={16} />
+                  <span>WhatsApp</span>
+                </a>
 
-            <a 
-              href={callUrl} 
-              className="btn-pluckcard-call"
-              title="Call doctor directly"
-              id={`btn-call-${listing.id}`}
-            >
-              <Phone size={14} />
-              <span>Call Doctor</span>
-            </a>
+                <a 
+                  href={callUrl} 
+                  className="btn-pluckcard-call"
+                  title="Call doctor directly"
+                  id={`btn-call-${listing.id}`}
+                >
+                  <Phone size={14} />
+                  <span>Call Doctor</span>
+                </a>
+              </>
+            ) : (
+              <>
+                <button 
+                  type="button"
+                  className="btn-pluckcard-wa"
+                  onClick={onOpenAuth}
+                  title="Log in with MOS credentials to connect on WhatsApp"
+                  id={`btn-wa-${listing.id}`}
+                >
+                  <Lock size={14} />
+                  <span>WhatsApp</span>
+                </button>
+
+                <button 
+                  type="button"
+                  className="btn-pluckcard-call"
+                  onClick={onOpenAuth}
+                  title="Log in with MOS credentials to call doctor"
+                  id={`btn-call-${listing.id}`}
+                >
+                  <Lock size={13} />
+                  <span>Call Doctor</span>
+                </button>
+              </>
+            )}
 
             <button 
               className="btn-pluckcard-detail"
