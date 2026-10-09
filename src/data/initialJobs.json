@@ -1,0 +1,184 @@
+[
+  {
+    "id": "job-101",
+    "title": "Consultant Vitreoretina Surgeon (Medical & Surgical)",
+    "hospital": "Netra Super Specialty Eye Hospital",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "specialization": "Vitreoretina",
+    "jobType": "Full Time",
+    "experience": "2+ Years Post-Fellowship",
+    "salary": "₹ 2,50,000 - ₹ 3,50,000 / month",
+    "description": "Looking for a skilled Vitreoretinal Surgeon to lead our retina department in Pune. Must be proficient in 23G/25G pars plana vitrectomy, retinal detachment surgery, diabetic vitrectomy, and intravitreal anti-VEGF injections. Hospital equipped with Constellation Vision System and Zeiss Lumera 700.",
+    "requirements": [
+      "MS / DNB / DO in Ophthalmology",
+      "Long-term Fellowship in Vitreoretinal Surgery (FVRS)",
+      "Registered with Maharashtra Medical Council (MMC)",
+      "Expertise in Retinal Angiography, OCT interpretation & Retinal Lasers"
+    ],
+    "contactEmail": "careers@netraeyeclinic.com",
+    "contactPhone": "9822872292",
+    "contactWhatsApp": "9822872292",
+    "postedBy": {
+      "name": "Dr. Sachin Gajanan Pagade",
+      "membershipNo": "3740",
+      "email": "drpagade@gmail.com",
+      "mobile": "9822872292"
+    },
+    "status": "approved",
+    "postedAt": "2026-09-22T10:00:00Z",
+    "approvedAt": "2026-09-22T14:30:00Z",
+    "approvedBy": "Admin (Developer Override)"
+  },
+  {
+    "id": "job-102",
+    "title": "Full-Time Phaco & Refractive Cataract Surgeon",
+    "hospital": "Apex Netralaya",
+    "city": "Mumbai (Dadar)",
+    "state": "Maharashtra",
+    "specialization": "Phaco / Cataract",
+    "jobType": "Full Time",
+    "experience": "3+ Years High-Volume Phaco",
+    "salary": "₹ 2,00,000 - ₹ 3,00,000 / month + Incentives",
+    "description": "Reputed eye care hospital in Dadar West looking for an experienced Cataract & Refractive Surgeon capable of handling 80-120 phacoemulsification surgeries per month. OT equipped with Alcon Centurion Vision System and Leica M844 microscope.",
+    "requirements": [
+      "MS / DNB in Ophthalmology",
+      "Proven track record in topical Phaco, Toric, and Multifocal / EDOF IOLs",
+      "Excellent patient communication skills in Marathi / Hindi / English",
+      "MMC registration mandatory"
+    ],
+    "contactEmail": "hr@apexnetralaya.org",
+    "contactPhone": "9987534374",
+    "contactWhatsApp": "9987534374",
+    "postedBy": {
+      "name": "Dr. Nirzari Mahesh Shah",
+      "membershipNo": "3759",
+      "email": "nirzarishah@ymail.com",
+      "mobile": "9987534374"
+    },
+    "status": "approved",
+    "postedAt": "2026-09-24T09:15:00Z",
+    "approvedAt": "2026-09-24T11:00:00Z",
+    "approvedBy": "Admin (Developer Override)"
+  },
+  {
+    "id": "job-103",
+    "title": "Senior Consultant Glaucoma Specialist",
+    "hospital": "Poona Eye Institute",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "specialization": "Glaucoma",
+    "jobType": "Visiting Consultant",
+    "experience": "5+ Years",
+    "salary": "Revenue Sharing / Per OPD & Surgery",
+    "description": "Established institute seeking Visiting Glaucoma Specialist for 2 days a week OPD and surgeries (Trabeculectomy with MMC, Ahmed Glaucoma Valve, and MIGS). Clinic equipped with Humphrey HFA 3 and Heidelberg OCT.",
+    "requirements": [
+      "MS / DNB in Ophthalmology with Fellowship in Glaucoma",
+      "Proficient in gonioscopy, visual field analysis, and laser trabeculoplasty",
+      "Available for Tuesday & Friday sessions"
+    ],
+    "contactEmail": "glaucoma.dept@poonaeye.com",
+    "contactPhone": "9860651897",
+    "contactWhatsApp": "9860651897",
+    "postedBy": {
+      "name": "Dr. Aishwarya Patil",
+      "membershipNo": "3760",
+      "email": "aishusanjaypatil@gmail.com",
+      "mobile": "8149315594"
+    },
+    "status": "approved",
+    "postedAt": "2026-09-26T14:40:00Z",
+    "approvedAt": "2026-09-26T16:20:00Z",
+    "approvedBy": "Admin (Developer Override)"
+  },
+  {
+    "id": "job-104",
+    "title": "Senior Optometrist & Contact Lens Practitioner",
+    "hospital": "Shinde Eye Clinic & Optical Center",
+    "city": "Nashik",
+    "state": "Maharashtra",
+    "specialization": "Optometry",
+    "jobType": "Full Time",
+    "experience": "1 - 3 Years",
+    "salary": "₹ 35,000 - ₹ 50,000 / month",
+    "description": "Leading eye hospital in Nashik invites applications from qualified Optometrists for subjective refraction, keratometry, biometry (IOL Master), pediatric refraction, and specialty contact lens fitting (RGP / Rose K).",
+    "requirements": [
+      "B.Sc Optometry or B.Optom from a recognized institute",
+      "Familiarity with Auto-Refractometers, Phoropters, and A-scan",
+      "Polite patient-facing demeanor"
+    ],
+    "contactEmail": "shinde.optometry@gmail.com",
+    "contactPhone": "9820835457",
+    "contactWhatsApp": "9820835457",
+    "postedBy": {
+      "name": "Dr. Vinita Chintaman More",
+      "membershipNo": "3761",
+      "email": "vinitamore2@gmail.com",
+      "mobile": "7020980200"
+    },
+    "status": "approved",
+    "postedAt": "2026-09-27T11:20:00Z",
+    "approvedAt": "2026-09-27T15:00:00Z",
+    "approvedBy": "Admin (Developer Override)"
+  },
+  {
+    "id": "job-105",
+    "title": "Ophthalmic OT Technician & CSSD Supervisor",
+    "hospital": "Vidarbha Regional Eye Hospital",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "specialization": "OT Technician",
+    "jobType": "Full Time",
+    "experience": "2+ Years in Ophthalmic OT",
+    "salary": "₹ 28,000 - ₹ 42,000 / month",
+    "description": "Urgent requirement for an experienced Ophthalmic Operation Theatre Technician. Responsibilities include handling phaco tubing, microscope positioning, autoclave ETO cycles, micro-surgical instrument maintenance, and OT sterility protocols.",
+    "requirements": [
+      "Diploma in Operation Theatre Technology (DOTT)",
+      "Hands-on experience with Alcon/AMO phaco machines and operating microscopes",
+      "Knowledge of sterilization standards and sterile tray preparation"
+    ],
+    "contactEmail": "ot.admin@vidarbhaeye.org",
+    "contactPhone": "8130983042",
+    "contactWhatsApp": "8130983042",
+    "postedBy": {
+      "name": "Dr. S. Kathiravan",
+      "membershipNo": "3745",
+      "email": "kathiravan.med@gmail.com",
+      "mobile": "8130983042"
+    },
+    "status": "approved",
+    "postedAt": "2026-09-28T08:30:00Z",
+    "approvedAt": "2026-09-28T12:00:00Z",
+    "approvedBy": "Admin (Developer Override)"
+  },
+  {
+    "id": "job-106",
+    "title": "Clinical Fellowship in Cornea & Refractive Surgery",
+    "hospital": "Maharashtra Eye Foundation & Laser Institute",
+    "city": "Thane / Mumbai",
+    "state": "Maharashtra",
+    "specialization": "Cornea",
+    "jobType": "Fellowship",
+    "experience": "Fresh Post-Graduates Welcome",
+    "salary": "₹ 65,000 / month Stipend",
+    "description": "Comprehensive 18-month fellowship covering full-thickness and lamellar keratoplasty (DALK, DSEK, DMEK), corneal collagen cross-linking (CXL), topography, and anterior segment reconstruction.",
+    "requirements": [
+      "MS / DNB in Ophthalmology (Passed in 2024, 2025, or 2026)",
+      "Strong interest in academic research and corneal surgery",
+      "MMC registered"
+    ],
+    "contactEmail": "fellowship@mah-eyefoundation.org",
+    "contactPhone": "7020980200",
+    "contactWhatsApp": "7020980200",
+    "postedBy": {
+      "name": "Dr. Vinita Chintaman More",
+      "membershipNo": "3761",
+      "email": "vinitamore2@gmail.com",
+      "mobile": "7020980200"
+    },
+    "status": "pending",
+    "postedAt": "2026-10-02T16:00:00Z",
+    "approvedAt": null,
+    "approvedBy": null
+  }
+]

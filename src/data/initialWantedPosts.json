@@ -1,0 +1,72 @@
+[
+  {
+    "id": "req-201",
+    "doctorName": "Dr. Nirzari Mahesh Shah",
+    "membershipNo": "3759",
+    "doctorCity": "Mumbai",
+    "equipmentName": "Zeiss Cirrus HD-OCT 5000 or 500",
+    "category": "OCT & Fundus",
+    "targetBudget": "₹ 18,00,000 - ₹ 22,00,000",
+    "urgency": "Immediate (Within 2 weeks)",
+    "description": "Looking for a well-maintained Zeiss Cirrus 5000 or 500 OCT with anterior segment module in Mumbai, Thane, or Pune. Must be currently under AMC or verified by Zeiss engineer.",
+    "createdAt": "2026-09-18T10:30:00Z",
+    "replies": [
+      {
+        "id": "rep-301",
+        "authorName": "Dr. Sachin Gajanan Pagade",
+        "authorMembershipNo": "3740",
+        "message": "Dr. Nirzari, please contact engineer Sanjiv Kundargi (9325775015). He has a clean Cirrus 4000/5000 unit coming out of an institutional upgrade in Pune.",
+        "createdAt": "2026-09-18T14:15:00Z"
+      },
+      {
+        "id": "rep-302",
+        "authorName": "Prasad Zeiss (Ovi MediServ)",
+        "authorMembershipNo": "Vendor-Verified",
+        "message": "Hello Doctor, I have one Cirrus 5000 ready in Borivali with AngioPlex OCTA license. You can inspect it at our workshop. Contact: 9004732061.",
+        "createdAt": "2026-09-19T09:00:00Z"
+      }
+    ]
+  },
+  {
+    "id": "req-202",
+    "doctorName": "Dr. Aishwarya Patil",
+    "membershipNo": "3760",
+    "doctorCity": "Ahilyanagar (Ahmednagar)",
+    "equipmentName": "Alcon Laureate or Centurion Phaco Handpieces (OZil)",
+    "category": "Phaco Machines",
+    "targetBudget": "₹ 80,000 - ₹ 1,50,000",
+    "urgency": "Urgent",
+    "description": "Need 2 working backup OZil phaco handpieces for our OT in Ahmednagar. Either refurbished or tested with test certificate.",
+    "createdAt": "2026-09-17T16:45:00Z",
+    "replies": [
+      {
+        "id": "rep-303",
+        "authorName": "Dr. Vinita More",
+        "authorMembershipNo": "3761",
+        "message": "You can check with Gyaneshwar Yaduwanshi (9407424027). He serviced both my laureate handpieces at reasonable rate and they work like new.",
+        "createdAt": "2026-09-18T08:10:00Z"
+      }
+    ]
+  },
+  {
+    "id": "req-203",
+    "doctorName": "Dr. TADAVI PAWAN RAMJAN",
+    "membershipNo": "3758",
+    "doctorCity": "Jalgaon",
+    "equipmentName": "Ophthalmic Refraction Chair Unit with Motorized Table",
+    "category": "Chair Units",
+    "targetBudget": "₹ 1,00,000 - ₹ 1,60,000",
+    "urgency": "Within 1 month",
+    "description": "Setting up a second consulting room in Jalgaon. Need complete motorized chair unit with slit lamp sliding table and trial lens drawer.",
+    "createdAt": "2026-09-16T11:20:00Z",
+    "replies": [
+      {
+        "id": "rep-304",
+        "authorName": "Narayan Channa (Heritage Surgicals)",
+        "authorMembershipNo": "Vendor-Verified",
+        "message": "We have 3 refurbished Appasamy and Chaxu motorized chair units in excellent condition, can dispatch and install in Jalgaon. Contact: 7875127875.",
+        "createdAt": "2026-09-17T12:00:00Z"
+      }
+    ]
+  }
+]
