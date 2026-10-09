@@ -424,7 +424,7 @@ export default function JobsPage({
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
-              {filteredJobs.map(job => {
+              {(currentDoctor ? filteredJobs : filteredJobs.slice(0, 2)).map(job => {
                 const cleanPhone = job.contactPhone ? job.contactPhone.replace(/\D/g, '') : '';
                 const waPhone = job.contactWhatsApp ? job.contactWhatsApp.replace(/\D/g, '') : cleanPhone;
                 const waText = encodeURIComponent(
@@ -463,7 +463,7 @@ export default function JobsPage({
                       {job.salary && (
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#059669', fontWeight: 700 }}>
                           <IndianRupee size={13} />
-                          <span>{job.salary}</span>
+                          <span>{currentDoctor ? job.salary : '₹ ••••••• (Member Only)'}</span>
                         </span>
                       )}
                     </div>
@@ -556,6 +556,30 @@ export default function JobsPage({
                   </div>
                 );
               })}
+
+              {/* Membership Gate for Jobs */}
+              {!currentDoctor && filteredJobs.length > 2 && (
+                <div className="pluckcard-locked-gate-card" id="jobs-lock-gate">
+                  <div className="locked-gate-icon">
+                    <Lock size={30} />
+                  </div>
+                  <span className="locked-gate-tag">MOS MEMBER EXCLUSIVE CAREER PORTAL</span>
+                  <h3 className="locked-gate-title">
+                    +{filteredJobs.length - 2} More Ophthalmic Positions Protected
+                  </h3>
+                  <p className="locked-gate-desc">
+                    Complete salary compensation ranges, hospital HR direct contacts, and WhatsApp apply links across Maharashtra are reserved for verified MOS ophthalmologists.
+                  </p>
+                  <button 
+                    className="btn-locked-gate-login"
+                    onClick={onOpenAuth}
+                    id="btn-gate-login-jobs"
+                  >
+                    <ShieldCheck size={18} />
+                    <span>Log In with MOS ID to View All Vacancies ({filteredJobs.length})</span>
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -875,7 +899,7 @@ export default function JobsPage({
                 </div>
                 {selectedJobDetail.salary && (
                   <div style={{ marginTop: '8px', fontSize: '1.05rem', fontWeight: 800, color: '#059669' }}>
-                    {selectedJobDetail.salary}
+                    {currentDoctor ? selectedJobDetail.salary : '₹ ••••••• (Member Only Compensation)'}
                   </div>
                 )}
               </div>

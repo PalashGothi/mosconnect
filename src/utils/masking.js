@@ -27,3 +27,27 @@ export function maskMembershipNo(membershipNo, isAuthorized) {
   if (str.length <= 2) return '••';
   return `${str.slice(0, 2)}••`;
 }
+
+export function maskDoctorName(name, isAuthorized) {
+  if (isAuthorized || !name) return name;
+  const trimmed = name.replace(/^Dr\.?\s*/i, '').trim();
+  const parts = trimmed.split(' ');
+  if (parts.length >= 2) {
+    const first = parts[0][0] + '••••••';
+    const last = parts[parts.length - 1][0] + '•••••';
+    return `Dr. ${first} ${last} (MOS Member)`;
+  }
+  return `Dr. ${trimmed.slice(0, 1)}•••••• (MOS Member)`;
+}
+
+export function maskPrice(priceFormatted, isAuthorized) {
+  if (isAuthorized) return priceFormatted;
+  return '₹ ••••••• (Member Price)';
+}
+
+export function maskTeaser(text, isAuthorized, maxChars = 60) {
+  if (isAuthorized || !text) return text;
+  if (text.length <= maxChars) return text;
+  return `${text.slice(0, maxChars)}... (Log in to read full details)`;
+}
+

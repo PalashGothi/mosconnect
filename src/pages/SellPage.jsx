@@ -174,6 +174,107 @@ export default function SellPage({
     status: 'Available'
   };
 
+  // If user is a guest, render the high-converting Member Seller Gateway instead of raw form
+  if (!currentDoctor) {
+    return (
+      <div className="seller-gateway-container">
+        {/* Gateway hero banner */}
+        <div className="seller-gateway-hero">
+          <div className="seller-gateway-badge">
+            <ShieldCheck size={16} />
+            <span>Official MOS Doctor Seller Portal</span>
+          </div>
+          <h2 className="seller-gateway-title">
+            List Your Equipment for Sale to <span>3,745 Verified Doctors</span> Across Maharashtra
+          </h2>
+          <p className="seller-gateway-subtitle">
+            Post your surgical microscope, phaco machine, slit lamp, or laser directly to fellow practicing ophthalmologists. Zero commission, verified doctor credentials, and direct WhatsApp buyer inquiries.
+          </p>
+
+          <div className="seller-gateway-cta-row">
+            <button 
+              className="btn-gateway-login-main"
+              onClick={onOpenAuth}
+              id="btn-seller-gateway-login"
+            >
+              <Lock size={18} />
+              <span>Log In with MOS ID to Post Equipment</span>
+            </button>
+            <button 
+              className="btn-gateway-browse-sample"
+              onClick={onViewOnBuyPage}
+            >
+              <span>Browse Existing Equipment →</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Benefits Grid */}
+        <div className="seller-benefits-grid">
+          <div className="seller-benefit-card">
+            <div className="seller-benefit-icon" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+              <Eye size={22} />
+            </div>
+            <h4>Exclusively Ophthalmology Doctors</h4>
+            <p>Direct access to 3,745 verified MOS members in Mumbai, Pune, Nagpur, Nashik looking for equipment.</p>
+          </div>
+
+          <div className="seller-benefit-card">
+            <div className="seller-benefit-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+              <CheckCircle size={22} />
+            </div>
+            <h4>Zero Brokerage / 100% Direct</h4>
+            <p>Negotiate directly on WhatsApp or call with fellow doctors. No middlemen, no commissions, no delayed payments.</p>
+          </div>
+
+          <div className="seller-benefit-card">
+            <div className="seller-benefit-icon" style={{ background: '#fef3c7', color: '#d97706' }}>
+              <ShieldCheck size={22} />
+            </div>
+            <h4>Verified Peer Trust</h4>
+            <p>Your listing displays an official MOS verified badge with your membership number, establishing immediate trust.</p>
+          </div>
+        </div>
+
+        {/* Live Preview Teaser Card */}
+        <div className="seller-preview-teaser-wrap">
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <span className="brand-pill">PREVIEW YOUR PLUCKCARD</span>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a', marginTop: '6px' }}>
+              How Your Equipment Will Appear to Fellow Doctors
+            </h3>
+            <p style={{ fontSize: '0.85rem', color: '#64748b' }}>
+              Your listing gets transformed into an interactive Pluckcard on the Buy page, with verified specifications and direct WhatsApp inquiry buttons.
+            </p>
+          </div>
+
+          <div style={{ maxWidth: '440px', margin: '0 auto' }}>
+            <Pluckcard 
+              listing={previewListing}
+              isSaved={false}
+              onToggleSave={() => {}}
+              onOpenDetails={() => {}}
+              currentDoctor={{ name: 'Dr. (Your Name)', membershipNo: '••••', city: 'Your City' }}
+              onOpenAuth={onOpenAuth}
+            />
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '24px' }}>
+            <button 
+              className="btn-gateway-login-main"
+              onClick={onOpenAuth}
+              style={{ margin: '0 auto' }}
+              id="btn-seller-gateway-login-bottom"
+            >
+              <ShieldCheck size={18} />
+              <span>Log In with MOS ID to List Your Equipment</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {/* Top Banner & Tab Switcher */}
@@ -244,35 +345,7 @@ export default function SellPage({
 
       {/* VIEW 1: POST NEW AD FORM WITH LIVE PLUCKCARD PREVIEW */}
       {activeSubTab === 'post' && (
-        <div>
-          {/* Guest Mode Notice Strip */}
-          {!currentDoctor && (
-            <div className="guest-mode-notice-banner" style={{ marginBottom: '24px' }}>
-              <div className="guest-notice-left">
-                <div className="guest-notice-icon">
-                  <Lock size={20} />
-                </div>
-                <div>
-                  <div className="guest-notice-title">
-                    Guest Mode — Seller Publishing Gated
-                  </div>
-                  <div className="guest-notice-sub">
-                    You can test the equipment form and preview your live Pluckcard below. To publish your listing to the MOS Connect Buy directory, log in with your MOS Credentials.
-                  </div>
-                </div>
-              </div>
-              <button 
-                className="btn-guest-unlock"
-                onClick={onOpenAuth}
-                id="btn-guest-unlock-sell"
-              >
-                <ShieldCheck size={16} />
-                <span>Log In with MOS ID</span>
-              </button>
-            </div>
-          )}
-
-          <div className="sell-layout">
+        <div className="sell-layout">
             {/* Form Side */}
             <div className="sell-form-card">
               <form onSubmit={handleSubmitAd}>
@@ -524,7 +597,6 @@ export default function SellPage({
             </div>
           </div>
         </div>
-      </div>
       )}
 
       {/* VIEW 2: MY EQUIPMENT LISTINGS (SELLER PROFILE DASHBOARD) */}

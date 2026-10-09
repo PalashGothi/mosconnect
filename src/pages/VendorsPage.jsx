@@ -272,7 +272,7 @@ export default function VendorsPage({ currentDoctor, onOpenAuth }) {
         </div>
       ) : (
         <div className="vendor-grid">
-          {filteredVendors.map(vendor => {
+          {(currentDoctor ? filteredVendors : filteredVendors.slice(0, 3)).map(vendor => {
             const primaryPhone = vendor.phones?.[0]?.replace(/\D/g, '') || '';
             const waText = encodeURIComponent(
               `Hello ${vendor.name} (${vendor.company}), I found your profile in the MOS Connect Ophthalmic Service Directory. I need assistance with ophthalmic equipment service/spares.`
@@ -389,6 +389,30 @@ export default function VendorsPage({ currentDoctor, onOpenAuth }) {
               </div>
             );
           })}
+
+          {/* Membership Gate for Technicians */}
+          {!currentDoctor && filteredVendors.length > 3 && (
+            <div className="pluckcard-locked-gate-card" id="vendors-lock-gate">
+              <div className="locked-gate-icon">
+                <Lock size={30} />
+              </div>
+              <span className="locked-gate-tag">MOS MEMBER EXCLUSIVE SERVICE DIRECTORY</span>
+              <h3 className="locked-gate-title">
+                +{filteredVendors.length - 3} More Biomedical Technicians & Engineers Protected
+              </h3>
+              <p className="locked-gate-desc">
+                Direct contact numbers, WhatsApp service dispatch links, and verified engineer coverage areas across Maharashtra are restricted to verified MOS members.
+              </p>
+              <button 
+                className="btn-locked-gate-login"
+                onClick={onOpenAuth}
+                id="btn-gate-login-vendors"
+              >
+                <ShieldCheck size={18} />
+                <span>Log In with MOS ID to Access Full Directory ({filteredVendors.length})</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

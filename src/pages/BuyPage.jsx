@@ -20,7 +20,7 @@ import {
 import Pluckcard from '../components/Pluckcard';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import HeroBannerSwitcher from '../components/HeroBannerSwitcher';
-import { maskPhone, maskMembershipNo } from '../utils/masking';
+import { maskPhone, maskMembershipNo, maskDoctorName, maskPrice } from '../utils/masking';
 
 export default function BuyPage({ 
   listings, 
@@ -263,7 +263,7 @@ export default function BuyPage({
         </div>
       ) : (
         <div className="pluckcard-grid">
-          {filteredListings.map(listing => (
+          {(currentDoctor ? filteredListings : filteredListings.slice(0, 3)).map(listing => (
             <Pluckcard 
               key={listing.id}
               listing={listing}
@@ -274,6 +274,35 @@ export default function BuyPage({
               onOpenAuth={onOpenAuth}
             />
           ))}
+
+          {/* Membership Gate Locked Card for Guests */}
+          {!currentDoctor && filteredListings.length > 3 && (
+            <div className="pluckcard-locked-gate-card" id="card-marketplace-lock-gate">
+              <div className="locked-gate-icon">
+                <Lock size={32} />
+              </div>
+              <span className="locked-gate-tag">MOS MEMBER EXCLUSIVE</span>
+              <h3 className="locked-gate-title">
+                +{filteredListings.length - 3} More Verified Machines Protected
+              </h3>
+              <p className="locked-gate-desc">
+                Asking prices, doctor negotiation terms, and the remaining {filteredListings.length - 3} active listings are restricted to verified Maharashtra Ophthalmological Society members.
+              </p>
+              <ul className="locked-gate-benefits">
+                <li>✓ Reveal all Asking Prices & Negotiation terms</li>
+                <li>✓ Direct WhatsApp & Call to Seller Doctors</li>
+                <li>✓ Optical clarity inspection & AMC logs</li>
+              </ul>
+              <button 
+                className="btn-locked-gate-login"
+                onClick={onOpenAuth}
+                id="btn-gate-login-buy"
+              >
+                <ShieldCheck size={18} />
+                <span>Log In with MOS ID to Unlock All ({filteredListings.length})</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
 
@@ -310,7 +339,7 @@ export default function BuyPage({
                 <div>
                   <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>ASKING PRICE</div>
                   <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>
-                    {selectedDetailListing.priceFormatted}
+                    {currentDoctor ? selectedDetailListing.priceFormatted : '₹ •••••••• (Member Price)'}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
@@ -355,10 +384,10 @@ export default function BuyPage({
                       VERIFIED SELLER (MOS MEMBER)
                     </div>
                     <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-                      {selectedDetailListing.sellerName}
+                      {maskDoctorName(selectedDetailListing.sellerName, !!currentDoctor)}
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#334155', marginTop: '2px' }}>
-                      {selectedDetailListing.clinicName || 'Ophthalmic Clinic'} • {selectedDetailListing.sellerCity}
+                      {currentDoctor ? (selectedDetailListing.clinicName || 'Ophthalmic Clinic') : 'Verified Eye Clinic'} • {selectedDetailListing.sellerCity}
                     </div>
                     <div style={{ fontSize: '0.82rem', color: '#0d9488', marginTop: '4px', fontWeight: 600 }}>
                       Phone: {maskPhone(selectedDetailListing.sellerMobile, !!currentDoctor)}

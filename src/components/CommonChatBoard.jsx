@@ -14,7 +14,7 @@ import {
   MessageCircle,
   Lock
 } from 'lucide-react';
-import { maskMembershipNo } from '../utils/masking';
+import { maskMembershipNo, maskDoctorName, maskTeaser } from '../utils/masking';
 
 export default function CommonChatBoard({ 
   posts, 
@@ -172,100 +172,149 @@ export default function CommonChatBoard({
             <p style={{ fontSize: '0.9rem', marginTop: '4px' }}>Be the first doctor to post an equipment request!</p>
           </div>
         ) : (
-          posts.map(post => (
-            <div key={post.id} className="chat-card" id={`wanted-post-${post.id}`}>
-              <div className="chat-card-top">
-                <div className="chat-author">
-                  <div className="avatar-circle" style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg, #0284c7, #0369a1)' }}>
-                    {post.doctorName.replace('Dr.', '').trim().charAt(0)}
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span className="chat-author-name">{post.doctorName}</span>
-                      <span className="mos-seal" style={{ padding: '2px 7px', fontSize: '0.68rem' }}>
-                        MOS #{maskMembershipNo(post.membershipNo, !!currentDoctor)}
-                      </span>
+          <>
+            {(currentDoctor ? posts : posts.slice(0, 2)).map(post => (
+              <div key={post.id} className="chat-card" id={`wanted-post-${post.id}`}>
+                <div className="chat-card-top">
+                  <div className="chat-author">
+                    <div className="avatar-circle" style={{ width: '38px', height: '38px', background: 'linear-gradient(135deg, #0284c7, #0369a1)' }}>
+                      {post.doctorName.replace('Dr.', '').trim().charAt(0)}
                     </div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                      <MapPin size={11} />
-                      <span>{post.doctorCity || 'Maharashtra'}</span>
-                      <span>•</span>
-                      <Clock size={11} />
-                      <span>{new Date(post.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span className="chat-equipment-badge">
-                    {post.category}
-                  </span>
-                  <span style={{ 
-                    fontSize: '0.75rem', 
-                    fontWeight: 700, 
-                    padding: '3px 8px', 
-                    borderRadius: '9999px',
-                    background: post.urgency?.toLowerCase().includes('urgent') || post.urgency?.toLowerCase().includes('immediate') ? '#fee2e2' : '#f1f5f9',
-                    color: post.urgency?.toLowerCase().includes('urgent') || post.urgency?.toLowerCase().includes('immediate') ? '#ef4444' : '#475569'
-                  }}>
-                    ⚡ {post.urgency || 'Needed'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Requirement Subject & Specs */}
-              <div style={{ marginTop: '10px' }}>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
-                  Wanted: {post.equipmentName}
-                </h4>
-                <p style={{ fontSize: '0.88rem', color: '#334155', lineHeight: 1.5, marginBottom: '10px' }}>
-                  {post.description}
-                </p>
-
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem' }}>
-                  <div className="chat-budget-tag">
-                    <span>Budget:</span>
-                    <strong>{post.targetBudget}</strong>
-                  </div>
-
-                  <button 
-                    onClick={() => setActiveReplyPostId(activeReplyPostId === post.id ? null : post.id)}
-                    style={{ 
-                      fontSize: '0.82rem', 
-                      color: '#0284c7', 
-                      fontWeight: 600, 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px' 
-                    }}
-                    id={`btn-reply-toggle-${post.id}`}
-                  >
-                    <CornerDownRight size={14} />
-                    <span>{post.replies?.length > 0 ? `View ${post.replies.length} Replies / Reply` : 'Reply to Doctor'}</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Threaded Replies Section */}
-              {((post.replies && post.replies.length > 0) || activeReplyPostId === post.id) && (
-                <div className="chat-replies-section">
-                  {post.replies?.map(rep => (
-                    <div key={rep.id} className="reply-bubble">
-                      <div className="reply-header">
-                        <span className="reply-author">
-                          {rep.authorName} <span style={{ color: '#059669', fontSize: '0.72rem', fontWeight: 600 }}>({rep.authorMembershipNo?.startsWith('Vendor') ? 'Verified Technician' : `MOS #${maskMembershipNo(rep.authorMembershipNo, !!currentDoctor)}`})</span>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span className="chat-author-name">{maskDoctorName(post.doctorName, !!currentDoctor)}</span>
+                        <span className="mos-seal" style={{ padding: '2px 7px', fontSize: '0.68rem' }}>
+                          MOS #{maskMembershipNo(post.membershipNo, !!currentDoctor)}
                         </span>
-                        <span>{new Date(rep.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
                       </div>
-                      <div style={{ color: '#1e293b', lineHeight: 1.4 }}>
-                        {rep.message}
+                      <div style={{ fontSize: '0.75rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
+                        <MapPin size={11} />
+                        <span>{post.doctorCity || 'Maharashtra'}</span>
+                        <span>•</span>
+                        <Clock size={11} />
+                        <span>{new Date(post.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                       </div>
                     </div>
-                  ))}
+                  </div>
 
-                  {/* Inline Reply Box */}
-                  {activeReplyPostId === post.id && (
-                    currentDoctor ? (
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <span className="chat-equipment-badge">
+                      {post.category}
+                    </span>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      fontWeight: 700, 
+                      padding: '3px 8px', 
+                      borderRadius: '9999px',
+                      background: post.urgency?.toLowerCase().includes('urgent') || post.urgency?.toLowerCase().includes('immediate') ? '#fee2e2' : '#f1f5f9',
+                      color: post.urgency?.toLowerCase().includes('urgent') || post.urgency?.toLowerCase().includes('immediate') ? '#ef4444' : '#475569'
+                    }}>
+                      ⚡ {post.urgency || 'Needed'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Requirement Subject & Specs */}
+                <div style={{ marginTop: '10px' }}>
+                  <h4 style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginBottom: '6px' }}>
+                    Wanted: {post.equipmentName}
+                  </h4>
+                  <p style={{ fontSize: '0.88rem', color: '#334155', lineHeight: 1.5, marginBottom: '10px' }}>
+                    {maskTeaser(post.description, !!currentDoctor, 75)}
+                  </p>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '0.82rem' }}>
+                    <div className="chat-budget-tag">
+                      <span>Budget:</span>
+                      <strong>{currentDoctor ? post.targetBudget : '₹ ••••••• (Member Only)'}</strong>
+                    </div>
+
+                    {currentDoctor ? (
+                      <button 
+                        onClick={() => setActiveReplyPostId(activeReplyPostId === post.id ? null : post.id)}
+                        style={{ 
+                          fontSize: '0.82rem', 
+                          color: '#0284c7', 
+                          fontWeight: 600, 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '4px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        id={`btn-reply-toggle-${post.id}`}
+                      >
+                        <CornerDownRight size={14} />
+                        <span>{post.replies?.length > 0 ? `View ${post.replies.length} Replies / Reply` : 'Reply to Doctor'}</span>
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={onOpenAuth}
+                        style={{ 
+                          fontSize: '0.82rem', 
+                          color: '#0284c7', 
+                          fontWeight: 600, 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '5px',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer'
+                        }}
+                        id={`btn-reply-toggle-${post.id}`}
+                      >
+                        <Lock size={13} />
+                        <span>Log In to View & Reply</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Hidden / Locked Replies Teaser for Guests */}
+                {!currentDoctor && post.replies?.length > 0 && (
+                  <div 
+                    className="chat-replies-locked-strip" 
+                    onClick={onOpenAuth}
+                    style={{
+                      marginTop: '12px',
+                      padding: '10px 14px',
+                      background: '#f8fafc',
+                      borderRadius: '8px',
+                      border: '1px dashed #cbd5e1',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.84rem', color: '#334155' }}>
+                      <Lock size={14} color="#0284c7" />
+                      <span><strong>{post.replies.length} Member {post.replies.length === 1 ? 'Reply' : 'Replies'}</strong> & Equipment Offers Protected</span>
+                    </div>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0284c7' }}>Log In to View →</span>
+                  </div>
+                )}
+
+                {/* Threaded Replies Section (Only visible for authenticated doctors) */}
+                {currentDoctor && ((post.replies && post.replies.length > 0) || activeReplyPostId === post.id) && (
+                  <div className="chat-replies-section">
+                    {post.replies?.map(rep => (
+                      <div key={rep.id} className="reply-bubble">
+                        <div className="reply-header">
+                          <span className="reply-author">
+                            {rep.authorName} <span style={{ color: '#059669', fontSize: '0.72rem', fontWeight: 600 }}>({rep.authorMembershipNo?.startsWith('Vendor') ? 'Verified Technician' : `MOS #${rep.authorMembershipNo}`})</span>
+                          </span>
+                          <span>{new Date(rep.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                        <div style={{ color: '#1e293b', lineHeight: 1.4 }}>
+                          {rep.message}
+                        </div>
+                      </div>
+                    ))}
+
+                    {/* Inline Reply Box */}
+                    {activeReplyPostId === post.id && (
                       <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
                         <input 
                           type="text" 
@@ -289,7 +338,9 @@ export default function CommonChatBoard({
                             fontSize: '0.85rem',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: '6px'
+                            gap: '6px',
+                            cursor: 'pointer',
+                            border: 'none'
                           }}
                           id={`btn-send-reply-${post.id}`}
                         >
@@ -297,27 +348,36 @@ export default function CommonChatBoard({
                           <span>Send</span>
                         </button>
                       </div>
-                    ) : (
-                      <div style={{ background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px dashed #cbd5e1', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '10px' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#475569' }}>
-                          <Lock size={15} color="#0284c7" />
-                          <span>Log in with your MOS Credentials to send a reply to this doctor.</span>
-                        </div>
-                        <button 
-                          className="btn-guest-unlock"
-                          onClick={onOpenAuth}
-                          style={{ padding: '6px 14px', fontSize: '0.78rem' }}
-                        >
-                          <ShieldCheck size={14} />
-                          <span>Log In</span>
-                        </button>
-                      </div>
-                    )
-                  )}
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Membership Lock Gate for Guests */}
+            {!currentDoctor && posts.length > 2 && (
+              <div className="pluckcard-locked-gate-card" id="chat-lock-gate">
+                <div className="locked-gate-icon">
+                  <Lock size={30} />
                 </div>
-              )}
-            </div>
-          ))
+                <span className="locked-gate-tag">MOS MEMBER EXCLUSIVE DISCUSSIONS</span>
+                <h3 className="locked-gate-title">
+                  +{posts.length - 2} More Equipment Requests & Member Offers Protected
+                </h3>
+                <p className="locked-gate-desc">
+                  All doctors' equipment wanted posts, price negotiation comments, and supplier replies across Maharashtra are restricted to verified members.
+                </p>
+                <button 
+                  className="btn-locked-gate-login"
+                  onClick={onOpenAuth}
+                  id="btn-gate-login-chat"
+                >
+                  <ShieldCheck size={18} />
+                  <span>Log In with MOS ID to View All Discussions</span>
+                </button>
+              </div>
+            )}
+          </>
         )}
       </div>
 

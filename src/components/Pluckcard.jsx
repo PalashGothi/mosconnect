@@ -15,7 +15,7 @@ import {
   Lock
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
-import { maskMembershipNo } from '../utils/masking';
+import { maskMembershipNo, maskDoctorName, maskTeaser } from '../utils/masking';
 
 export default function Pluckcard({ 
   listing, 
@@ -87,13 +87,13 @@ export default function Pluckcard({
         <div className="seller-strip">
           <div className="seller-strip-info">
             <div className="seller-strip-name">
-              <span>{listing.sellerName}</span>
+              <span>{maskDoctorName(listing.sellerName, !!currentDoctor)}</span>
               <CheckCircle2 size={13} color="#10b981" />
             </div>
             <div className="seller-strip-loc">
               <MapPin size={11} style={{ display: 'inline', marginRight: '3px' }} />
               <span>{listing.sellerCity || 'Maharashtra'}</span>
-              {listing.clinicName && <span> • {listing.clinicName}</span>}
+              {listing.clinicName && <span> • {currentDoctor ? listing.clinicName : 'Verified Clinic'}</span>}
             </div>
           </div>
           
@@ -137,7 +137,7 @@ export default function Pluckcard({
 
         {/* Short description snippet */}
         <p style={{ fontSize: '0.82rem', color: '#64748b', lineHeight: 1.45, marginBottom: '14px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-          {listing.description}
+          {maskTeaser(listing.description, !!currentDoctor, 85)}
         </p>
 
         {/* Warranty Tag */}
@@ -151,9 +151,22 @@ export default function Pluckcard({
         {/* Pluckcard Footer */}
         <div className="pluckcard-footer">
           <div className="price-row">
-            <span className="pluckcard-price">
-              {listing.priceFormatted || `₹ ${Number(listing.price || 0).toLocaleString('en-IN')}`}
-            </span>
+            {currentDoctor ? (
+              <span className="pluckcard-price">
+                {listing.priceFormatted || `₹ ${Number(listing.price || 0).toLocaleString('en-IN')}`}
+              </span>
+            ) : (
+              <div 
+                className="pluckcard-price-masked" 
+                onClick={onOpenAuth}
+                title="Log in with MOS ID to view verified price"
+                style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Lock size={14} color="#0284c7" />
+                <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>₹ ••••••••</span>
+                <span style={{ fontSize: '0.7rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', fontWeight: 700 }}>Member Only</span>
+              </div>
+            )}
             <span className="price-negotiable-badge">
               {listing.isNegotiable ? 'Negotiable' : 'Fixed Price'}
             </span>
@@ -184,41 +197,39 @@ export default function Pluckcard({
                   <Phone size={14} />
                   <span>Call Doctor</span>
                 </a>
+
+                <button 
+                  className="btn-pluckcard-detail"
+                  onClick={() => onOpenDetails(listing)}
+                  title="View full specs and hospital details"
+                  id={`btn-detail-${listing.id}`}
+                >
+                  <Info size={15} />
+                </button>
               </>
             ) : (
               <>
                 <button 
                   type="button"
-                  className="btn-pluckcard-wa"
+                  className="btn-pluckcard-unlock-full"
                   onClick={onOpenAuth}
-                  title="Log in with MOS credentials to connect on WhatsApp"
-                  id={`btn-wa-${listing.id}`}
+                  title="Log in with MOS credentials to view asking price and doctor contact"
+                  id={`btn-unlock-${listing.id}`}
                 >
                   <Lock size={14} />
-                  <span>WhatsApp</span>
+                  <span>Log In to View Price & Connect</span>
                 </button>
 
                 <button 
-                  type="button"
-                  className="btn-pluckcard-call"
+                  className="btn-pluckcard-detail"
                   onClick={onOpenAuth}
-                  title="Log in with MOS credentials to call doctor"
-                  id={`btn-call-${listing.id}`}
+                  title="Log in to view full specs"
+                  id={`btn-detail-${listing.id}`}
                 >
-                  <Lock size={13} />
-                  <span>Call Doctor</span>
+                  <Lock size={14} />
                 </button>
               </>
             )}
-
-            <button 
-              className="btn-pluckcard-detail"
-              onClick={() => onOpenDetails(listing)}
-              title="View full specs and hospital details"
-              id={`btn-detail-${listing.id}`}
-            >
-              <Info size={15} />
-            </button>
           </div>
         </div>
       </div>
