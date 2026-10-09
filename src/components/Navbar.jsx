@@ -15,7 +15,9 @@ import {
   Briefcase,
   Settings,
   Sparkles,
-  Zap
+  Zap,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function Navbar({ 
@@ -32,7 +34,14 @@ export default function Navbar({
   pendingJobsCount = 0
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAdmin = currentDoctor?.role === 'admin';
+
+  const handleMobileNavClick = (tab) => {
+    setActiveTab(tab);
+    setMobileMenuOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <>
@@ -339,8 +348,187 @@ export default function Navbar({
               <span>Doctor Login (MOS)</span>
             </button>
           )}
+
+          {/* Mobile Menu Hamburger Toggle */}
+          <button 
+            className="mobile-hamburger-btn"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            aria-label="Toggle Navigation Menu"
+            id="btn-mobile-menu-toggle"
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
+
+        {/* Mobile Slide-Down Drawer Menu */}
+        {mobileMenuOpen && (
+          <div className="mobile-drawer-menu" id="mobile-drawer-menu">
+            <div className="mobile-drawer-links">
+              <button 
+                className={`mobile-drawer-item ${activeTab === 'buy' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('buy')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <ShoppingBag size={20} />
+                  <span>Buy Equipment</span>
+                </div>
+                {listingsCount > 0 && <span className="nav-badge">{listingsCount}</span>}
+              </button>
+
+              <button 
+                className={`mobile-drawer-item ${activeTab === 'wanted' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('wanted')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <MessageSquareQuote size={20} />
+                  <span>Wanted Board</span>
+                </div>
+                {wantedCount > 0 && <span className="nav-badge verified-badge">{wantedCount}</span>}
+              </button>
+
+              <button 
+                className={`mobile-drawer-item ${activeTab === 'sell' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('sell')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <PlusCircle size={20} />
+                  <span>Sell Equipment</span>
+                </div>
+              </button>
+
+              <button 
+                className={`mobile-drawer-item ${activeTab === 'jobs' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('jobs')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <Briefcase size={20} />
+                  <span>Jobs & Fellowships</span>
+                </div>
+                {jobsCount > 0 && <span className="nav-badge" style={{ background: '#0284c7' }}>{jobsCount}</span>}
+              </button>
+
+              <button 
+                className={`mobile-drawer-item ${activeTab === 'vendors' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('vendors')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <Wrench size={20} />
+                  <span>Vendors & Technicians</span>
+                </div>
+                <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}+</span>
+              </button>
+
+              {isAdmin && (
+                <button 
+                  className={`mobile-drawer-item admin-drawer-item ${activeTab === 'admin' ? 'active' : ''}`}
+                  onClick={() => handleMobileNavClick('admin')}
+                >
+                  <div className="mobile-drawer-item-left">
+                    <Settings size={20} color="#38bdf8" />
+                    <span>Admin Panel</span>
+                  </div>
+                  {pendingJobsCount > 0 && (
+                    <span className="nav-badge" style={{ background: '#f59e0b', color: '#ffffff' }}>
+                      {pendingJobsCount}
+                    </span>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Mobile Drawer Auth Strip */}
+            <div className="mobile-drawer-footer">
+              {currentDoctor ? (
+                <div className="mobile-drawer-user-info">
+                  <div className="mobile-drawer-user-row">
+                    <div className="avatar-circle" style={{ width: '32px', height: '32px', fontSize: '0.8rem' }}>
+                      {isAdmin ? <ShieldCheck size={16} /> : (currentDoctor.name ? currentDoctor.name.replace('Dr.', '').trim().charAt(0) : 'D')}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem', color: '#0f172a' }}>{currentDoctor.name}</div>
+                      <div style={{ fontSize: '0.75rem', color: '#059669', fontWeight: 600 }}>MOS #{currentDoctor.membershipNo}</div>
+                    </div>
+                  </div>
+                  <button 
+                    className="btn-mobile-logout"
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      onLogout();
+                    }}
+                  >
+                    <LogOut size={16} />
+                    <span>Log Out</span>
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  className="btn-mobile-login"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    onOpenAuth();
+                  }}
+                >
+                  <ShieldCheck size={18} color="#38bdf8" />
+                  <span>Doctor Login (MOS ID)</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
+
+      {/* Floating Sticky Mobile Bottom Navigation Bar */}
+      <div className="mobile-bottom-bar" id="mobile-bottom-bar">
+        <button 
+          className={`bottom-nav-item ${activeTab === 'buy' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick('buy')}
+          aria-label="Buy Equipment"
+        >
+          <ShoppingBag size={20} />
+          <span>Buy</span>
+          {listingsCount > 0 && <span className="bottom-nav-dot"></span>}
+        </button>
+
+        <button 
+          className={`bottom-nav-item ${activeTab === 'wanted' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick('wanted')}
+          aria-label="Wanted Board"
+        >
+          <MessageSquareQuote size={20} />
+          <span>Wanted</span>
+          {wantedCount > 0 && <span className="bottom-nav-dot"></span>}
+        </button>
+
+        <button 
+          className={`bottom-nav-item bottom-sell-accent ${activeTab === 'sell' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick('sell')}
+          aria-label="Sell Equipment"
+        >
+          <div className="sell-icon-bubble">
+            <PlusCircle size={22} />
+          </div>
+          <span>Sell</span>
+        </button>
+
+        <button 
+          className={`bottom-nav-item ${activeTab === 'jobs' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick('jobs')}
+          aria-label="Jobs"
+        >
+          <Briefcase size={20} />
+          <span>Jobs</span>
+          {jobsCount > 0 && <span className="bottom-nav-dot"></span>}
+        </button>
+
+        <button 
+          className={`bottom-nav-item ${activeTab === 'vendors' || activeTab === 'admin' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick(isAdmin ? 'admin' : 'vendors')}
+          aria-label={isAdmin ? 'Admin' : 'Vendors'}
+        >
+          {isAdmin ? <Settings size={20} /> : <Wrench size={20} />}
+          <span>{isAdmin ? 'Admin' : 'Vendors'}</span>
+        </button>
+      </div>
     </>
   );
 }
