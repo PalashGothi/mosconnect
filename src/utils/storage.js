@@ -2,12 +2,14 @@ import initialListings from '../data/initialListings.json';
 import initialWantedPosts from '../data/initialWantedPosts.json';
 import initialJobs from '../data/initialJobs.json';
 import mosMembers from '../data/mosMembers.json';
+import vendorsData from '../data/vendors.json';
 
 const STORAGE_KEYS = {
   LISTINGS: 'mos_eyeequip_listings',
   WANTED_POSTS: 'mos_eyeequip_wanted_posts',
   JOBS: 'mos_eyeequip_jobs',
   MEMBERS: 'mos_eyeequip_members',
+  VENDORS: 'mos_eyeequip_vendors',
   CURRENT_DOCTOR: 'mos_eyeequip_current_doctor',
   SAVED_ITEMS: 'mos_eyeequip_saved_items',
   INQUIRIES: 'mos_eyeequip_inquiries'
@@ -356,3 +358,64 @@ export function toggleSaveItem(id) {
   localStorage.setItem(STORAGE_KEYS.SAVED_ITEMS, JSON.stringify(updated));
   return updated;
 }
+
+// ================= VENDORS & TECHNICIANS =================
+export function getVendors() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.VENDORS);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (e) {
+    console.error('Error reading vendors from localStorage', e);
+  }
+  // Initialize with vendors data
+  try {
+    localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(vendorsData));
+  } catch (err) {
+    console.warn('localStorage error setting vendors', err);
+  }
+  return vendorsData;
+}
+
+export function saveVendor(newVendor) {
+  const vendors = getVendors();
+  let updated;
+  if (newVendor.id) {
+    const index = vendors.findIndex(v => v.id === newVendor.id);
+    if (index >= 0) {
+      updated = [...vendors];
+      updated[index] = { ...updated[index], ...newVendor };
+    } else {
+      updated = [newVendor, ...vendors];
+    }
+  } else {
+    const createdVendor = {
+      ...newVendor,
+      id: `v-${Date.now()}`,
+      createdAt: new Date().toISOString()
+    };
+    updated = [createdVendor, ...vendors];
+  }
+  try {
+    localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
+  } catch (e) {
+    console.error('Failed to save vendor to localStorage', e);
+  }
+  return updated;
+}
+
+export function deleteVendor(id) {
+  const vendors = getVendors();
+  const updated = vendors.filter(v => v.id !== id);
+  try {
+    localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
+  } catch (e) {
+    console.error('Failed to delete vendor from localStorage', e);
+  }
+  return updated;
+}
+

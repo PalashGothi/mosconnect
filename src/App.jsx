@@ -21,6 +21,9 @@ import {
   getMembers,
   saveMember,
   addMembersBulk,
+  getVendors,
+  saveVendor,
+  deleteVendor,
   getCurrentDoctor, 
   setCurrentDoctor, 
   getSavedItems, 
@@ -44,6 +47,7 @@ export default function App() {
   const [wantedPosts, setWantedPosts] = useState([]);
   const [jobs, setJobs] = useState([]);
   const [members, setMembers] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
@@ -54,6 +58,7 @@ export default function App() {
     setWantedPosts(getWantedPosts());
     setJobs(getJobs());
     setMembers(getMembers());
+    setVendors(getVendors());
     setSavedItems(getSavedItems());
   }, []);
 
@@ -109,6 +114,24 @@ export default function App() {
     return result;
   };
 
+  // Vendor Management Handlers
+  const handleAddVendor = (newVendor) => {
+    const updated = saveVendor(newVendor);
+    setVendors(updated);
+  };
+
+  const handleDeleteVendor = (id) => {
+    if (window.confirm('Are you sure you want to remove this vendor/technician directory entry?')) {
+      const updated = deleteVendor(id);
+      setVendors(updated);
+    }
+  };
+
+  const handleUpdateVendor = (updatedVendor) => {
+    const updated = saveVendor(updatedVendor);
+    setVendors(updated);
+  };
+
   // Wanted Board Handlers
   const handleAddWantedPost = (newPost) => {
     const updated = saveWantedPost(newPost);
@@ -155,7 +178,7 @@ export default function App() {
         onOpenPostAd={() => setActiveTab('sell')}
         listingsCount={listings.length}
         wantedCount={wantedPosts.length}
-        vendorsCount={45}
+        vendorsCount={vendors.length}
         jobsCount={approvedJobsCount}
         pendingJobsCount={pendingJobsCount}
       />
@@ -209,8 +232,10 @@ export default function App() {
 
         {activeTab === 'vendors' && (
           <VendorsPage 
+            vendors={vendors}
             currentDoctor={currentDoctor}
             onOpenAuth={() => setIsAuthOpen(true)}
+            onOpenAdminPanel={() => setActiveTab('admin')}
           />
         )}
 
@@ -219,11 +244,15 @@ export default function App() {
             currentDoctor={currentDoctor}
             jobs={jobs}
             members={members}
+            vendors={vendors}
             listings={listings}
             onUpdateJobStatus={handleUpdateJobStatus}
             onDeleteJob={handleDeleteJob}
             onAddMember={handleAddMember}
             onBulkAddMembers={handleBulkAddMembers}
+            onAddVendor={handleAddVendor}
+            onDeleteVendor={handleDeleteVendor}
+            onUpdateVendor={handleUpdateVendor}
           />
         )}
       </main>

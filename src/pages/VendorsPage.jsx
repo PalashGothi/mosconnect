@@ -19,10 +19,14 @@ import vendorsData from '../data/vendors.json';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import { maskPhone } from '../utils/masking';
 
-export default function VendorsPage({ currentDoctor, onOpenAuth }) {
+export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpenAdminPanel }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
+
+  const activeVendors = useMemo(() => {
+    return vendors && vendors.length > 0 ? vendors : vendorsData;
+  }, [vendors]);
 
   const filterCategories = [
     'All',
@@ -42,18 +46,18 @@ export default function VendorsPage({ currentDoctor, onOpenAuth }) {
   // Distinct cities from vendors
   const cities = useMemo(() => {
     const citySet = new Set();
-    vendorsData.forEach(v => {
+    activeVendors.forEach(v => {
       if (v.city) {
         // split multiple cities like "Pune / Mumbai"
         v.city.split('/').forEach(c => citySet.add(c.trim()));
       }
     });
     return ['All', ...Array.from(citySet).sort()];
-  }, []);
+  }, [activeVendors]);
 
   // Filter vendors based on search, category and city
   const filteredVendors = useMemo(() => {
-    return vendorsData.filter(v => {
+    return activeVendors.filter(v => {
       // Category filter
       if (selectedCategory !== 'All') {
         if (selectedCategory === 'Zeiss Specialists') {
@@ -130,27 +134,52 @@ export default function VendorsPage({ currentDoctor, onOpenAuth }) {
 
       return true;
     });
-  }, [searchQuery, selectedCategory, selectedCity]);
+  }, [activeVendors, searchQuery, selectedCategory, selectedCity]);
 
   return (
     <div>
       {/* Directory Hero Banner */}
       <div className="hero-banner" style={{ background: 'linear-gradient(135deg, #091a2f 0%, #0d3858 100%)' }}>
         <div className="hero-content">
-          <div className="hero-badge" style={{ background: 'rgba(13, 148, 136, 0.2)', borderColor: '#14b8a6', color: '#5eead4' }}>
-            <Award size={15} />
-            <span>Official MOS Equipment Engineering Directory</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="hero-badge" style={{ background: 'rgba(13, 148, 136, 0.2)', borderColor: '#14b8a6', color: '#5eead4', marginBottom: 0 }}>
+              <Award size={15} />
+              <span>Official MOS Equipment Engineering Directory</span>
+            </div>
+
+            {currentDoctor?.role === 'admin' && (
+              <button
+                onClick={onOpenAdminPanel}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                  color: '#ffffff',
+                  border: '1px solid #38bdf8',
+                  padding: '6px 14px',
+                  borderRadius: '9999px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <ShieldCheck size={14} />
+                <span>+ Add / Manage Vendors in Admin Console</span>
+              </button>
+            )}
           </div>
-          <h2 className="hero-title">
+
+          <h2 className="hero-title" style={{ marginTop: '16px' }}>
             Verified <span>Engineers & Technicians</span> for Ophthalmic Devices
           </h2>
           <p className="hero-desc">
-            Direct contacts for 45+ specialized biomedical engineers, former Zeiss & Appasamy technicians, Phaco probe repair specialists, autoclave engineers, and certified ophthalmic optics experts across Maharashtra.
+            Direct contacts for {activeVendors.length}+ specialized biomedical engineers, former Zeiss & Appasamy technicians, Phaco probe repair specialists, autoclave engineers, and certified ophthalmic optics experts across Maharashtra.
           </p>
 
           <div className="hero-stats-row">
             <div className="hero-stat-item">
-              <span className="hero-stat-num">{vendorsData.length} Engineers</span>
+              <span className="hero-stat-num">{activeVendors.length} Engineers</span>
               <span className="hero-stat-label">Verified Specialists</span>
             </div>
             <div className="hero-stat-item">

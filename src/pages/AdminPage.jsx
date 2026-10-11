@@ -20,7 +20,9 @@ import {
   Layers,
   Sparkles,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Wrench,
+  Edit2
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -28,13 +30,17 @@ export default function AdminPage({
   currentDoctor, 
   jobs, 
   members, 
+  vendors = [],
   listings, 
   onUpdateJobStatus, 
   onDeleteJob,
   onAddMember,
-  onBulkAddMembers 
+  onBulkAddMembers,
+  onAddVendor,
+  onDeleteVendor,
+  onUpdateVendor
 }) {
-  const [activeAdminTab, setActiveAdminTab] = useState('jobs'); // 'jobs' or 'members'
+  const [activeAdminTab, setActiveAdminTab] = useState('jobs'); // 'jobs', 'members', or 'vendors'
   const [jobStatusFilter, setJobStatusFilter] = useState('pending'); // 'pending', 'approved', 'rejected', 'all'
   
   // Member Search & Pagination State
@@ -42,6 +48,33 @@ export default function AdminPage({
   const [memberTypeFilter, setMemberTypeFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
+
+  // Vendor Management State
+  const [vendorSearch, setVendorSearch] = useState('');
+  const [vendorCityFilter, setVendorCityFilter] = useState('All');
+  const [vendorCategoryFilter, setVendorCategoryFilter] = useState('All');
+  const [currentVendorPage, setCurrentVendorPage] = useState(1);
+  const vendorPageSize = 12;
+
+  const [showVendorModal, setShowVendorModal] = useState(false);
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [vendorForm, setVendorForm] = useState({
+    name: '',
+    company: '',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    coverage: 'All Maharashtra',
+    phonesText: '',
+    email: '',
+    address: '',
+    categoriesText: 'Microscopes, Phaco Machines',
+    brandsText: 'Zeiss, Topcon, Alcon',
+    servicesText: 'Machine Repair, Spares, AMC',
+    description: '',
+    experience: '10+ Years',
+    verified: true,
+    badge: 'Verified Service Center'
+  });
 
   // Manual Member Modal State
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
@@ -130,6 +163,145 @@ export default function AdminPage({
       ratifiedYear: '2026'
     });
     setUploadStats({ message: `Member ${newMem.name} (#${newMem.membershipNo}) added successfully!` });
+    setTimeout(() => setUploadStats(null), 4000);
+  };
+
+  // Vendor Filter Memos
+  const vendorCities = useMemo(() => {
+    const citySet = new Set();
+    vendors.forEach(v => {
+      if (v.city) v.city.split('/').forEach(c => citySet.add(c.trim()));
+    });
+    return ['All', ...Array.from(citySet).sort()];
+  }, [vendors]);
+
+  const filteredVendors = useMemo(() => {
+    return vendors.filter(v => {
+      if (vendorCityFilter !== 'All') {
+        const matchesCity = v.city?.toLowerCase().includes(vendorCityFilter.toLowerCase()) ||
+                            v.coverage?.toLowerCase().includes(vendorCityFilter.toLowerCase());
+        if (!matchesCity) return false;
+      }
+      if (vendorCategoryFilter !== 'All') {
+        const matchesCat = v.categories?.some(c => c.toLowerCase().includes(vendorCategoryFilter.toLowerCase()));
+        if (!matchesCat) return false;
+      }
+      if (vendorSearch.trim()) {
+        const q = vendorSearch.toLowerCase().trim();
+        const matches = 
+          v.name?.toLowerCase().includes(q) ||
+          v.company?.toLowerCase().includes(q) ||
+          v.city?.toLowerCase().includes(q) ||
+          v.brands?.some(b => b.toLowerCase().includes(q)) ||
+          v.categories?.some(c => c.toLowerCase().includes(q)) ||
+          v.description?.toLowerCase().includes(q);
+        if (!matches) return false;
+      }
+      return true;
+    });
+  }, [vendors, vendorSearch, vendorCityFilter, vendorCategoryFilter]);
+
+  const totalVendorPages = Math.ceil(filteredVendors.length / vendorPageSize) || 1;
+  const paginatedVendors = useMemo(() => {
+    const start = (currentVendorPage - 1) * vendorPageSize;
+    return filteredVendors.slice(start, start + vendorPageSize);
+  }, [filteredVendors, currentVendorPage]);
+
+  const handleOpenAddVendor = () => {
+    setEditingVendor(null);
+    setVendorForm({
+      name: '',
+      company: '',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      coverage: 'All Maharashtra',
+      phonesText: '',
+      email: '',
+      address: '',
+      categoriesText: 'Microscopes, Phaco Machines',
+      brandsText: 'Zeiss, Topcon, Alcon',
+      servicesText: 'Machine Repair, Spares, AMC Maintenance',
+      description: '',
+      experience: '10+ Years',
+      verified: true,
+      badge: 'Verified Service Center'
+    });
+    setShowVendorModal(true);
+  };
+
+  const handleOpenEditVendor = (v) => {
+    setEditingVendor(v);
+    setVendorForm({
+      name: v.name || '',
+      company: v.company || '',
+      city: v.city || 'Mumbai',
+      state: v.state || 'Maharashtra',
+      coverage: v.coverage || 'All Maharashtra',
+      phonesText: Array.isArray(v.phones) ? v.phones.join(', ') : '',
+      email: v.email || '',
+      address: v.address || '',
+      categoriesText: Array.isArray(v.categories) ? v.categories.join(', ') : '',
+      brandsText: Array.isArray(v.brands) ? v.brands.join(', ') : '',
+      servicesText: Array.isArray(v.services) ? v.services.join(', ') : '',
+      description: v.description || '',
+      experience: v.experience || '10+ Years',
+      verified: v.verified !== false,
+      badge: v.badge || 'Verified Service Center'
+    });
+    setShowVendorModal(true);
+  };
+
+  const handleVendorFormSubmit = (e) => {
+    e.preventDefault();
+    if (!vendorForm.company.trim() && !vendorForm.name.trim()) return;
+
+    const phones = vendorForm.phonesText
+      .split(/[,/\n]/)
+      .map(p => p.trim())
+      .filter(Boolean);
+    const categories = vendorForm.categoriesText
+      .split(',')
+      .map(c => c.trim())
+      .filter(Boolean);
+    const brands = vendorForm.brandsText
+      .split(',')
+      .map(b => b.trim())
+      .filter(Boolean);
+    const services = vendorForm.servicesText
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const vendorPayload = {
+      ...(editingVendor || {}),
+      id: editingVendor?.id || `v-${Date.now()}`,
+      name: vendorForm.name.trim(),
+      company: vendorForm.company.trim(),
+      city: vendorForm.city.trim(),
+      state: vendorForm.state.trim() || 'Maharashtra',
+      coverage: vendorForm.coverage.trim() || 'All Maharashtra',
+      phones: phones.length > 0 ? phones : ['+919800000000'],
+      email: vendorForm.email.trim(),
+      address: vendorForm.address.trim(),
+      categories: categories.length > 0 ? categories : ['Microscopes'],
+      brands: brands.length > 0 ? brands : ['All Brands'],
+      services: services.length > 0 ? services : ['Machine Repair'],
+      description: vendorForm.description.trim(),
+      experience: vendorForm.experience.trim() || '5+ Years',
+      verified: vendorForm.verified,
+      badge: vendorForm.badge.trim() || 'Verified Specialist',
+      rating: editingVendor?.rating || 4.9
+    };
+
+    if (editingVendor && onUpdateVendor) {
+      onUpdateVendor(vendorPayload);
+      setUploadStats({ message: `Vendor "${vendorPayload.company || vendorPayload.name}" updated successfully!` });
+    } else if (onAddVendor) {
+      onAddVendor(vendorPayload);
+      setUploadStats({ message: `Vendor "${vendorPayload.company || vendorPayload.name}" added to directory!` });
+    }
+
+    setShowVendorModal(false);
     setTimeout(() => setUploadStats(null), 4000);
   };
 
@@ -312,11 +484,32 @@ export default function AdminPage({
               <Users size={16} />
               <span>Member Management ({members.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveAdminTab('vendors')}
+              style={{
+                padding: '9px 18px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                fontSize: '0.86rem',
+                background: activeAdminTab === 'vendors' ? '#0284c7' : '#334155',
+                color: '#ffffff',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              id="admin-tab-vendors"
+            >
+              <Wrench size={16} />
+              <span>Engineers & Vendors ({vendors.length})</span>
+            </button>
           </div>
         </div>
 
         {/* Admin KPI Metrics Bar */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px', marginTop: '24px', paddingTop: '20px', borderTop: '1px solid rgba(255, 255, 255, 0.1)' }}>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#38bdf8' }}>{pendingJobsCount}</div>
             <div style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Jobs Awaiting Approval</div>
@@ -328,6 +521,10 @@ export default function AdminPage({
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff' }}>{members.length.toLocaleString('en-IN')}</div>
             <div style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Approved MOS Eye Doctors</div>
+          </div>
+          <div>
+            <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#14b8a6' }}>{vendors.length}</div>
+            <div style={{ fontSize: '0.78rem', color: '#94a3b8', textTransform: 'uppercase', fontWeight: 600 }}>Verified Service Engineers</div>
           </div>
           <div>
             <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#f59e0b' }}>{listings.length}</div>
@@ -726,6 +923,199 @@ export default function AdminPage({
         </div>
       )}
 
+      {/* TAB 3: VENDORS & BIOMEDICAL TECHNICIANS MANAGEMENT */}
+      {activeAdminTab === 'vendors' && (
+        <div style={{ background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '28px', boxShadow: '0 2px 10px rgba(15, 23, 42, 0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
+            <div>
+              <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a' }}>
+                Verified Engineers & Vendor Directory
+              </h3>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>
+                Add, update, or remove specialized biomedical service engineers and ophthalmic suppliers for Maharashtra eye care centers.
+              </p>
+            </div>
+
+            <button
+              className="btn-post-ad"
+              onClick={handleOpenAddVendor}
+              id="btn-admin-add-vendor"
+              style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' }}
+            >
+              <PlusCircle size={18} />
+              <span>+ Add New Vendor / Engineer</span>
+            </button>
+          </div>
+
+          {/* Search & Filter Bar */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ position: 'relative' }}>
+              <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+              <input
+                type="text"
+                placeholder="Search vendor name, company, brands (e.g. Zeiss, Alcon), machines..."
+                value={vendorSearch}
+                onChange={e => { setVendorSearch(e.target.value); setCurrentVendorPage(1); }}
+                className="main-search-input"
+                style={{ width: '100%', paddingLeft: '40px' }}
+                id="input-admin-vendor-search"
+              />
+            </div>
+
+            <select
+              value={vendorCityFilter}
+              onChange={e => { setVendorCityFilter(e.target.value); setCurrentVendorPage(1); }}
+              className="filter-select"
+              style={{ width: '100%', minWidth: 'unset' }}
+            >
+              <option value="All">All Cities (Maharashtra)</option>
+              {vendorCities.filter(c => c !== 'All').map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+
+            <select
+              value={vendorCategoryFilter}
+              onChange={e => { setVendorCategoryFilter(e.target.value); setCurrentVendorPage(1); }}
+              className="filter-select"
+              style={{ width: '100%', minWidth: 'unset' }}
+            >
+              <option value="All">All Equipment Specialties</option>
+              <option value="Microscopes">Microscopes</option>
+              <option value="Phaco">Phaco Machines & Probes</option>
+              <option value="Lasers">Lasers (YAG, Green)</option>
+              <option value="OCT">OCT & Fundus</option>
+              <option value="Autoclave">Autoclave / CSSD</option>
+              <option value="Autoref">Autoref / Biometry</option>
+              <option value="Chair">Chair Units</option>
+            </select>
+          </div>
+
+          {/* Vendors Table / List */}
+          {filteredVendors.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 20px', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+              <Wrench size={36} color="#94a3b8" style={{ margin: '0 auto 12px auto' }} />
+              <h4 style={{ fontSize: '1.1rem', fontWeight: 700, color: '#334155' }}>No Vendors Found</h4>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', marginTop: '4px' }}>Try adjusting your search query or add a new vendor manually.</p>
+              <button onClick={handleOpenAddVendor} className="btn-post-ad" style={{ margin: '16px auto 0 auto' }}>
+                <PlusCircle size={16} />
+                <span>+ Add First Vendor</span>
+              </button>
+            </div>
+          ) : (
+            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
+                    <th style={{ padding: '12px 16px' }}>Company & Contact</th>
+                    <th style={{ padding: '12px 16px' }}>Phone(s)</th>
+                    <th style={{ padding: '12px 16px' }}>Location & Coverage</th>
+                    <th style={{ padding: '12px 16px' }}>Specialty Categories</th>
+                    <th style={{ padding: '12px 16px' }}>Brands Serviced</th>
+                    <th style={{ padding: '12px 16px' }}>Badge / Status</th>
+                    <th style={{ padding: '12px 16px', textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paginatedVendors.map((v) => (
+                    <tr key={v.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ fontWeight: 800, color: '#0f172a' }}>{v.company || v.name}</div>
+                        {v.name && v.company && v.name !== v.company && (
+                          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Contact: {v.name}</div>
+                        )}
+                        <div style={{ fontSize: '0.72rem', color: '#0284c7', fontWeight: 600 }}>{v.experience || '5+ Years Exp'}</div>
+                      </td>
+                      <td style={{ padding: '12px 16px', color: '#334155' }}>
+                        {Array.isArray(v.phones) && v.phones.length > 0 ? (
+                          v.phones.map((p, i) => (
+                            <div key={i} style={{ fontWeight: 600, fontSize: '0.8rem' }}>{p}</div>
+                          ))
+                        ) : '—'}
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ fontWeight: 700, color: '#0f172a' }}>{v.city}</div>
+                        <div style={{ fontSize: '0.74rem', color: '#64748b' }}>{v.coverage || 'Maharashtra'}</div>
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', maxWidth: '200px' }}>
+                          {(v.categories || []).slice(0, 3).map((cat, ci) => (
+                            <span key={ci} style={{ fontSize: '0.7rem', background: '#f0f9ff', color: '#0284c7', padding: '2px 6px', borderRadius: '4px', fontWeight: 600 }}>
+                              {cat}
+                            </span>
+                          ))}
+                          {(v.categories || []).length > 3 && (
+                            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>+{(v.categories.length - 3)} more</span>
+                          )}
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px 16px', color: '#475569', fontSize: '0.8rem' }}>
+                        {(v.brands || []).slice(0, 3).join(', ') || 'All Brands'}
+                      </td>
+                      <td style={{ padding: '12px 16px' }}>
+                        <span style={{ fontSize: '0.72rem', fontWeight: 700, background: v.verified ? '#ecfdf5' : '#fffbeb', color: v.verified ? '#059669' : '#d97706', padding: '3px 8px', borderRadius: '9999px', border: `1px solid ${v.verified ? '#a7f3d0' : '#fde68a'}` }}>
+                          {v.badge || (v.verified ? 'Verified' : 'Listed')}
+                        </span>
+                      </td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right' }}>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                          <button
+                            onClick={() => handleOpenEditVendor(v)}
+                            title="Edit Vendor"
+                            style={{ padding: '6px 10px', background: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.78rem', fontWeight: 600, color: '#0f172a' }}
+                          >
+                            <Edit2 size={13} color="#0284c7" />
+                            <span>Edit</span>
+                          </button>
+                          <button
+                            onClick={() => onDeleteVendor && onDeleteVendor(v.id)}
+                            title="Delete Vendor"
+                            style={{ padding: '6px 8px', background: '#fff1f2', border: '1px solid #fecdd3', borderRadius: '6px', cursor: 'pointer', color: '#e11d48' }}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          {/* Vendor Pagination Bar */}
+          {filteredVendors.length > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', fontSize: '0.84rem', color: '#64748b' }}>
+              <span>
+                Showing {filteredVendors.length > 0 ? (currentVendorPage - 1) * vendorPageSize + 1 : 0} to {Math.min(currentVendorPage * vendorPageSize, filteredVendors.length)} of {filteredVendors.length} service engineers
+              </span>
+
+              <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+                <button
+                  disabled={currentVendorPage <= 1}
+                  onClick={() => setCurrentVendorPage(p => p - 1)}
+                  style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: currentVendorPage <= 1 ? '#f1f5f9' : '#ffffff', cursor: currentVendorPage <= 1 ? 'not-allowed' : 'pointer' }}
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <span style={{ fontWeight: 700, padding: '0 8px' }}>
+                  Page {currentVendorPage} of {totalVendorPages}
+                </span>
+
+                <button
+                  disabled={currentVendorPage >= totalVendorPages}
+                  onClick={() => setCurrentVendorPage(p => p + 1)}
+                  style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', background: currentVendorPage >= totalVendorPages ? '#f1f5f9' : '#ffffff', cursor: currentVendorPage >= totalVendorPages ? 'not-allowed' : 'pointer' }}
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* MODAL: ADD MEMBER MANUALLY */}
       {showAddMemberModal && (
         <div className="modal-overlay" onClick={() => setShowAddMemberModal(false)}>
@@ -857,6 +1247,214 @@ export default function AdminPage({
                   id="btn-submit-add-member"
                 >
                   <span>Save Member to Database</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: ADD / EDIT VENDOR OR BIOMEDICAL TECHNICIAN */}
+      {showVendorModal && (
+        <div className="modal-overlay" onClick={() => setShowVendorModal(false)}>
+          <div className="modal-card" style={{ maxWidth: '640px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                {editingVendor ? 'Edit Service Engineer / Vendor' : 'Add New Service Engineer / Vendor'}
+              </h3>
+              <button className="modal-close-btn" onClick={() => setShowVendorModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleVendorFormSubmit} style={{ padding: '24px' }}>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-company">Company / Workshop Name *</label>
+                  <input
+                    id="input-vendor-company"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Nirale Eyecare Services"
+                    required
+                    value={vendorForm.company}
+                    onChange={e => setVendorForm({ ...vendorForm, company: e.target.value })}
+                    autoFocus
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-name">Contact Person Name</label>
+                  <input
+                    id="input-vendor-name"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Gajendra Nirale"
+                    value={vendorForm.name}
+                    onChange={e => setVendorForm({ ...vendorForm, name: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-phones">Primary Mobile / WhatsApp Number(s) *</label>
+                  <input
+                    id="input-vendor-phones"
+                    type="text"
+                    className="form-input"
+                    placeholder="+919822410293, +918329761468"
+                    required
+                    value={vendorForm.phonesText}
+                    onChange={e => setVendorForm({ ...vendorForm, phonesText: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-email">Email ID</label>
+                  <input
+                    id="input-vendor-email"
+                    type="email"
+                    className="form-input"
+                    placeholder="services@eyecare.com"
+                    value={vendorForm.email}
+                    onChange={e => setVendorForm({ ...vendorForm, email: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-city">Base City (Maharashtra) *</label>
+                  <input
+                    id="input-vendor-city"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Pune, Mumbai, Nagpur"
+                    required
+                    value={vendorForm.city}
+                    onChange={e => setVendorForm({ ...vendorForm, city: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-coverage">Coverage Region</label>
+                  <input
+                    id="input-vendor-coverage"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. All Maharashtra & Goa"
+                    value={vendorForm.coverage}
+                    onChange={e => setVendorForm({ ...vendorForm, coverage: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="input-vendor-categories">Equipment Categories Serviced (comma separated) *</label>
+                <input
+                  id="input-vendor-categories"
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. Microscopes, Phaco Machines, Lasers, OCT, Autoclave"
+                  required
+                  value={vendorForm.categoriesText}
+                  onChange={e => setVendorForm({ ...vendorForm, categoriesText: e.target.value })}
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-brands">Brands Serviced (comma separated)</label>
+                  <input
+                    id="input-vendor-brands"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Zeiss, Topcon, Alcon, Appasamy"
+                    value={vendorForm.brandsText}
+                    onChange={e => setVendorForm({ ...vendorForm, brandsText: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-experience">Experience</label>
+                  <input
+                    id="input-vendor-experience"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. 15+ Years"
+                    value={vendorForm.experience}
+                    onChange={e => setVendorForm({ ...vendorForm, experience: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="input-vendor-address">Workshop / Office Address</label>
+                <input
+                  id="input-vendor-address"
+                  type="text"
+                  className="form-input"
+                  placeholder="Shop / Office address, landmark, area"
+                  value={vendorForm.address}
+                  onChange={e => setVendorForm({ ...vendorForm, address: e.target.value })}
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="input-vendor-description">Services & Technical Specialization</label>
+                <textarea
+                  id="input-vendor-description"
+                  className="form-textarea"
+                  rows={3}
+                  placeholder="Describe machine repair specialties, PCB repair, optics alignment, AMC terms, buyback offers..."
+                  value={vendorForm.description}
+                  onChange={e => setVendorForm({ ...vendorForm, description: e.target.value })}
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="input-vendor-badge">Badge Label</label>
+                  <input
+                    id="input-vendor-badge"
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g. Top Rated Service Center"
+                    value={vendorForm.badge}
+                    onChange={e => setVendorForm({ ...vendorForm, badge: e.target.value })}
+                  />
+                </div>
+
+                <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '28px' }}>
+                  <input
+                    type="checkbox"
+                    id="checkbox-vendor-verified"
+                    checked={vendorForm.verified}
+                    onChange={e => setVendorForm({ ...vendorForm, verified: e.target.checked })}
+                    style={{ width: '18px', height: '18px', accentColor: '#0284c7' }}
+                  />
+                  <label htmlFor="checkbox-vendor-verified" style={{ fontSize: '0.88rem', fontWeight: 700, color: '#0f172a', cursor: 'pointer' }}>
+                    Mark as Verified MOS Technician
+                  </label>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+                <button
+                  type="button"
+                  className="btn-pluckcard-call"
+                  onClick={() => setShowVendorModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="btn-post-ad"
+                  id="btn-submit-save-vendor"
+                >
+                  <span>{editingVendor ? 'Save Changes' : 'Add to Verified Directory'}</span>
                 </button>
               </div>
             </form>
