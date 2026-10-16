@@ -20,6 +20,8 @@ import {
 import Pluckcard from '../components/Pluckcard';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import HeroBannerSwitcher from '../components/HeroBannerSwitcher';
+import OpticuraProductsShelf from '../components/OpticuraProductsShelf';
+import OpticuraShowcaseModal from '../components/OpticuraShowcaseModal';
 import { maskPhone, maskMembershipNo, maskDoctorName, maskPrice } from '../utils/masking';
 
 export default function BuyPage({ 
@@ -37,7 +39,8 @@ export default function BuyPage({
   const [selectedCondition, setSelectedCondition] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
-  const [selectedDetailListing, setSelectedDetailListing] = useState(null);
+  const [isOpticuraModalOpen, setIsOpticuraModalOpen] = useState(false);
+  const [selectedOpticuraId, setSelectedOpticuraId] = useState(null);
 
   const categories = [
     'All',
@@ -112,6 +115,14 @@ export default function BuyPage({
         }}
       />
 
+      {/* Opticura Ophthalmic Formulations Shelf */}
+      <OpticuraProductsShelf 
+        onOpenProductModal={(pId) => {
+          setSelectedOpticuraId(pId);
+          setIsOpticuraModalOpen(true);
+        }}
+      />
+
       {/* Filter & Search Bar */}
       <div id="equipment-filter-section" className="filter-search-container">
         <div className="search-input-row">
@@ -178,7 +189,7 @@ export default function BuyPage({
         </div>
       </div>
 
-      {/* Wanted Board Prompt Strip */}
+      {/* Requirement Board Prompt Strip */}
       <div className="wanted-board-prompt-banner">
         <div className="wanted-prompt-left">
           <div className="wanted-prompt-icon">
@@ -189,7 +200,7 @@ export default function BuyPage({
               Can't find the exact equipment or model you are looking for?
             </h4>
             <p className="wanted-prompt-desc">
-              Post what machine you need on our <strong>Doctors' Wanted Board</strong>. All 3,745 MOS members and verified technicians will be notified.
+              Post what machine or equipment you need on our <strong>Doctors' Requirement Board</strong>. All 3,745 MOS members and verified technicians will be notified.
             </p>
           </div>
         </div>
@@ -200,7 +211,7 @@ export default function BuyPage({
           id="btn-goto-wanted-board"
         >
           <MessageSquareQuote size={16} />
-          <span>Go to Wanted Board</span>
+          <span>Post Your Requirement Here</span>
         </button>
       </div>
 
@@ -246,7 +257,7 @@ export default function BuyPage({
               className="btn-open-common-chat"
               onClick={onOpenWantedBoard}
             >
-              Post to Wanted Board
+              Post Your Requirement
             </button>
             <button 
               className="btn-pluckcard-call"
@@ -269,7 +280,10 @@ export default function BuyPage({
               listing={listing}
               isSaved={savedItems.includes(listing.id)}
               onToggleSave={onToggleSave}
-              onOpenDetails={setSelectedDetailListing}
+              onOpenDetails={() => {
+                setSelectedOpticuraId(null);
+                setIsOpticuraModalOpen(true);
+              }}
               currentDoctor={currentDoctor}
               onOpenAuth={onOpenAuth}
             />
@@ -306,146 +320,12 @@ export default function BuyPage({
         </div>
       )}
 
-      {/* Full Equipment Detail Modal */}
-      {selectedDetailListing && (
-        <div className="modal-overlay" onClick={() => setSelectedDetailListing(null)}>
-          <div className="modal-card" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <div>
-                <span className="brand-pill">{selectedDetailListing.brand}</span>
-                <h3 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>
-                  {selectedDetailListing.title}
-                </h3>
-              </div>
-              <button 
-                className="modal-close-btn" 
-                onClick={() => setSelectedDetailListing(null)}
-                id="btn-close-detail-modal"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div style={{ padding: '24px' }}>
-              <div style={{ borderRadius: '12px', overflow: 'hidden', height: '280px', marginBottom: '20px', background: '#0f172a' }}>
-                <img 
-                  src={selectedDetailListing.image} 
-                  alt={selectedDetailListing.title}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              </div>
-
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-                <div>
-                  <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 600 }}>ASKING PRICE</div>
-                  <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>
-                    {currentDoctor ? selectedDetailListing.priceFormatted : '₹ •••••••• (Member Price)'}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  <div className="condition-badge mint" style={{ position: 'static' }}>
-                    <Sparkles size={12} />
-                    <span>{selectedDetailListing.condition}</span>
-                  </div>
-                  <div style={{ fontSize: '0.78rem', color: '#059669', fontWeight: 600, marginTop: '4px' }}>
-                    {selectedDetailListing.isNegotiable ? 'Negotiable Price' : 'Fixed Price'}
-                  </div>
-                </div>
-              </div>
-
-              {/* Specs & Description */}
-              <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '8px' }}>Clinical Overview & Specifications</h4>
-                <p style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6 }}>
-                  {selectedDetailListing.description}
-                </p>
-              </div>
-
-              {/* Included Accessories */}
-              {selectedDetailListing.accessories?.length > 0 && (
-                <div style={{ marginBottom: '20px' }}>
-                  <h4 style={{ fontSize: '1.05rem', fontWeight: 700, marginBottom: '8px' }}>Included Accessories & Spares</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                    {selectedDetailListing.accessories.map((acc, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem', color: '#334155', background: '#f1f5f9', padding: '8px 12px', borderRadius: '8px' }}>
-                        <CheckCircle2 size={16} color="#059669" />
-                        <span>{acc}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Seller Doctor Credentials Card */}
-              <div style={{ padding: '16px', background: '#f0fdfa', border: '1px solid #99f6e4', borderRadius: '12px', marginBottom: '24px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
-                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#0d9488', letterSpacing: '0.04em' }}>
-                      VERIFIED SELLER (MOS MEMBER)
-                    </div>
-                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>
-                      {maskDoctorName(selectedDetailListing.sellerName, !!currentDoctor)}
-                    </div>
-                    <div style={{ fontSize: '0.82rem', color: '#334155', marginTop: '2px' }}>
-                      {currentDoctor ? (selectedDetailListing.clinicName || 'Ophthalmic Clinic') : 'Verified Eye Clinic'} • {selectedDetailListing.sellerCity}
-                    </div>
-                    <div style={{ fontSize: '0.82rem', color: '#0d9488', marginTop: '4px', fontWeight: 600 }}>
-                      Phone: {maskPhone(selectedDetailListing.sellerMobile, !!currentDoctor)}
-                    </div>
-                  </div>
-                  <span className="mos-seal">
-                    MOS #{maskMembershipNo(selectedDetailListing.sellerMembershipNo, !!currentDoctor)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              {currentDoctor ? (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <a 
-                    href={`https://wa.me/91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hello ${selectedDetailListing.sellerName}, I am contacting you regarding your ${selectedDetailListing.title} on MOS Connect.`)}`}
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="btn-vendor-wa"
-                  >
-                    <WhatsAppIcon size={19} />
-                    <span>Connect on WhatsApp</span>
-                  </a>
-                  <a 
-                    href={`tel:+91${selectedDetailListing.sellerMobile?.replace(/\D/g, '')}`}
-                    className="btn-vendor-call"
-                  >
-                    <Phone size={18} />
-                    <span>Call Doctor Directly</span>
-                  </a>
-                </div>
-              ) : (
-                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px dashed #cbd5e1', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', color: '#0f172a', fontWeight: 700, fontSize: '0.95rem', marginBottom: '6px' }}>
-                    <Lock size={16} color="#0284c7" />
-                    <span>Doctor Contact Information Protected</span>
-                  </div>
-                  <p style={{ fontSize: '0.84rem', color: '#64748b', marginBottom: '14px', maxWidth: '420px', margin: '0 auto 14px auto' }}>
-                    Direct phone numbers and WhatsApp connections are reserved for verified MOS ophthalmic members.
-                  </p>
-                  <button 
-                    className="btn-guest-unlock"
-                    onClick={() => {
-                      setSelectedDetailListing(null);
-                      onOpenAuth();
-                    }}
-                    style={{ width: '100%', padding: '12px', justifyContent: 'center', fontSize: '0.95rem' }}
-                    id="btn-detail-modal-login"
-                  >
-                    <ShieldCheck size={18} />
-                    <span>Log In with MOS ID to Connect with Doctor</span>
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Opticura Ophthalmic Products Showcase Modal */}
+      <OpticuraShowcaseModal
+        isOpen={isOpticuraModalOpen}
+        onClose={() => setIsOpticuraModalOpen(false)}
+        initialProductId={selectedOpticuraId}
+      />
     </div>
   );
 }

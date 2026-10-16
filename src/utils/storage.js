@@ -12,7 +12,8 @@ const STORAGE_KEYS = {
   VENDORS: 'mos_eyeequip_vendors',
   CURRENT_DOCTOR: 'mos_eyeequip_current_doctor',
   SAVED_ITEMS: 'mos_eyeequip_saved_items',
-  INQUIRIES: 'mos_eyeequip_inquiries'
+  INQUIRIES: 'mos_eyeequip_inquiries',
+  VENDOR_REVIEWS: 'mos_eyeequip_vendor_reviews'
 };
 
 // Developer / SuperAdmin Stored Credentials (MOS ID: 'admin', Name: 'admin', Contact: 'admin12345')
@@ -417,5 +418,102 @@ export function deleteVendor(id) {
     console.error('Failed to delete vendor from localStorage', e);
   }
   return updated;
+}
+
+// ================= VENDOR REVIEWS & RATINGS =================
+const INITIAL_VENDOR_REVIEWS = {
+  'v-1': [
+    {
+      id: 'rev-1',
+      doctorName: 'Dr. Amit Khare',
+      membershipNo: '1842',
+      city: 'Pune',
+      rating: 5,
+      comment: 'Prompt response on a Sunday when our Zeiss Lumera microscope halogen unit failed. Arrived within 3 hours.',
+      date: '12 Oct 2026'
+    },
+    {
+      id: 'rev-2',
+      doctorName: 'Dr. Snehal Deshmukh',
+      membershipNo: '2904',
+      city: 'Mumbai',
+      rating: 5,
+      comment: 'Repaired our Phaco handpiece and recalibrated pressure sensors. Flawless OT performance since then.',
+      date: '28 Sep 2026'
+    }
+  ],
+  'v-2': [
+    {
+      id: 'rev-3',
+      doctorName: 'Dr. Rajesh Kulkarni',
+      membershipNo: '3115',
+      city: 'Nashik',
+      rating: 5,
+      comment: 'Very knowledgeable regarding ophthalmic electronics and PCB repair. Fixed our Topcon slit lamp power unit.',
+      date: '04 Oct 2026'
+    }
+  ],
+  'v-3': [
+    {
+      id: 'rev-4',
+      doctorName: 'Dr. Priya Shinde',
+      membershipNo: '2240',
+      city: 'Nagpur',
+      rating: 5,
+      comment: 'Reliable AMC service for our OT equipment. Highly courteous engineers with genuine spare parts.',
+      date: '18 Sep 2026'
+    }
+  ]
+};
+
+export function getAllVendorReviews() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.VENDOR_REVIEWS);
+    if (saved) {
+      return JSON.parse(saved);
+    }
+  } catch (e) {
+    console.error('Error reading vendor reviews from localStorage', e);
+  }
+  try {
+    localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(INITIAL_VENDOR_REVIEWS));
+  } catch (e) {
+    console.warn('Failed to initialize vendor reviews', e);
+  }
+  return INITIAL_VENDOR_REVIEWS;
+}
+
+export function getVendorReviews(vendorId) {
+  const all = getAllVendorReviews();
+  return all[vendorId] || [
+    {
+      id: `rev-default-${vendorId}`,
+      doctorName: 'Dr. Verified MOS Member',
+      membershipNo: 'MOS Surgeon',
+      city: 'Maharashtra',
+      rating: 5,
+      comment: 'Verified service engineer recommended for ophthalmic surgical equipment maintenance and AMC support.',
+      date: 'Recent'
+    }
+  ];
+}
+
+export function saveVendorReview(vendorId, review) {
+  const all = getAllVendorReviews();
+  const existing = all[vendorId] || [];
+  const newReview = {
+    ...review,
+    id: `rev-${Date.now()}`,
+    date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  };
+  const updatedList = [newReview, ...existing];
+  all[vendorId] = updatedList;
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(all));
+  } catch (e) {
+    console.error('Failed to save vendor review to localStorage', e);
+  }
+  return updatedList;
 }
 

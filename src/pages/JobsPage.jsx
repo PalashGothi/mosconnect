@@ -23,6 +23,7 @@ import {
   Lock
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
+import OpticuraLogo from '../components/OpticuraLogo';
 import { maskPhone, maskEmail, maskMembershipNo } from '../utils/masking';
 
 export default function JobsPage({ 
@@ -182,9 +183,12 @@ export default function JobsPage({
       {/* Hero Banner */}
       <div className="hero-banner" style={{ background: 'linear-gradient(135deg, #091a2f 0%, #1e3a5f 100%)' }}>
         <div className="hero-content">
-          <div className="hero-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: '#38bdf8', color: '#38bdf8' }}>
-            <Briefcase size={15} />
-            <span>Official Ophthalmic Careers & Vacancies</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '8px' }}>
+            <div className="hero-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: '#38bdf8', color: '#38bdf8', marginBottom: 0 }}>
+              <Briefcase size={15} />
+              <span>Verified Ophthalmic Careers • Supported by Opticura</span>
+            </div>
+            <OpticuraLogo variant="card" height={30} />
           </div>
           <h2 className="hero-title">
             Ophthalmic <span>Job Board & Fellowships</span> Across Maharashtra

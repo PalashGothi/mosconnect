@@ -25,6 +25,7 @@ import {
   Edit2
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
+import OpticuraLogo from '../components/OpticuraLogo';
 
 export default function AdminPage({ 
   currentDoctor, 
@@ -430,15 +431,18 @@ export default function AdminPage({
       <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: '32px', color: '#ffffff', marginBottom: '28px', border: '1px solid #334155' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid #38bdf8', padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8', marginBottom: '10px' }}>
-              <ShieldCheck size={14} />
-              <span>SUPERADMINISTRATION CONSOLE</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', background: 'rgba(56, 189, 248, 0.15)', border: '1px solid #38bdf8', padding: '4px 12px', borderRadius: '9999px', fontSize: '0.75rem', fontWeight: 700, color: '#38bdf8' }}>
+                <ShieldCheck size={14} />
+                <span>SUPERADMINISTRATION CONSOLE</span>
+              </div>
+              <OpticuraLogo variant="card" height={28} />
             </div>
             <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#ffffff' }}>
               MOS Connect Control Center
             </h2>
             <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '4px' }}>
-              Logged in as: <strong>{currentDoctor?.name}</strong> ({currentDoctor?.membershipNo})
+              Platform supported by Opticura • Logged in as: <strong>{currentDoctor?.name}</strong> ({currentDoctor?.membershipNo})
             </p>
           </div>
 

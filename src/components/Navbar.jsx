@@ -19,6 +19,9 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import WhatsAppIcon from './WhatsAppIcon';
+import OpticuraLogo from './OpticuraLogo';
+import { OPTICURA_CONTACT } from '../data/opticuraProducts';
 
 export default function Navbar({ 
   activeTab, 
@@ -45,11 +48,22 @@ export default function Navbar({
 
   return (
     <>
-      {/* Official MOS Announcement Strip */}
+      {/* Announcement Strip */}
       <div className="mos-top-bar">
-        <div className="verified-label">
-          <ShieldCheck size={14} color="#38bdf8" />
-          <span>Official Peer-to-Peer Marketplace & Service Network | Maharashtra Ophthalmological Society</span>
+        <div className="verified-label" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 800, color: '#38bdf8' }}>Supported by Opticura</span>
+          <span style={{ opacity: 0.5 }}>•</span>
+          <span>Premier Ophthalmic Platform for Eye Care Professionals</span>
+          <span style={{ opacity: 0.5 }}>•</span>
+          <a
+            href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am interested in accessing the MOS Connect platform supported by Opticura.')}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: '#4ade80', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+          >
+            <WhatsAppIcon size={13} />
+            <span>Non-member? Contact Dr. Atul Kadhane (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
+          </a>
         </div>
         <div className="active-members-count">
           <span className="pulse-dot"></span>
@@ -66,7 +80,10 @@ export default function Navbar({
           </div>
           <div className="brand-info">
             <h1>MOS <span>Connect</span></h1>
-            <span className="brand-tagline">Equipment, Careers & Service Network</span>
+            <span className="brand-tagline">Supported by Opticura • Eye Care Network</span>
+          </div>
+          <div style={{ marginLeft: '8px' }}>
+            <OpticuraLogo variant="compact" height={26} showBadge={false} />
           </div>
         </div>
 
@@ -86,9 +103,10 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'wanted' ? 'active' : ''}`}
             onClick={() => setActiveTab('wanted')}
             id="nav-tab-wanted"
+            title="Post your requirement here"
           >
             <MessageSquareQuote size={18} />
-            <span>Wanted Board</span>
+            <span>Post Requirement</span>
             {wantedCount > 0 && <span className="nav-badge verified-badge">{wantedCount}</span>}
           </button>
 
@@ -381,7 +399,7 @@ export default function Navbar({
               >
                 <div className="mobile-drawer-item-left">
                   <MessageSquareQuote size={20} />
-                  <span>Wanted Board</span>
+                  <span>Post Requirement</span>
                 </div>
                 {wantedCount > 0 && <span className="nav-badge verified-badge">{wantedCount}</span>}
               </button>
@@ -495,7 +513,7 @@ export default function Navbar({
           aria-label="Wanted Board"
         >
           <MessageSquareQuote size={20} />
-          <span>Wanted</span>
+          <span>Requirement</span>
           {wantedCount > 0 && <span className="bottom-nav-dot"></span>}
         </button>
 

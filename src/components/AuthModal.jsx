@@ -8,6 +8,9 @@ import {
   AlertCircle,
   UserCheck
 } from 'lucide-react';
+import WhatsAppIcon from './WhatsAppIcon';
+import OpticuraLogo from './OpticuraLogo';
+import { OPTICURA_CONTACT } from '../data/opticuraProducts';
 import { verifyDoctorLogin } from '../utils/storage';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
@@ -51,6 +54,9 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
         <div className="auth-flow-card">
           {/* Header */}
           <div className="auth-header">
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '12px' }}>
+              <OpticuraLogo variant="card" height={32} />
+            </div>
             <div className="auth-seal-icon">
               <ShieldCheck size={32} />
             </div>
@@ -58,7 +64,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               MOS Eye Doctor Login
             </h2>
             <p style={{ fontSize: '0.86rem', color: '#64748b', marginTop: '4px' }}>
-              Direct credential verification for approved members of Maharashtra Ophthalmological Society
+              Platform supported by Opticura • Direct credential verification for approved members of Maharashtra Ophthalmological Society
             </p>
           </div>
 
@@ -173,6 +179,49 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 <span>Verify & Login (Direct Access)</span>
                 <ArrowRight size={18} />
               </button>
+
+              {/* Not an MOS Member? Contact Dr. Atul Kadhane */}
+              <div 
+                style={{ 
+                  marginTop: '20px', 
+                  padding: '14px 16px', 
+                  background: '#f0fdf4', 
+                  border: '1.5px solid #86efac', 
+                  borderRadius: '12px', 
+                  textAlign: 'center' 
+                }}
+              >
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>Not an MOS Member?</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#374151', margin: '4px 0 10px 0', lineHeight: 1.4 }}>
+                  Interested in accessing this platform, selling equipment, or joining the network? Contact <strong>{OPTICURA_CONTACT.drName}</strong> directly on WhatsApp.
+                </p>
+                <a
+                  href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am not currently an MOS member, but I am interested in accessing / joining the MOS Connect platform supported by Opticura.')}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    background: '#25D366',
+                    color: '#ffffff',
+                    fontWeight: 700,
+                    fontSize: '0.84rem',
+                    padding: '9px 16px',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
+                    width: '100%'
+                  }}
+                  id="btn-auth-contact-dr-atul"
+                >
+                  <WhatsAppIcon size={16} />
+                  <span>Chat with {OPTICURA_CONTACT.drName} (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
+                </a>
+              </div>
             </form>
           )}
         </div>

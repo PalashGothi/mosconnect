@@ -19,6 +19,7 @@ import {
   Lock
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
+import OpticuraLogo from '../components/OpticuraLogo';
 
 // Preset sample photos for quick medical ad creation
 const PRESET_EQUIPMENT_PHOTOS = [
@@ -180,9 +181,12 @@ export default function SellPage({
       <div className="seller-gateway-container">
         {/* Gateway hero banner */}
         <div className="seller-gateway-hero">
-          <div className="seller-gateway-badge">
-            <ShieldCheck size={16} />
-            <span>Official MOS Doctor Seller Portal</span>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '16px' }}>
+            <div className="seller-gateway-badge" style={{ marginBottom: 0 }}>
+              <ShieldCheck size={16} />
+              <span>Verified Doctor Seller Portal • Supported by Opticura</span>
+            </div>
+            <OpticuraLogo variant="card" height={32} />
           </div>
           <h2 className="seller-gateway-title">
             List Your Equipment for Sale to <span>3,745 Verified Doctors</span> Across Maharashtra
@@ -232,7 +236,7 @@ export default function SellPage({
               <ShieldCheck size={22} />
             </div>
             <h4>Verified Peer Trust</h4>
-            <p>Your listing displays an official MOS verified badge with your membership number, establishing immediate trust.</p>
+            <p>Your listing displays a verified doctor badge with your membership number, establishing immediate trust.</p>
           </div>
         </div>
 
@@ -280,11 +284,14 @@ export default function SellPage({
       {/* Top Banner & Tab Switcher */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
         <div>
-          <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a' }}>
-            Equipment Seller Portal & My Listings
-          </h2>
-          <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '2px' }}>
-            Post your ad to be displayed as an official Pluckcard on the Buy page and manage your active equipment.
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: 800, color: '#0f172a', margin: 0 }}>
+              Equipment Seller Portal & My Listings
+            </h2>
+            <OpticuraLogo variant="card" height={28} />
+          </div>
+          <p style={{ fontSize: '0.9rem', color: '#64748b', margin: 0 }}>
+            Post your ad to be displayed as a verified Pluckcard on the Buy page and manage your active equipment. Supported by Opticura.
           </p>
         </div>
 

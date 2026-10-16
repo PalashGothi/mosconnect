@@ -15,6 +15,7 @@ import {
   Lock
 } from 'lucide-react';
 import { maskMembershipNo, maskDoctorName, maskTeaser } from '../utils/masking';
+import OpticuraLogo from './OpticuraLogo';
 
 export default function CommonChatBoard({ 
   posts, 
@@ -109,31 +110,35 @@ export default function CommonChatBoard({
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#38bdf8', fontSize: '0.85rem', fontWeight: 600, marginBottom: '4px' }}>
             <MessageSquareQuote size={18} />
-            <span>COMMUNITY WANTED BOARD & EQUIPMENT INQUIRIES</span>
+            <span>POST YOUR REQUIREMENT HERE • SUPPORTED BY OPTICURA</span>
           </div>
           <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#ffffff' }}>
-            Looking for Equipment You Couldn't Find?
+            Post Your Requirement Here
           </h2>
           <p style={{ fontSize: '0.9rem', color: '#94a3b8', marginTop: '4px', maxWidth: '700px' }}>
-            Post what machine you need below. All 3,745 MOS ophthalmologists and verified technicians across Maharashtra can see your request and assist you directly.
+            Looking for specific ophthalmic machines, instruments, or models? Post what you need below. All 3,745 MOS ophthalmologists and verified technicians across Maharashtra will be notified.
           </p>
         </div>
 
-        <button 
-          className="btn-post-ad"
-          style={{ background: '#10b981', boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)' }}
-          onClick={() => {
-            if (!currentDoctor) {
-              onOpenAuth();
-            } else {
-              setShowPostModal(true);
-            }
-          }}
-          id="btn-open-wanted-modal"
-        >
-          <PlusCircle size={18} />
-          <span>Post Equipment Wanted</span>
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <OpticuraLogo variant="card" height={32} />
+
+          <button 
+            className="btn-post-ad"
+            style={{ background: '#10b981', boxShadow: '0 4px 14px rgba(16, 185, 129, 0.35)' }}
+            onClick={() => {
+              if (!currentDoctor) {
+                onOpenAuth();
+              } else {
+                setShowPostModal(true);
+              }
+            }}
+            id="btn-open-wanted-modal"
+          >
+            <PlusCircle size={18} />
+            <span>+ Post Your Requirement</span>
+          </button>
+        </div>
       </div>
 
       {/* Guest Mode Notice Strip */}
@@ -381,12 +386,12 @@ export default function CommonChatBoard({
         )}
       </div>
 
-      {/* Modal: Post Wanted Equipment */}
+      {/* Modal: Post Requirement */}
       {showPostModal && (
         <div className="modal-overlay" onClick={() => setShowPostModal(false)}>
           <div className="modal-card" style={{ maxWidth: '560px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Post Wanted Equipment Request</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Post Your Requirement Here</h3>
               <button className="modal-close-btn" onClick={() => setShowPostModal(false)}>
                 &times;
               </button>

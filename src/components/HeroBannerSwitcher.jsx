@@ -21,6 +21,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import mosConnectBanner from '../assets/mos-connect-banner.jpg';
+import OpticuraLogo from './OpticuraLogo';
 
 export default function HeroBannerSwitcher({
   listingsCount = 0,
@@ -119,9 +120,12 @@ export default function HeroBannerSwitcher({
   const renderMarketplaceSlide = (isSplit = false) => (
     <div className={`hero-banner-inner slide-marketplace ${isSplit ? 'split-mode' : ''}`}>
       <div className="hero-content">
-        <div className="hero-badge">
-          <ShieldCheck size={15} />
-          <span>100% Peer-to-Peer Doctor Verified</span>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', flexWrap: 'wrap', marginBottom: '8px' }}>
+          <div className="hero-badge" style={{ marginBottom: 0 }}>
+            <ShieldCheck size={15} />
+            <span>Supported by Opticura • Peer-to-Peer Verified</span>
+          </div>
+          <OpticuraLogo variant="card" height={30} />
         </div>
         <h2 className="hero-title">
           Buy & Sell <span>Ophthalmology Equipment</span> Across Maharashtra
@@ -158,7 +162,7 @@ export default function HeroBannerSwitcher({
             id="hero-btn-wanted"
           >
             <Users size={15} />
-            <span>Doctors Wanted Board</span>
+            <span>Post Your Requirement</span>
           </button>
         </div>
 
@@ -198,7 +202,7 @@ export default function HeroBannerSwitcher({
             />
             <div className="mosconnect-img-badge">
               <Sparkles size={14} />
-              <span>Official MOS Society Portal</span>
+              <span>Supported by Opticura</span>
             </div>
           </div>
         </div>
@@ -206,26 +210,12 @@ export default function HeroBannerSwitcher({
         {/* Interactive Feature Panel Side */}
         <div className="mosconnect-info-side">
           <div className="mosconnect-header">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
               <div className="mosconnect-seal-badge" style={{ marginBottom: 0 }}>
                 <span className="mos-seal-dot"></span>
                 <span>Maharashtra Ophthalmological Society</span>
               </div>
-              <div style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                background: 'rgba(56, 189, 248, 0.12)',
-                border: '1px solid rgba(56, 189, 248, 0.35)',
-                padding: '3px 10px',
-                borderRadius: '9999px',
-                fontSize: '0.72rem',
-                color: '#7dd3fc',
-                fontWeight: 700
-              }}>
-                <span>Supported By</span>
-                <strong style={{ color: '#ffffff', letterSpacing: '0.03em' }}>OPTICURA</strong>
-              </div>
+              <OpticuraLogo variant="compact" height={26} />
             </div>
             <h2 className="mosconnect-main-title">
               MOS <span>CONNECT</span>
@@ -236,7 +226,7 @@ export default function HeroBannerSwitcher({
           </div>
 
           <p className="mosconnect-summary-text">
-            The official unified ecosystem for 3,745+ eye surgeons and hospitals in Maharashtra. Seamlessly access peer-to-peer equipment deals, ophthalmic career opportunities, verified biomedical engineers, and doctor networking.
+            The premier ophthalmic ecosystem supported by Opticura for 3,745+ eye surgeons and hospitals in Maharashtra. Seamlessly access peer-to-peer equipment deals, ophthalmic career opportunities, verified biomedical engineers, and doctor networking.
           </p>
 
           {/* Interactive Feature Pills (Clickable shortcuts) */}
@@ -377,8 +367,8 @@ export default function HeroBannerSwitcher({
             id="nav-pill-mosconnect"
           >
             <span className="nav-pill-num">02</span>
-            <span className="nav-pill-text">MOS CONNECT Official</span>
-            <span className="nav-pill-badge">Official</span>
+            <span className="nav-pill-text">MOS CONNECT</span>
+            <span className="nav-pill-badge" style={{ background: '#0284c7', color: '#ffffff' }}>Supported by Opticura</span>
           </button>
         </div>
 

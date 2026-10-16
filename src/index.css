@@ -1886,6 +1886,140 @@ input, select, textarea {
   background: var(--navy-800);
 }
 
+/* 3D Flip Card Container & Review System */
+.vendor-flip-wrapper {
+  perspective: 1200px;
+  min-height: 440px;
+  height: 100%;
+}
+
+.vendor-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.vendor-flip-wrapper.is-flipped .vendor-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.vendor-card-front, 
+.vendor-card-back {
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.vendor-card-front {
+  position: relative;
+  z-index: 2;
+  transform: rotateY(0deg);
+}
+
+.vendor-card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: rotateY(180deg);
+  background: #ffffff;
+  border: 1.5px solid #0284c7;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(2, 132, 199, 0.12);
+  z-index: 1;
+  overflow: hidden;
+}
+
+.vendor-flip-wrapper.is-flipped .vendor-card-back {
+  z-index: 3;
+}
+
+.btn-flip-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-flip-trigger:hover {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.vendor-reviews-scroll {
+  flex: 1;
+  overflow-y: auto;
+  margin: 12px 0;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vendor-reviews-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.vendor-reviews-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.vendor-review-item {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.btn-add-review-on-card {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-flip-back-compact {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+
 /* Auth Modal & Member Search */
 .auth-flow-card {
   padding: 32px;
@@ -3140,6 +3274,194 @@ html, body {
   .app-footer {
     padding-bottom: 90px; /* Space so bottom bar doesn't obscure footer */
   }
+}
+
+/* ================= VENDOR 3D FLIP CARD & REVIEWS ================= */
+.vendor-flip-wrapper {
+  perspective: 1200px;
+  position: relative;
+  min-height: 480px;
+  display: flex;
+}
+
+.vendor-flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+  transform-style: preserve-3d;
+  display: flex;
+}
+
+.vendor-flip-wrapper.is-flipped .vendor-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.vendor-card-front,
+.vendor-card-back {
+  width: 100%;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+.vendor-card-front {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.vendor-card-front:hover {
+  border-color: #cbd5e1;
+  box-shadow: var(--shadow-md);
+}
+
+.vendor-card-back {
+  background: linear-gradient(145deg, #091a2f 0%, #0d2847 100%);
+  color: #ffffff;
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  padding: 22px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+  transform: rotateY(180deg);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+}
+
+.vendor-reviews-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 12px;
+}
+
+.vendor-reviews-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.vendor-reviews-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.vendor-reviews-scroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.vendor-reviews-scroll::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.4);
+  border-radius: 4px;
+}
+
+.vendor-review-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+}
+
+.vendor-review-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.78rem;
+  color: #94a3b8;
+  margin-bottom: 4px;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.vendor-review-author {
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.vendor-review-stars {
+  color: #fbbf24;
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.vendor-review-text {
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+
+.vendor-flip-trigger-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vendor-flip-trigger-pill:hover {
+  background: #dcfce7;
+  transform: translateY(-1px);
+}
+
+.btn-card-turnback {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+}
+
+.btn-card-turnback:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #38bdf8;
+}
+
+.btn-add-review-cta {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #ffffff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  transition: transform 0.15s ease;
+}
+
+.btn-add-review-cta:hover {
+  transform: translateY(-1px);
 }
 
 

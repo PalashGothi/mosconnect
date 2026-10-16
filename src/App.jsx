@@ -7,6 +7,7 @@ import VendorsPage from './pages/VendorsPage';
 import JobsPage from './pages/JobsPage';
 import AdminPage from './pages/AdminPage';
 import CommonChatBoard from './components/CommonChatBoard';
+import OpticuraLogo from './components/OpticuraLogo';
 import { 
   getListings, 
   saveListing, 
@@ -275,11 +276,14 @@ export default function App() {
               <h3 style={{ fontSize: '1.25rem', color: '#ffffff' }}>MOS <span>Connect</span></h3>
             </div>
             <p style={{ fontSize: '0.85rem', lineHeight: 1.6, color: '#94a3b8', maxWidth: '380px' }}>
-              Official equipment marketplace, career exchange, and verified service directory for eye care specialists. Enabling peer-to-peer equipment exchange, hospital recruitment, and service support for 3,745+ ophthalmologists across Maharashtra.
+              Equipment marketplace, career exchange, and verified service directory for eye care specialists across Maharashtra. Supported by Opticura — caring to cure.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '16px', color: '#10b981', fontSize: '0.82rem', fontWeight: 600 }}>
+            <div style={{ marginTop: '14px' }}>
+              <OpticuraLogo variant="card" height={28} />
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '14px', color: '#10b981', fontSize: '0.82rem', fontWeight: 600 }}>
               <ShieldCheck size={16} />
-              <span>Approved MOS Member Authentication System</span>
+              <span>Verified MOS Member Authentication System</span>
             </div>
           </div>
 
@@ -287,7 +291,7 @@ export default function App() {
             <h4 style={{ color: '#ffffff', fontSize: '0.95rem', marginBottom: '14px', fontWeight: 700 }}>Quick Navigation</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.86rem' }}>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('buy')}>Buy Equipment Pluckcards</span>
-              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('wanted')}>Doctors' Wanted Board</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('wanted')}>Post Your Requirement Here</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('sell')}>Sell Equipment / Post Ad</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('jobs')}>Ophthalmic Job Board</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('vendors')}>45+ Technicians Directory</span>
@@ -311,13 +315,30 @@ export default function App() {
           </div>
 
           <div>
-            <h4 style={{ color: '#ffffff', fontSize: '0.95rem', marginBottom: '14px', fontWeight: 700 }}>MOS Coordination</h4>
-            <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '12px' }}>
-              For queries related to member approval records, vacancy moderation, or vendor submissions, reach out through the member portal.
+            <h4 style={{ color: '#ffffff', fontSize: '0.95rem', marginBottom: '14px', fontWeight: 700 }}>Non-MOS Inquiries</h4>
+            <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '10px' }}>
+              If you are not an MOS member and interested in joining or utilizing this platform, please reach out directly:
             </p>
-            <div style={{ fontSize: '0.82rem', color: '#38bdf8' }}>
-              Maharashtra Ophthalmological Society
-            </div>
+            <a 
+              href="https://wa.me/919890617789?text=Hello%20Dr.%20Atul%20Kadhane,%20I%20am%20interested%20in%20the%20MOS%20Connect%20platform%20(Supported%20by%20Opticura)."
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                background: 'rgba(34, 197, 94, 0.15)',
+                border: '1px solid #22c55e',
+                color: '#4ade80',
+                padding: '6px 12px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 700,
+                textDecoration: 'none'
+              }}
+            >
+              <span>💬 Contact Dr. Atul Kadhane: 9890617789</span>
+            </a>
           </div>
         </div>
 
