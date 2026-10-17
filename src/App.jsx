@@ -28,8 +28,10 @@ import {
   getCurrentDoctor, 
   setCurrentDoctor, 
   getSavedItems, 
-  toggleSaveItem 
+  toggleSaveItem,
+  applyCloudRecord
 } from './utils/storage';
+import { initCloudSync } from './services/cloudSync';
 import { 
   Eye, 
   ShieldCheck, 
@@ -61,6 +63,28 @@ export default function App() {
     setMembers(getMembers());
     setVendors(getVendors());
     setSavedItems(getSavedItems());
+
+    // Connect to JSONBin cloud sync for real-time cross-device updates
+    let cleanupFn = null;
+    initCloudSync((cloudRecord) => {
+      const changed = applyCloudRecord(cloudRecord);
+      if (changed) {
+        setListings(getListings());
+        setWantedPosts(getWantedPosts());
+        setJobs(getJobs());
+        setVendors(getVendors());
+      }
+    }).then(cleanup => {
+      cleanupFn = cleanup;
+    }).catch(err => {
+      console.warn('Cloud sync init error', err);
+    });
+
+    return () => {
+      if (typeof cleanupFn === 'function') {
+        cleanupFn();
+      }
+    };
   }, []);
 
   // Listing Handlers

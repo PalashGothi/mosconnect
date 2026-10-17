@@ -3,6 +3,7 @@ import initialWantedPosts from '../data/initialWantedPosts.json';
 import initialJobs from '../data/initialJobs.json';
 import mosMembers from '../data/mosMembers.json';
 import vendorsData from '../data/vendors.json';
+import { pushCloudDataDebounced } from '../services/cloudSync';
 
 const STORAGE_KEYS = {
   LISTINGS: 'mos_eyeequip_listings',
@@ -15,6 +16,52 @@ const STORAGE_KEYS = {
   INQUIRIES: 'mos_eyeequip_inquiries',
   VENDOR_REVIEWS: 'mos_eyeequip_vendor_reviews'
 };
+
+/**
+ * Trigger background push to cloud (JSONBin.io)
+ */
+export function triggerCloudSync() {
+  pushCloudDataDebounced(() => ({
+    listings: getListings(),
+    wantedPosts: getWantedPosts(),
+    jobs: getJobs(),
+    vendors: getVendors(),
+    vendorReviews: getAllVendorReviews()
+  }));
+}
+
+/**
+ * Apply cloud data downloaded from JSONBin.io to local cache
+ */
+export function applyCloudRecord(record) {
+  if (!record || typeof record !== 'object') return false;
+  let changed = false;
+  try {
+    if (Array.isArray(record.listings) && record.listings.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(record.listings));
+      changed = true;
+    }
+    if (Array.isArray(record.wantedPosts) && record.wantedPosts.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(record.wantedPosts));
+      changed = true;
+    }
+    if (Array.isArray(record.jobs) && record.jobs.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(record.jobs));
+      changed = true;
+    }
+    if (Array.isArray(record.vendors) && record.vendors.length > 0) {
+      localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(record.vendors));
+      changed = true;
+    }
+    if (record.vendorReviews && typeof record.vendorReviews === 'object') {
+      localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(record.vendorReviews));
+      changed = true;
+    }
+  } catch (e) {
+    console.error('Error applying cloud record to localStorage', e);
+  }
+  return changed;
+}
 
 // Developer / SuperAdmin Stored Credentials (MOS ID: 'admin', Name: 'admin', Contact: 'admin12345')
 export const DEVELOPER_ADMIN_ACCOUNT = {
@@ -211,6 +258,7 @@ export function saveJob(newJob) {
     updated = [newJob, ...jobs];
   }
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -228,6 +276,7 @@ export function updateJobStatus(jobId, status, adminName = 'MOS Admin') {
     return job;
   });
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -235,6 +284,7 @@ export function deleteJob(jobId) {
   const jobs = getJobs();
   const updated = jobs.filter(j => j.id !== jobId);
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -263,6 +313,7 @@ export function saveListing(newListing) {
     updated = [newListing, ...listings];
   }
   localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -270,6 +321,7 @@ export function deleteListing(id) {
   const listings = getListings();
   const updated = listings.filter(l => l.id !== id);
   localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -291,6 +343,7 @@ export function saveWantedPost(newPost) {
   const posts = getWantedPosts();
   const updated = [newPost, ...posts];
   localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -306,6 +359,7 @@ export function addReplyToPost(postId, reply) {
     return post;
   });
   localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(updated));
+  triggerCloudSync();
   return updated;
 }
 
@@ -403,6 +457,7 @@ export function saveVendor(newVendor) {
   }
   try {
     localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
+    triggerCloudSync();
   } catch (e) {
     console.error('Failed to save vendor to localStorage', e);
   }
@@ -414,6 +469,7 @@ export function deleteVendor(id) {
   const updated = vendors.filter(v => v.id !== id);
   try {
     localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
+    triggerCloudSync();
   } catch (e) {
     console.error('Failed to delete vendor from localStorage', e);
   }
@@ -511,6 +567,7 @@ export function saveVendorReview(vendorId, review) {
 
   try {
     localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(all));
+    triggerCloudSync();
   } catch (e) {
     console.error('Failed to save vendor review to localStorage', e);
   }

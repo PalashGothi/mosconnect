@@ -65,9 +65,16 @@ export default function Navbar({
             <span>Non-member? Contact Dr. Atul Kadhane (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
           </a>
         </div>
-        <div className="active-members-count">
-          <span className="pulse-dot"></span>
-          <span><strong>3,745</strong> Verified Eye Doctors Active</span>
+        <div className="active-members-count" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: '#38bdf8', fontSize: '0.74rem', fontWeight: 600 }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#38bdf8', boxShadow: '0 0 6px #38bdf8' }}></span>
+            <span>Cloud Live</span>
+          </span>
+          <span style={{ opacity: 0.4 }}>•</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+            <span className="pulse-dot"></span>
+            <span><strong>3,745</strong> Verified Doctors</span>
+          </span>
         </div>
       </div>
 
