@@ -508,7 +508,7 @@ export default function Navbar({
         <button 
           className={`bottom-nav-item ${activeTab === 'wanted' ? 'active' : ''}`}
           onClick={() => handleMobileNavClick('wanted')}
-          aria-label="Wanted Board"
+          aria-label="Post Requirement"
         >
           <MessageSquareQuote size={20} />
           <span>Requirement</span>

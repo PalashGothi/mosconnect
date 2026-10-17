@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   X, 
   ShieldCheck, 
@@ -31,6 +31,16 @@ export default function OpticuraShowcaseModal({
     }
     return OPTICURA_PRODUCTS[0];
   });
+
+  // Handle Escape key to close modal
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -106,20 +116,23 @@ export default function OpticuraShowcaseModal({
           <button 
             className="modal-close-btn" 
             onClick={onClose}
+            id="btn-close-opticura-modal"
+            aria-label="Close modal"
             style={{ 
-              background: 'rgba(255, 255, 255, 0.1)', 
+              background: 'rgba(255, 255, 255, 0.15)', 
               color: '#ffffff',
-              border: 'none',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
               borderRadius: '50%',
-              width: '36px',
-              height: '36px',
+              width: '40px',
+              height: '40px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
             }}
           >
-            <X size={20} />
+            <X size={22} />
           </button>
         </div>
 
@@ -136,6 +149,7 @@ export default function OpticuraShowcaseModal({
         >
           {/* Left: Product List Carousel / Selector */}
           <div 
+            className="opticura-modal-sidebar"
             style={{ 
               borderRight: '1px solid #e2e8f0', 
               overflowY: 'auto', 
@@ -254,8 +268,8 @@ export default function OpticuraShowcaseModal({
           </div>
 
           {/* Right: Selected Product In-Depth Specifications */}
-          <div style={{ overflowY: 'auto', padding: '24px 28px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px', alignItems: 'start' }}>
+          <div className="opticura-modal-content" style={{ overflowY: 'auto', padding: '24px 28px' }}>
+            <div className="opticura-modal-detail-grid" style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '24px', alignItems: 'start' }}>
               {/* Product Hero Image */}
               <div 
                 style={{ 

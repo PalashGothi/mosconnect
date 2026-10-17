@@ -189,34 +189,36 @@ export default function BuyPage({
         </div>
       </div>
 
-      {/* Requirement Board Prompt Strip */}
-      <div className="wanted-board-prompt-banner">
-        <div className="wanted-prompt-left">
-          <div className="wanted-prompt-icon">
-            <MessageSquareQuote size={22} />
+      {/* Requirement Board Prompt Strip (Only when listings are present) */}
+      {listings.length > 0 && (
+        <div className="wanted-board-prompt-banner">
+          <div className="wanted-prompt-left">
+            <div className="wanted-prompt-icon">
+              <MessageSquareQuote size={22} />
+            </div>
+            <div>
+              <h4 className="wanted-prompt-title">
+                Can't find the exact equipment or model you are looking for?
+              </h4>
+              <p className="wanted-prompt-desc">
+                Post what machine or equipment you need on our <strong>Doctors' Requirement Board</strong>. All 3,745 MOS members and verified technicians will be notified.
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="wanted-prompt-title">
-              Can't find the exact equipment or model you are looking for?
-            </h4>
-            <p className="wanted-prompt-desc">
-              Post what machine or equipment you need on our <strong>Doctors' Requirement Board</strong>. All 3,745 MOS members and verified technicians will be notified.
-            </p>
-          </div>
+
+          <button 
+            className="btn-open-common-chat"
+            onClick={onOpenWantedBoard}
+            id="btn-goto-wanted-board"
+          >
+            <MessageSquareQuote size={16} />
+            <span>Post Your Requirement Here</span>
+          </button>
         </div>
+      )}
 
-        <button 
-          className="btn-open-common-chat"
-          onClick={onOpenWantedBoard}
-          id="btn-goto-wanted-board"
-        >
-          <MessageSquareQuote size={16} />
-          <span>Post Your Requirement Here</span>
-        </button>
-      </div>
-
-      {/* Guest Mode Notice Strip */}
-      {!currentDoctor && (
+      {/* Guest Mode Notice Strip (Only when listings exist) */}
+      {!currentDoctor && listings.length > 0 && (
         <div className="guest-mode-notice-banner">
           <div className="guest-notice-left">
             <div className="guest-notice-icon">

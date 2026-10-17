@@ -141,8 +141,8 @@ export default function CommonChatBoard({
         </div>
       </div>
 
-      {/* Guest Mode Notice Strip */}
-      {!currentDoctor && (
+      {/* Guest Mode Notice Strip (Only when posts exist) */}
+      {!currentDoctor && posts.length > 0 && (
         <div className="guest-mode-notice-banner" style={{ marginTop: '20px', marginBottom: '20px' }}>
           <div className="guest-notice-left">
             <div className="guest-notice-icon">

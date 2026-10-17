@@ -317,8 +317,8 @@ export default function JobsPage({
       {/* TAB 1: BROWSE PUBLIC JOBS */}
       {activeTab === 'browse' && (
         <div>
-          {/* Guest Mode Notice Strip */}
-          {!currentDoctor && (
+          {/* Guest Mode Notice Strip (Only when job openings exist) */}
+          {!currentDoctor && jobs.length > 0 && (
             <div className="guest-mode-notice-banner">
               <div className="guest-notice-left">
                 <div className="guest-notice-icon">

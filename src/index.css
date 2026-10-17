@@ -3464,5 +3464,61 @@ html, body {
   transform: translateY(-1px);
 }
 
+/* ================= OPTICURA SHOWCASE MODAL RESPONSIVENESS ================= */
+.opticura-modal-sidebar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.opticura-modal-sidebar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.opticura-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.opticura-modal-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .opticura-modal-split {
+    grid-template-columns: 1fr !important;
+    overflow-y: auto !important;
+  }
+
+  .opticura-modal-sidebar {
+    border-right: none !important;
+    border-bottom: 1px solid #e2e8f0;
+    max-height: 190px !important;
+    padding: 10px 12px !important;
+  }
+
+  .opticura-modal-sidebar > div:nth-child(2) {
+    display: flex !important;
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    gap: 8px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .opticura-modal-sidebar button {
+    min-width: 170px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .opticura-modal-detail-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .opticura-modal-content {
+    padding: 18px 14px !important;
+  }
+}
+
 
 

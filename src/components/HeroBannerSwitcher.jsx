@@ -162,8 +162,8 @@ export default function HeroBannerSwitcher({
             <span className="hero-stat-label">MOS Approved Doctors</span>
           </div>
           <div className="hero-stat-item">
-            <span className="hero-stat-num">{listingsCount} Active</span>
-            <span className="hero-stat-label">Equipment Pluckcards</span>
+            <span className="hero-stat-num">{listingsCount > 0 ? `${listingsCount} Active` : 'Verified OT'}</span>
+            <span className="hero-stat-label">{listingsCount > 0 ? 'Equipment Pluckcards' : 'Equipment Exchange'}</span>
           </div>
           <div className="hero-stat-item">
             <span className="hero-stat-num">45+ Techs</span>
