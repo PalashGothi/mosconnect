@@ -147,16 +147,6 @@ export default function HeroBannerSwitcher({
 
           <button 
             type="button" 
-            className="hero-cta-btn secondary"
-            onClick={onOpenPostAd}
-            id="hero-btn-sell"
-          >
-            <PlusCircle size={15} />
-            <span>Post Ad to Sell</span>
-          </button>
-
-          <button 
-            type="button" 
             className="hero-cta-btn outline"
             onClick={onOpenWantedBoard}
             id="hero-btn-wanted"

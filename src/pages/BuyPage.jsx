@@ -257,15 +257,6 @@ export default function BuyPage({
               : 'Try adjusting your search filters or post your requirement directly on the requirement board.'}
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            {onOpenPostAd && (
-              <button 
-                className="btn-open-common-chat"
-                onClick={onOpenPostAd}
-                style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff' }}
-              >
-                + List Equipment for Sale
-              </button>
-            )}
             <button 
               className="btn-open-common-chat"
               onClick={onOpenWantedBoard}

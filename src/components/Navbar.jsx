@@ -171,15 +171,6 @@ export default function Navbar({
 
         {/* Right Nav Actions */}
         <div className="nav-actions">
-          <button 
-            className="btn-post-ad"
-            onClick={onOpenPostAd}
-            id="btn-post-ad-header"
-          >
-            <PlusCircle size={17} />
-            <span>Post Equipment Ad</span>
-          </button>
-
           {currentDoctor ? (
             <div style={{ position: 'relative' }}>
               <button 
