@@ -272,14 +272,14 @@ export function verifyDoctorLogin(inputMembershipNo, inputName, inputContact) {
         member: {
           sNo: '217',
           membershipNo: '3545',
-          membershipType: 'Life Membership',
+          membershipType: 'MOS Member & Platform Administrator',
           name: 'Dr. Atul Kadhane',
           email: 'atul.kadhane@opticura.in',
           mobile: '9890617789',
           city: 'Amravati / Mumbai',
           state: 'Maharashtra',
           isVerified: true,
-          role: 'doctor',
+          role: 'admin',
           ratifiedYear: '2025',
           lastLogin: new Date().toISOString()
         }
@@ -332,12 +332,19 @@ export function verifyDoctorLogin(inputMembershipNo, inputName, inputContact) {
     };
   }
 
+  const isDoctorAtul = 
+    String(member.membershipNo) === '3545' || 
+    String(member.mobile) === '9890617789' ||
+    matchDoctorNames('Dr. Atul Kadhane', member.name) ||
+    matchDoctorNames('Dr. Yash Atul Kadhane', member.name);
+
   return {
     success: true,
     member: {
       ...member,
       isVerified: true,
-      role: 'doctor',
+      role: isDoctorAtul ? 'admin' : (member.role || 'doctor'),
+      membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : (member.membershipType || 'Life Membership'),
       lastLogin: new Date().toISOString()
     }
   };
@@ -486,7 +493,20 @@ export function getCurrentDoctor() {
 
     const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_DOCTOR);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      // Ensure Dr. Atul Kadhane always has Admin rights
+      if (parsed && (
+        String(parsed.membershipNo) === '3545' || 
+        String(parsed.mobile) === '9890617789' ||
+        String(parsed.name || '').toLowerCase().includes('atul kadhane')
+      )) {
+        if (parsed.role !== 'admin') {
+          parsed.role = 'admin';
+          parsed.membershipType = 'MOS Member & Platform Administrator';
+          localStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(parsed));
+        }
+      }
+      return parsed;
     }
   } catch (e) {
     console.error('Error reading doctor from localStorage', e);
