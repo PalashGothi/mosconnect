@@ -17,7 +17,8 @@ import {
   Sparkles,
   Zap,
   Menu,
-  X
+  X,
+  Home
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import OpticuraLogo from './OpticuraLogo';
@@ -81,7 +82,7 @@ export default function Navbar({
       {/* Main Sticky Navbar */}
       <nav className="navbar">
         {/* Brand */}
-        <div className="nav-brand" onClick={() => setActiveTab('buy')}>
+        <div className="nav-brand" onClick={() => setActiveTab('home')}>
           <div className="brand-icon-wrapper">
             <Eye size={24} strokeWidth={2.5} />
           </div>
@@ -96,6 +97,15 @@ export default function Navbar({
 
         {/* Center Nav Links */}
         <div className="nav-links">
+          <button 
+            className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
+            onClick={() => setActiveTab('home')}
+            id="nav-tab-home"
+          >
+            <Home size={18} />
+            <span>Home</span>
+          </button>
+
           <button 
             className={`nav-item ${activeTab === 'buy' ? 'active' : ''}`}
             onClick={() => setActiveTab('buy')}
@@ -381,6 +391,16 @@ export default function Navbar({
           <div className="mobile-drawer-menu" id="mobile-drawer-menu">
             <div className="mobile-drawer-links">
               <button 
+                className={`mobile-drawer-item ${activeTab === 'home' ? 'active' : ''}`}
+                onClick={() => handleMobileNavClick('home')}
+              >
+                <div className="mobile-drawer-item-left">
+                  <Home size={20} />
+                  <span>Home</span>
+                </div>
+              </button>
+
+              <button 
                 className={`mobile-drawer-item ${activeTab === 'buy' ? 'active' : ''}`}
                 onClick={() => handleMobileNavClick('buy')}
               >
@@ -495,6 +515,15 @@ export default function Navbar({
 
       {/* Floating Sticky Mobile Bottom Navigation Bar */}
       <div className="mobile-bottom-bar" id="mobile-bottom-bar">
+        <button 
+          className={`bottom-nav-item ${activeTab === 'home' ? 'active' : ''}`}
+          onClick={() => handleMobileNavClick('home')}
+          aria-label="Home"
+        >
+          <Home size={20} />
+          <span>Home</span>
+        </button>
+
         <button 
           className={`bottom-nav-item ${activeTab === 'buy' ? 'active' : ''}`}
           onClick={() => handleMobileNavClick('buy')}

@@ -19,8 +19,7 @@ import {
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
 import WhatsAppIcon from '../components/WhatsAppIcon';
-import HeroBannerSwitcher from '../components/HeroBannerSwitcher';
-import OpticuraProductsShelf from '../components/OpticuraProductsShelf';
+import OpticuraLogo from '../components/OpticuraLogo';
 import OpticuraShowcaseModal from '../components/OpticuraShowcaseModal';
 import { maskPhone, maskMembershipNo, maskDoctorName, maskPrice } from '../utils/masking';
 
@@ -101,27 +100,45 @@ export default function BuyPage({
 
   return (
     <div>
-      {/* Dynamic Auto-Switcher Hero Banner Carousel & Side-by-Side */}
-      <HeroBannerSwitcher 
-        listingsCount={listings.length}
-        currentDoctor={currentDoctor}
-        onOpenPostAd={onOpenPostAd}
-        onOpenWantedBoard={onOpenWantedBoard}
-        onNavigateTab={onNavigateTab}
-        onOpenAuth={onOpenAuth}
-        onScrollToEquipment={() => {
-          const el = document.getElementById('equipment-filter-section');
-          if (el) el.scrollIntoView({ behavior: 'smooth' });
-        }}
-      />
+      {/* Equipment Marketplace Hero Banner */}
+      <div className="hero-banner" style={{ background: 'linear-gradient(135deg, #091a2f 0%, #0d3858 100%)' }}>
+        <div className="hero-content">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+            <div className="hero-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: '#38bdf8', color: '#38bdf8', marginBottom: 0 }}>
+              <ShieldCheck size={15} />
+              <span>Pre-Owned Ophthalmic Equipment Marketplace • Supported by Opticura</span>
+            </div>
 
-      {/* Opticura Ophthalmic Formulations Shelf */}
-      <OpticuraProductsShelf 
-        onOpenProductModal={(pId) => {
-          setSelectedOpticuraId(pId);
-          setIsOpticuraModalOpen(true);
-        }}
-      />
+            <OpticuraLogo variant="hero" height={32} />
+          </div>
+
+          <h2 className="hero-title" style={{ marginTop: '16px' }}>
+            Buy & Inspect <span>Verified Eye Equipment</span>
+          </h2>
+          <p className="hero-desc">
+            Directly connect with 3,745+ verified eye surgeons across Maharashtra. Inspect surgical microscopes, phacoemulsifiers, OCT systems, and slit lamps with complete transparency, clinical logs, and zero brokerage.
+          </p>
+
+          <div className="hero-stats-row">
+            <div className="hero-stat-item">
+              <span className="hero-stat-num">3,745</span>
+              <span className="hero-stat-label">MOS Approved Doctors</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-num">{listings.length > 0 ? `${listings.length} Active` : 'Verified OT'}</span>
+              <span className="hero-stat-label">{listings.length > 0 ? 'Equipment Pluckcards' : 'Equipment Exchange'}</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-num">0%</span>
+              <span className="hero-stat-label">Direct Connect Fee</span>
+            </div>
+            <div className="hero-stat-item">
+              <span className="hero-stat-num">100% Direct</span>
+              <span className="hero-stat-label">Peer to Peer</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Filter & Search Bar */}
       <div id="equipment-filter-section" className="filter-search-container">

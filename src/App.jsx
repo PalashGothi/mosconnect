@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import AuthModal from './components/AuthModal';
+import HomePage from './pages/HomePage';
 import BuyPage from './pages/BuyPage';
 import SellPage from './pages/SellPage';
 import VendorsPage from './pages/VendorsPage';
@@ -44,7 +45,7 @@ import {
 } from 'lucide-react';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('buy'); // 'buy', 'wanted', 'sell', 'jobs', 'vendors', 'admin'
+  const [activeTab, setActiveTab] = useState('home'); // 'home', 'buy', 'wanted', 'sell', 'jobs', 'vendors', 'admin'
   const [currentDoctor, setCurrentDoctorState] = useState(null);
   const [listings, setListings] = useState([]);
   const [wantedPosts, setWantedPosts] = useState([]);
@@ -210,6 +211,18 @@ export default function App() {
 
       {/* Main Page Routing */}
       <main className="main-content">
+        {activeTab === 'home' && (
+          <HomePage 
+            onNavigateTab={(tab) => setActiveTab(tab)}
+            onOpenAuth={() => setIsAuthOpen(true)}
+            currentDoctor={currentDoctor}
+            listingsCount={listings.length}
+            vendorsCount={vendors.length}
+            jobsCount={approvedJobsCount}
+            wantedCount={wantedPosts.length}
+          />
+        )}
+
         {activeTab === 'buy' && (
           <BuyPage 
             listings={listings}
@@ -314,6 +327,7 @@ export default function App() {
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '0.95rem', marginBottom: '14px', fontWeight: 700 }}>Quick Navigation</h4>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '0.86rem' }}>
+              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('home')}>Home</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('buy')}>Buy Equipment Pluckcards</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('wanted')}>Post Your Requirement Here</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('sell')}>Sell Equipment / Post Ad</span>
