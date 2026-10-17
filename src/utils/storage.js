@@ -37,15 +37,15 @@ export function applyCloudRecord(record) {
   if (!record || typeof record !== 'object') return false;
   let changed = false;
   try {
-    if (Array.isArray(record.listings) && record.listings.length > 0) {
+    if (Array.isArray(record.listings)) {
       localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(record.listings));
       changed = true;
     }
-    if (Array.isArray(record.wantedPosts) && record.wantedPosts.length > 0) {
+    if (Array.isArray(record.wantedPosts)) {
       localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(record.wantedPosts));
       changed = true;
     }
-    if (Array.isArray(record.jobs) && record.jobs.length > 0) {
+    if (Array.isArray(record.jobs)) {
       localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(record.jobs));
       changed = true;
     }
@@ -61,6 +61,19 @@ export function applyCloudRecord(record) {
     console.error('Error applying cloud record to localStorage', e);
   }
   return changed;
+}
+
+// One-time cleanup of initial mock listings, wanted posts, and jobs
+try {
+  const mockCleaned = localStorage.getItem('mos_mock_data_cleaned_v2');
+  if (!mockCleaned) {
+    localStorage.removeItem(STORAGE_KEYS.LISTINGS);
+    localStorage.removeItem(STORAGE_KEYS.WANTED_POSTS);
+    localStorage.removeItem(STORAGE_KEYS.JOBS);
+    localStorage.setItem('mos_mock_data_cleaned_v2', 'true');
+  }
+} catch (e) {
+  // ignore
 }
 
 // Developer / SuperAdmin Stored Credentials (MOS ID: 'admin', Name: 'admin', Contact: 'admin12345')

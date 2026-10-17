@@ -420,11 +420,27 @@ export default function JobsPage({
             <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
               <Briefcase size={48} style={{ margin: '0 auto 16px auto', color: '#94a3b8' }} />
               <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
-                No Positions Matching Your Criteria
+                {jobs.length === 0 ? 'No Job Openings Posted Yet' : 'No Positions Matching Your Criteria'}
               </h3>
-              <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '6px' }}>
-                Try broadening your specialty filters or post a job vacancy for your clinic.
+              <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '6px', maxWidth: '500px', margin: '6px auto 16px auto' }}>
+                {jobs.length === 0
+                  ? 'Be the first eye hospital or clinic to post an ophthalmic surgeon opening, fellowship, or optometrist vacancy.'
+                  : 'Try broadening your specialty filters or post a job vacancy for your clinic.'}
               </p>
+              <button 
+                className="btn-post-ad"
+                onClick={() => {
+                  if (!currentDoctor) {
+                    onOpenAuth();
+                  } else {
+                    setShowPostModal(true);
+                  }
+                }}
+                style={{ display: 'inline-flex', margin: '0 auto' }}
+              >
+                <PlusCircle size={17} />
+                <span>Post a Job Vacancy</span>
+              </button>
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>

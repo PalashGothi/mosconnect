@@ -247,29 +247,44 @@ export default function BuyPage({
         <div style={{ textAlign: 'center', padding: '60px 20px', background: '#ffffff', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
           <HelpCircle size={48} style={{ margin: '0 auto 16px auto', color: '#94a3b8' }} />
           <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
-            No Equipment Found Matching "{searchQuery}"
+            {listings.length === 0 
+              ? 'No Pre-Owned Equipment Listed Yet' 
+              : `No Equipment Found Matching "${searchQuery}"`}
           </h3>
-          <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '6px', maxWidth: '500px', margin: '6px auto 20px auto' }}>
-            Try adjusting your search filters or post your requirement directly on the common chat board so other doctors can contact you.
+          <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '6px', maxWidth: '520px', margin: '6px auto 20px auto' }}>
+            {listings.length === 0
+              ? 'Be the first doctor to list an ophthalmic machine, slit lamp, phaco unit, or clinic equipment for sale directly to peers.'
+              : 'Try adjusting your search filters or post your requirement directly on the requirement board.'}
           </p>
-          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {onOpenPostAd && (
+              <button 
+                className="btn-open-common-chat"
+                onClick={onOpenPostAd}
+                style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff' }}
+              >
+                + List Equipment for Sale
+              </button>
+            )}
             <button 
               className="btn-open-common-chat"
               onClick={onOpenWantedBoard}
             >
               Post Your Requirement
             </button>
-            <button 
-              className="btn-pluckcard-call"
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('All');
-                setSelectedCondition('All');
-                setSelectedCity('All');
-              }}
-            >
-              Clear Filters
-            </button>
+            {listings.length > 0 && (
+              <button 
+                className="btn-pluckcard-call"
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                  setSelectedCondition('All');
+                  setSelectedCity('All');
+                }}
+              >
+                Clear Filters
+              </button>
+            )}
           </div>
         </div>
       ) : (

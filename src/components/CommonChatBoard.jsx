@@ -171,10 +171,25 @@ export default function CommonChatBoard({
       {/* Thread Feed */}
       <div className="chat-thread-list">
         {posts.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '40px 20px', color: '#64748b' }}>
-            <HelpCircle size={40} style={{ margin: '0 auto 12px auto', color: '#94a3b8' }} />
-            <h3>No Wanted Posts Yet</h3>
-            <p style={{ fontSize: '0.9rem', marginTop: '4px' }}>Be the first doctor to post an equipment request!</p>
+          <div style={{ textAlign: 'center', padding: '48px 20px', color: '#64748b' }}>
+            <HelpCircle size={44} style={{ margin: '0 auto 12px auto', color: '#94a3b8' }} />
+            <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a' }}>No Requirements Posted Yet</h3>
+            <p style={{ fontSize: '0.9rem', color: '#64748b', marginTop: '6px', maxWidth: '440px', margin: '6px auto 16px auto' }}>
+              Be the first doctor to post an equipment or OT consumable requirement so colleagues and technicians across Maharashtra can assist you!
+            </p>
+            <button
+              onClick={() => {
+                if (!currentDoctor) {
+                  onOpenAuth();
+                } else {
+                  setShowNewPostModal(true);
+                }
+              }}
+              className="btn-open-common-chat"
+              style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff' }}
+            >
+              + Post Your Requirement
+            </button>
           </div>
         ) : (
           <>
