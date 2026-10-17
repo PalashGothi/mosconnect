@@ -2494,18 +2494,20 @@ input, select, textarea {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  color: #ffffff !important;
 }
 
 .seller-gateway-title span {
-  color: #38bdf8;
+  color: #38bdf8 !important;
 }
 
 .seller-gateway-subtitle {
-  font-size: 0.96rem;
-  color: #94a3b8;
+  font-size: 0.98rem;
+  color: #e2e8f0 !important;
   line-height: 1.6;
   max-width: 680px;
   margin: 0 auto 28px auto;
+  opacity: 0.95;
 }
 
 .seller-gateway-cta-row {

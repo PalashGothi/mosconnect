@@ -116,8 +116,8 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               {/* FIELD 2: DOCTOR NAME */}
               <div className="form-group">
                 <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Doctor Full Name *</span>
-                  <span style={{ color: '#0284c7', fontSize: '0.75rem', fontWeight: 600 }}>Mandatory</span>
+                  <span>Doctor Name *</span>
+                  <span style={{ color: '#0284c7', fontSize: '0.75rem', fontWeight: 600 }}>Dr. prefix optional</span>
                 </label>
                 <div style={{ position: 'relative' }}>
                   <UserCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
@@ -125,7 +125,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     type="text"
                     className="form-input"
                     style={{ paddingLeft: '42px' }}
-                    placeholder="e.g. Dr. Aishwarya Patil"
+                    placeholder="e.g. Atul Kadhane or Aishwarya Patil"
                     required
                     value={doctorName}
                     onChange={e => setDoctorName(e.target.value)}

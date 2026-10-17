@@ -188,10 +188,10 @@ export default function SellPage({
             </div>
             <OpticuraLogo variant="card" height={32} />
           </div>
-          <h2 className="seller-gateway-title">
-            List Your Equipment for Sale to <span>3,745 Verified Doctors</span> Across Maharashtra
+          <h2 className="seller-gateway-title" style={{ color: '#ffffff' }}>
+            List Your Equipment for Sale to <span style={{ color: '#38bdf8' }}>3,745 Verified Doctors</span> Across Maharashtra
           </h2>
-          <p className="seller-gateway-subtitle">
+          <p className="seller-gateway-subtitle" style={{ color: '#e2e8f0' }}>
             Post your surgical microscope, phaco machine, slit lamp, or laser directly to fellow practicing ophthalmologists. Zero commission, verified doctor credentials, and direct WhatsApp buyer inquiries.
           </p>
 
