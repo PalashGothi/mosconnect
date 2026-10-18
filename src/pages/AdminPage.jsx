@@ -437,9 +437,9 @@ export default function AdminPage({
   };
 
   return (
-    <div>
+    <div className="admin-page-container">
       {/* Admin Header */}
-      <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', borderRadius: '16px', padding: '32px', color: '#ffffff', marginBottom: '28px', border: '1px solid #334155' }}>
+      <div className="admin-header-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '16px' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '10px' }}>
@@ -457,22 +457,10 @@ export default function AdminPage({
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div className="admin-nav-tabs">
             <button
               onClick={() => setActiveAdminTab('jobs')}
-              style={{
-                padding: '9px 18px',
-                borderRadius: '8px',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                background: activeAdminTab === 'jobs' ? '#0284c7' : '#334155',
-                color: '#ffffff',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className={`admin-nav-tab-btn ${activeAdminTab === 'jobs' ? 'active' : 'inactive'}`}
               id="admin-tab-jobs"
             >
               <Briefcase size={16} />
@@ -481,19 +469,7 @@ export default function AdminPage({
 
             <button
               onClick={() => setActiveAdminTab('members')}
-              style={{
-                padding: '9px 18px',
-                borderRadius: '8px',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                background: activeAdminTab === 'members' ? '#0284c7' : '#334155',
-                color: '#ffffff',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className={`admin-nav-tab-btn ${activeAdminTab === 'members' ? 'active' : 'inactive'}`}
               id="admin-tab-members"
             >
               <Users size={16} />
@@ -502,19 +478,7 @@ export default function AdminPage({
 
             <button
               onClick={() => setActiveAdminTab('vendors')}
-              style={{
-                padding: '9px 18px',
-                borderRadius: '8px',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                background: activeAdminTab === 'vendors' ? '#0284c7' : '#334155',
-                color: '#ffffff',
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
+              className={`admin-nav-tab-btn ${activeAdminTab === 'vendors' ? 'active' : 'inactive'}`}
               id="admin-tab-vendors"
             >
               <Wrench size={16} />
@@ -588,47 +552,26 @@ export default function AdminPage({
             </div>
 
             {/* Filter Pills */}
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div className="admin-filter-pills-row">
               <button 
                 onClick={() => setJobStatusFilter('pending')}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  background: jobStatusFilter === 'pending' ? '#f59e0b' : '#f1f5f9',
-                  color: jobStatusFilter === 'pending' ? '#ffffff' : '#475569'
-                }}
+                className={`admin-filter-pill ${jobStatusFilter === 'pending' ? 'pending-active' : 'inactive'}`}
                 id="filter-jobs-pending"
               >
-                Pending Review ({pendingJobsCount})
+                ⏳ Pending ({pendingJobsCount})
               </button>
 
               <button 
                 onClick={() => setJobStatusFilter('approved')}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  background: jobStatusFilter === 'approved' ? '#10b981' : '#f1f5f9',
-                  color: jobStatusFilter === 'approved' ? '#ffffff' : '#475569'
-                }}
+                className={`admin-filter-pill ${jobStatusFilter === 'approved' ? 'approved-active' : 'inactive'}`}
                 id="filter-jobs-approved"
               >
-                Approved & Live ({approvedJobsCount})
+                ✓ Approved ({approvedJobsCount})
               </button>
 
               <button 
                 onClick={() => setJobStatusFilter('all')}
-                style={{
-                  padding: '6px 14px',
-                  borderRadius: '9999px',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  background: jobStatusFilter === 'all' ? '#0f172a' : '#f1f5f9',
-                  color: jobStatusFilter === 'all' ? '#ffffff' : '#475569'
-                }}
+                className={`admin-filter-pill ${jobStatusFilter === 'all' ? 'all-active' : 'inactive'}`}
                 id="filter-jobs-all"
               >
                 All Jobs ({jobs.length})
@@ -722,7 +665,7 @@ export default function AdminPage({
                   </div>
 
                   {/* Admin Actions */}
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
+                  <div className="admin-job-actions-row">
                     {job.status !== 'approved' && (
                       <button
                         onClick={() => {
@@ -730,18 +673,7 @@ export default function AdminPage({
                           setAdminNotice(`✓ Approved: "${job.title}" has been published live to the public careers board.`);
                           setTimeout(() => setAdminNotice(''), 6000);
                         }}
-                        style={{
-                          background: '#059669',
-                          color: '#ffffff',
-                          padding: '8px 16px',
-                          borderRadius: '8px',
-                          fontWeight: 700,
-                          fontSize: '0.84rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          cursor: 'pointer'
-                        }}
+                        className="admin-btn-approve"
                         id={`btn-approve-job-${job.id}`}
                       >
                         <CheckCircle2 size={16} />
@@ -756,18 +688,7 @@ export default function AdminPage({
                           setAdminNotice(`Job "${job.title}" has been marked as rejected.`);
                           setTimeout(() => setAdminNotice(''), 6000);
                         }}
-                        style={{
-                          background: '#fee2e2',
-                          color: '#ef4444',
-                          padding: '8px 14px',
-                          borderRadius: '8px',
-                          fontWeight: 700,
-                          fontSize: '0.84rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          cursor: 'pointer'
-                        }}
+                        className="admin-btn-reject"
                         id={`btn-reject-job-${job.id}`}
                       >
                         <XCircle size={16} />
@@ -777,20 +698,18 @@ export default function AdminPage({
 
                     <button
                       onClick={() => {
-                        onDeleteJob(job.id);
-                        setAdminNotice(`Job "${job.title}" has been deleted.`);
-                        setTimeout(() => setAdminNotice(''), 6000);
+                        if (window.confirm(`Are you sure you want to delete "${job.title}"?`)) {
+                          onDeleteJob(job.id);
+                          setAdminNotice(`Job "${job.title}" has been deleted.`);
+                          setTimeout(() => setAdminNotice(''), 6000);
+                        }
                       }}
-                      style={{
-                        padding: '8px 12px',
-                        color: '#64748b',
-                        background: '#f1f5f9',
-                        borderRadius: '8px',
-                        cursor: 'pointer'
-                      }}
+                      className="admin-btn-delete"
                       title="Delete job"
+                      id={`btn-delete-job-${job.id}`}
                     >
                       <Trash2 size={15} />
+                      <span>Delete Job</span>
                     </button>
                   </div>
                 </div>
@@ -814,7 +733,7 @@ export default function AdminPage({
               </p>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+            <div className="admin-member-actions-row">
               <button
                 onClick={handleDownloadTemplate}
                 style={{
@@ -827,7 +746,8 @@ export default function AdminPage({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  border: '1px solid #cbd5e1'
                 }}
                 id="btn-download-excel-template"
               >
@@ -846,7 +766,8 @@ export default function AdminPage({
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  border: 'none'
                 }}
                 id="label-upload-excel"
               >
@@ -875,7 +796,7 @@ export default function AdminPage({
           </div>
 
           {/* Member Search & Filter Bar */}
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+          <div className="admin-search-filter-bar">
             <div style={{ position: 'relative', flex: 1 }}>
               <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
               <input 
@@ -906,8 +827,8 @@ export default function AdminPage({
             </select>
           </div>
 
-          {/* Members Table */}
-          <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+          {/* Members Table - Desktop */}
+          <div className="admin-desktop-table" style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
@@ -952,8 +873,30 @@ export default function AdminPage({
             </table>
           </div>
 
+          {/* Members - Mobile Cards */}
+          <div className="admin-mobile-cards">
+            {paginatedMembers.map((m, idx) => (
+              <div key={`m-mob-${m.membershipNo}-${idx}`} className="admin-member-mobile-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                  <div>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0284c7' }}>#{m.membershipNo}</span>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{m.name}</h4>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', fontWeight: 600, background: '#ecfdf5', color: '#059669', padding: '3px 8px', borderRadius: '6px' }}>
+                    {m.membershipType || 'Life Membership'}
+                  </span>
+                </div>
+                <div style={{ fontSize: '0.82rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div>📞 +91 {m.mobile || '—'}</div>
+                  <div>✉️ {m.email || '—'}</div>
+                  <div>📍 {m.city || '—'}, {m.state || 'Maharashtra'}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Pagination Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', fontSize: '0.84rem', color: '#64748b' }}>
+          <div className="admin-pagination-bar">
             <span>
               Showing {filteredMembers.length > 0 ? (currentPage - 1) * pageSize + 1 : 0} to {Math.min(currentPage * pageSize, filteredMembers.length)} of {filteredMembers.length} doctors
             </span>
@@ -997,7 +940,7 @@ export default function AdminPage({
             </div>
 
             <button
-              className="btn-post-ad"
+              className="btn-post-ad admin-add-vendor-btn"
               onClick={handleOpenAddVendor}
               id="btn-admin-add-vendor"
               style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' }}
@@ -1008,7 +951,7 @@ export default function AdminPage({
           </div>
 
           {/* Search & Filter Bar */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+          <div className="admin-search-filter-bar">
             <div style={{ position: 'relative' }}>
               <Search size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
               <input
@@ -1063,7 +1006,8 @@ export default function AdminPage({
               </button>
             </div>
           ) : (
-            <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
+            <>
+            <div className="admin-desktop-table" style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '12px' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
@@ -1141,11 +1085,94 @@ export default function AdminPage({
                 </tbody>
               </table>
             </div>
+
+            {/* Vendors - Mobile Cards */}
+            <div className="admin-mobile-cards">
+              {paginatedVendors.map((v) => (
+                <div key={`v-mob-${v.id}`} className="admin-vendor-mobile-card">
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                    <div>
+                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>{v.company || v.name}</h4>
+                      {v.name && v.company && v.name !== v.company && (
+                        <div style={{ fontSize: '0.78rem', color: '#64748b' }}>Contact: {v.name}</div>
+                      )}
+                      <div style={{ fontSize: '0.75rem', color: '#0284c7', fontWeight: 600, marginTop: '2px' }}>
+                        📍 {v.city} • {v.experience || '5+ Years Exp'}
+                      </div>
+                    </div>
+                    <span style={{ fontSize: '0.72rem', fontWeight: 700, background: v.verified ? '#ecfdf5' : '#fffbeb', color: v.verified ? '#059669' : '#d97706', padding: '3px 8px', borderRadius: '9999px', border: `1px solid ${v.verified ? '#a7f3d0' : '#fde68a'}` }}>
+                      {v.badge || (v.verified ? 'Verified' : 'Listed')}
+                    </span>
+                  </div>
+
+                  <div style={{ fontSize: '0.84rem', color: '#334155', marginBottom: '8px' }}>
+                    📞 {Array.isArray(v.phones) && v.phones.length > 0 ? v.phones.join(', ') : '—'}
+                  </div>
+
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '12px' }}>
+                    {(v.categories || []).map((cat, ci) => (
+                      <span key={ci} style={{ fontSize: '0.72rem', background: '#f0f9ff', color: '#0284c7', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>
+                        {cat}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
+                    <button
+                      onClick={() => handleOpenEditVendor(v)}
+                      style={{
+                        background: '#0284c7',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 14px',
+                        fontWeight: 700,
+                        fontSize: '0.86rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Edit2 size={15} />
+                      <span>Edit Vendor</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (window.confirm(`Delete vendor "${v.company || v.name}"?`)) {
+                          onDeleteVendor && onDeleteVendor(v.id);
+                        }
+                      }}
+                      style={{
+                        background: '#fee2e2',
+                        color: '#b91c1c',
+                        border: '1px solid #fca5a5',
+                        borderRadius: '8px',
+                        padding: '10px 14px',
+                        fontWeight: 700,
+                        fontSize: '0.86rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <Trash2 size={15} />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+            </>
           )}
 
           {/* Vendor Pagination Bar */}
           {filteredVendors.length > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', fontSize: '0.84rem', color: '#64748b' }}>
+            <div className="admin-pagination-bar">
               <span>
                 Showing {filteredVendors.length > 0 ? (currentVendorPage - 1) * vendorPageSize + 1 : 0} to {Math.min(currentVendorPage * vendorPageSize, filteredVendors.length)} of {filteredVendors.length} service engineers
               </span>
@@ -1290,7 +1317,7 @@ export default function AdminPage({
                 />
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <div className="admin-modal-actions">
                 <button 
                   type="button" 
                   className="btn-pluckcard-call" 
@@ -1498,7 +1525,7 @@ export default function AdminPage({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <div className="admin-modal-actions">
                 <button
                   type="button"
                   className="btn-pluckcard-call"
