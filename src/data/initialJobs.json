@@ -1,1 +1,68 @@
-[]
+[
+  {
+    "id": "job-suraj-eye-vitreoretinal-surgeon",
+    "title": "Vitreoretinal Surgeon",
+    "hospital": "Suraj Eye Institute",
+    "city": "Nagpur",
+    "state": "Maharashtra",
+    "specialization": "Vitreoretina",
+    "jobType": "Full Time",
+    "experience": "MS / DNB in Ophthalmology, Fellowship in Vitreoretinal Surgery",
+    "salary": "Attractive & Competitive Remuneration based on experience",
+    "description": "Join a growing eye care team in Central India at Suraj Eye Institute (Nagpur | MIHAN). We are hiring a Vitreoretinal Surgeon with hands-on experience in retinal detachment, diabetic vitrectomy, and macular surgery. Advanced surgical and diagnostic setup, supportive team of ophthalmology specialists with opportunity to grow across two locations (Nagpur and MIHAN).",
+    "requirements": [
+      "MS / DNB in Ophthalmology",
+      "Fellowship in Vitreoretinal Surgery",
+      "Hands-on experience in retinal detachment",
+      "Diabetic vitrectomy and macular surgery",
+      "Valid medical council registration",
+      "Strong clinical skills & patient-first approach"
+    ],
+    "flyerImage": "/images/flyers/suraj_eye_institute_hiring.jpg",
+    "contactEmail": "hr@surajeye.org",
+    "contactPhone": "9884093001",
+    "contactWhatsApp": "9884093001",
+    "postedBy": {
+      "name": "Dr. Atul Kadhane",
+      "membershipNo": "3545",
+      "email": "atul.kadhane@opticura.in",
+      "mobile": "9890617789"
+    },
+    "status": "approved",
+    "postedAt": "2026-10-18T12:00:00.000Z",
+    "approvedAt": "2026-10-18T12:00:00.000Z",
+    "approvedBy": "Dr. Atul Kadhane"
+  },
+  {
+    "id": "job-sri-adinath-netralay-ophthalmologist",
+    "title": "Full Time Consultant Ophthalmologist (SAN)",
+    "hospital": "Sri Adinath Netralay (SAN) - Global Veerayatan Foundation (Affiliated with LVPEI)",
+    "city": "Palitana",
+    "state": "Gujarat",
+    "specialization": "General Ophthalmology",
+    "jobType": "Full Time",
+    "experience": "MS / DNB / DO in Ophthalmology",
+    "salary": "Negotiable based on experience + Free Campus Accommodation",
+    "description": "URGENT Opportunity for Full time Ophthalmologist at Sri Adinath Netralay (SAN), Palitana, Gujarat. SAN is an Eye Hospital instituted under the auspices of the Global Veerayatan Foundation and affiliated with the renowned LV Prasad Eye Institute (LVPEI). Comprehensive surgical center, high clinical volume, and comfortable accommodation provided on campus.",
+    "requirements": [
+      "MS / DNB / DO in Ophthalmology",
+      "Anterior segment & cataract surgical competency",
+      "Medical council registration",
+      "Dedication to charitable and quality community eye care"
+    ],
+    "flyerImage": null,
+    "contactEmail": "dolly.mehta@veerayatan.org",
+    "contactPhone": "9372900754",
+    "contactWhatsApp": "9372900754",
+    "postedBy": {
+      "name": "Dr.Chinmay Vishwanath Vaze",
+      "membershipNo": "2800",
+      "email": "cvvaze@gmail.com",
+      "mobile": "9765248936"
+    },
+    "status": "approved",
+    "postedAt": "2026-10-18T12:05:00.000Z",
+    "approvedAt": "2026-10-18T12:05:00.000Z",
+    "approvedBy": "Dr. Atul Kadhane"
+  }
+]

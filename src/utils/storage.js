@@ -355,7 +355,10 @@ export function getJobs() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.JOBS);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Error reading jobs from localStorage', e);
@@ -450,7 +453,10 @@ export function getWantedPosts() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.WANTED_POSTS);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
   } catch (e) {
     console.error('Error reading wanted posts from localStorage', e);
