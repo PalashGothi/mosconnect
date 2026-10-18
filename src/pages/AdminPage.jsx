@@ -43,6 +43,7 @@ export default function AdminPage({
 }) {
   const [activeAdminTab, setActiveAdminTab] = useState('jobs'); // 'jobs', 'members', or 'vendors'
   const [jobStatusFilter, setJobStatusFilter] = useState('pending'); // 'pending', 'approved', 'rejected', 'all'
+  const [selectedAdminFlyer, setSelectedAdminFlyer] = useState(null);
   
   // Member Search & Pagination State
   const [memberSearch, setMemberSearch] = useState('');
@@ -669,6 +670,30 @@ export default function AdminPage({
                   <p style={{ fontSize: '0.88rem', color: '#334155', lineHeight: 1.5 }}>
                     {job.description}
                   </p>
+
+                  {job.flyerImage && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#f0f9ff', border: '1px solid #bae6fd', padding: '10px 14px', borderRadius: '8px' }}>
+                      <img 
+                        src={job.flyerImage} 
+                        alt="Flyer" 
+                        style={{ width: '48px', height: '64px', objectFit: 'cover', borderRadius: '4px', cursor: 'pointer', border: '1px solid #cbd5e1' }}
+                        onClick={() => setSelectedAdminFlyer(job.flyerImage)}
+                      />
+                      <div>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#0369a1' }}>
+                          📄 Attached Recruitment / Fellowship Flyer Poster
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedAdminFlyer(job.flyerImage)}
+                          style={{ color: '#0284c7', fontSize: '0.78rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px', marginTop: '3px', cursor: 'pointer' }}
+                        >
+                          <Eye size={13} />
+                          <span>Inspect Full Flyer</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', fontSize: '0.82rem', color: '#64748b', background: '#f8fafc', padding: '10px 14px', borderRadius: '8px' }}>
                     <span>Experience: <strong>{job.experience}</strong></span>
@@ -1462,6 +1487,70 @@ export default function AdminPage({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ADMIN FLYER INSPECT LIGHTBOX */}
+      {selectedAdminFlyer && (
+        <div 
+          className="modal-overlay" 
+          style={{ zIndex: 1200, background: 'rgba(0, 0, 0, 0.88)', padding: '16px' }}
+          onClick={() => setSelectedAdminFlyer(null)}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              maxWidth: '850px', 
+              maxHeight: '92vh', 
+              width: '100%',
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              justifyContent: 'center' 
+            }} 
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              type="button"
+              onClick={() => setSelectedAdminFlyer(null)}
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                right: '-14px',
+                background: '#ef4444',
+                color: '#ffffff',
+                border: '2px solid #ffffff',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                zIndex: 10
+              }}
+              title="Close Flyer"
+            >
+              <X size={20} />
+            </button>
+
+            <img 
+              src={selectedAdminFlyer} 
+              alt="Admin Flyer Review" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '85vh', 
+                objectFit: 'contain', 
+                borderRadius: '12px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                background: '#091a2f'
+              }} 
+            />
+
+            <div style={{ marginTop: '10px', color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 600 }}>
+              MOS Connect Admin Moderation Review • Click outside or close to exit
+            </div>
           </div>
         </div>
       )}

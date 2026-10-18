@@ -142,7 +142,7 @@ export default function Navbar({
             id="nav-tab-jobs"
           >
             <Briefcase size={18} />
-            <span>Jobs</span>
+            <span>Jobs & Fellowship</span>
             {jobsCount > 0 && <span className="nav-badge" style={{ background: '#0284c7' }}>{jobsCount}</span>}
           </button>
 
@@ -438,7 +438,7 @@ export default function Navbar({
               >
                 <div className="mobile-drawer-item-left">
                   <Briefcase size={20} />
-                  <span>Jobs & Fellowships</span>
+                  <span>Jobs & Fellowship</span>
                 </div>
                 {jobsCount > 0 && <span className="nav-badge" style={{ background: '#0284c7' }}>{jobsCount}</span>}
               </button>
@@ -558,10 +558,10 @@ export default function Navbar({
         <button 
           className={`bottom-nav-item ${activeTab === 'jobs' ? 'active' : ''}`}
           onClick={() => handleMobileNavClick('jobs')}
-          aria-label="Jobs"
+          aria-label="Jobs & Fellowship"
         >
           <Briefcase size={20} />
-          <span>Jobs</span>
+          <span>Fellowship</span>
           {jobsCount > 0 && <span className="bottom-nav-dot"></span>}
         </button>
 

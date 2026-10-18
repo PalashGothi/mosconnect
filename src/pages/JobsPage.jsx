@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Briefcase, 
   Search, 
@@ -20,7 +20,11 @@ import {
   Award,
   Layers,
   FileText,
-  Lock
+  Lock,
+  Image as ImageIcon,
+  UploadCloud,
+  GraduationCap,
+  ZoomIn
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import OpticuraLogo from '../components/OpticuraLogo';
@@ -40,20 +44,36 @@ export default function JobsPage({
   const [selectedCity, setSelectedCity] = useState('All');
   const [showPostModal, setShowPostModal] = useState(false);
   const [selectedJobDetail, setSelectedJobDetail] = useState(null);
+  const [selectedFlyerModal, setSelectedFlyerModal] = useState(null);
+  const [onlyFlyersFilter, setOnlyFlyersFilter] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState('');
 
-  // Form State for Posting Job
+  // Handle ESC key for modal dismissal
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (selectedFlyerModal) setSelectedFlyerModal(null);
+        else if (selectedJobDetail) setSelectedJobDetail(null);
+        else if (showPostModal) setShowPostModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedFlyerModal, selectedJobDetail, showPostModal]);
+
+  // Form State for Posting Job / Fellowship
   const [formData, setFormData] = useState({
     title: '',
     hospital: '',
     city: currentDoctor?.city || 'Mumbai',
     state: 'Maharashtra',
     specialization: 'Phaco / Cataract',
-    jobType: 'Full Time',
-    experience: '2+ Years',
+    jobType: 'Fellowship',
+    experience: 'MS / DNB Ophthalmology',
     salary: '₹ 1,50,000 - ₹ 2,50,000 / month',
     description: '',
     requirementsText: 'MS / DNB in Ophthalmology, MMC Registration',
+    flyerImage: '',
     contactEmail: currentDoctor?.email || '',
     contactPhone: currentDoctor?.mobile || '',
     contactWhatsApp: currentDoctor?.mobile || ''
@@ -103,6 +123,9 @@ export default function JobsPage({
       if (selectedCity !== 'All' && !job.city?.toLowerCase().includes(selectedCity.toLowerCase())) {
         return false;
       }
+      if (onlyFlyersFilter && !job.flyerImage) {
+        return false;
+      }
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase().trim();
         const matches = 
@@ -115,7 +138,7 @@ export default function JobsPage({
       }
       return true;
     }).sort((a, b) => new Date(b.postedAt || 0) - new Date(a.postedAt || 0));
-  }, [publicJobs, selectedSpecialty, selectedJobType, selectedCity, searchQuery]);
+  }, [publicJobs, selectedSpecialty, selectedJobType, selectedCity, searchQuery, onlyFlyersFilter]);
 
   // Jobs posted by this doctor
   const myPostedJobs = useMemo(() => {
@@ -150,6 +173,7 @@ export default function JobsPage({
       salary: formData.salary,
       description: formData.description,
       requirements: requirementsArray,
+      flyerImage: formData.flyerImage || null,
       contactEmail: formData.contactEmail,
       contactPhone: formData.contactPhone,
       contactWhatsApp: formData.contactWhatsApp,
@@ -168,6 +192,24 @@ export default function JobsPage({
     onAddJob(newJob);
     setShowPostModal(false);
     
+    // Reset form
+    setFormData({
+      title: '',
+      hospital: '',
+      city: currentDoctor?.city || 'Mumbai',
+      state: 'Maharashtra',
+      specialization: 'Phaco / Cataract',
+      jobType: 'Fellowship',
+      experience: 'MS / DNB Ophthalmology',
+      salary: '₹ 1,50,000 - ₹ 2,50,000 / month',
+      description: '',
+      requirementsText: 'MS / DNB in Ophthalmology, MMC Registration',
+      flyerImage: '',
+      contactEmail: currentDoctor?.email || '',
+      contactPhone: currentDoctor?.mobile || '',
+      contactWhatsApp: currentDoctor?.mobile || ''
+    });
+
     if (currentDoctor.role === 'admin') {
       setSubmissionSuccess(`Job "${newJob.title}" posted and approved immediately as Administrator.`);
     } else {
@@ -186,15 +228,15 @@ export default function JobsPage({
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', marginBottom: '8px' }}>
             <div className="hero-badge" style={{ background: 'rgba(56, 189, 248, 0.15)', borderColor: '#38bdf8', color: '#38bdf8', marginBottom: 0 }}>
               <Briefcase size={15} />
-              <span>Verified Ophthalmic Careers • Supported by Opticura</span>
+              <span>Verified Ophthalmic Careers & Fellowships • Supported by Opticura</span>
             </div>
             <OpticuraLogo variant="card" height={30} />
           </div>
           <h2 className="hero-title">
-            Ophthalmic <span>Job Board & Fellowships</span> Across Maharashtra
+            Jobs & Fellowship
           </h2>
           <p className="hero-desc">
-            Direct recruitment for eye hospitals, retina institutes, and surgical clinics. Connect with qualified vitreoretina consultants, phaco surgeons, optometrists, and ophthalmic OT teams verified by MOS.
+            Direct ophthalmic recruitment and fellowship opportunities across Maharashtra. Explore hospital openings, surgical fellowships, clinical postings, and verified career flyers.
           </p>
 
           <div className="hero-stats-row">
@@ -234,7 +276,7 @@ export default function JobsPage({
             onClick={() => setActiveTab('browse')}
             id="tab-browse-jobs"
           >
-            Browse Open Positions ({publicJobs.length})
+            Browse Positions & Fellowships ({publicJobs.length})
           </button>
 
           <button 
@@ -299,7 +341,7 @@ export default function JobsPage({
             id="btn-post-job-cta"
           >
             <PlusCircle size={18} />
-            <span>Post a Job Vacancy</span>
+            <span>Post a Job / Fellowship</span>
           </button>
         </div>
       </div>
@@ -383,7 +425,18 @@ export default function JobsPage({
             </div>
 
             {/* Specialization Filter Pills */}
-            <div className="category-pills">
+            <div className="category-pills" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center' }}>
+              <button 
+                type="button"
+                className={`category-pill ${onlyFlyersFilter ? 'active' : ''}`}
+                style={onlyFlyersFilter ? { background: '#0284c7', color: '#ffffff', borderColor: '#0284c7' } : { borderColor: '#38bdf8', color: '#0369a1', background: '#f0f9ff' }}
+                onClick={() => setOnlyFlyersFilter(!onlyFlyersFilter)}
+                id="filter-only-flyers"
+              >
+                <ImageIcon size={14} />
+                <span>📷 With Flyers Only</span>
+              </button>
+
               {specializations.map(spec => (
                 <button 
                   key={spec}
@@ -452,14 +505,86 @@ export default function JobsPage({
                 );
 
                 return (
-                  <div key={job.id} className="vendor-card" style={{ padding: '22px' }} id={`job-card-${job.id}`}>
+                  <div key={job.id} className="vendor-card" style={{ padding: '22px', display: 'flex', flexDirection: 'column' }} id={`job-card-${job.id}`}>
+                    {/* Top Flyer Thumbnail Banner if flyer is attached */}
+                    {job.flyerImage && (
+                      <div 
+                        className="job-card-flyer-header"
+                        onClick={() => setSelectedFlyerModal(job.flyerImage)}
+                        style={{
+                          height: '165px',
+                          margin: '-22px -22px 14px -22px',
+                          position: 'relative',
+                          cursor: 'pointer',
+                          overflow: 'hidden',
+                          borderRadius: '16px 16px 0 0',
+                          background: '#091a2f'
+                        }}
+                        title="Click to view full flyer"
+                      >
+                        <img 
+                          src={job.flyerImage} 
+                          alt={job.title} 
+                          style={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            objectPosition: 'top center',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        />
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '8px',
+                          right: '8px',
+                          background: 'rgba(15, 23, 42, 0.85)',
+                          backdropFilter: 'blur(4px)',
+                          color: '#ffffff',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          padding: '4px 9px',
+                          borderRadius: '6px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px'
+                        }}>
+                          <Eye size={13} />
+                          <span>View Full Flyer</span>
+                        </div>
+                        {job.jobType === 'Fellowship' && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '10px',
+                            left: '10px',
+                            background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                            color: '#ffffff',
+                            fontSize: '0.7rem',
+                            fontWeight: 800,
+                            padding: '3px 9px',
+                            borderRadius: '9999px',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                            letterSpacing: '0.04em'
+                          }}>
+                            🎓 FELLOWSHIP
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                       <span className="brand-pill" style={{ background: '#f0fdfa', color: '#0d9488' }}>
                         {job.specialization}
                       </span>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 9px', borderRadius: '9999px', background: '#f1f5f9', color: '#334155' }}>
-                        {job.jobType}
-                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {job.flyerImage && !job.flyerImage.startsWith('data:') && (
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 7px', borderRadius: '4px' }}>
+                            📷 Flyer
+                          </span>
+                        )}
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 9px', borderRadius: '9999px', background: '#f1f5f9', color: '#334155' }}>
+                          {job.jobType}
+                        </span>
+                      </div>
                     </div>
 
                     <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#0f172a', lineHeight: 1.3, marginBottom: '4px' }}>
@@ -696,12 +821,12 @@ export default function JobsPage({
         </div>
       )}
 
-      {/* MODAL: POST A JOB */}
+      {/* MODAL: POST A JOB / FELLOWSHIP */}
       {showPostModal && (
         <div className="modal-overlay" onClick={() => setShowPostModal(false)}>
-          <div className="modal-card" style={{ maxWidth: '640px' }} onClick={e => e.stopPropagation()}>
+          <div className="modal-card" style={{ maxWidth: '680px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Post Ophthalmic Job Vacancy</h3>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Post Ophthalmic Job or Fellowship Vacancy</h3>
               <button className="modal-close-btn" onClick={() => setShowPostModal(false)}>
                 <X size={20} />
               </button>
@@ -832,6 +957,162 @@ export default function JobsPage({
                 />
               </div>
 
+              {/* FIELD: RECRUITMENT / FELLOWSHIP FLYER IMAGE */}
+              <div className="form-group" style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <label className="form-label" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <ImageIcon size={16} color="#0284c7" />
+                    <span>Recruitment / Fellowship Flyer Poster (Optional)</span>
+                  </label>
+                  <span style={{ fontSize: '0.75rem', color: '#0284c7', fontWeight: 600 }}>Images & Posters Supported</span>
+                </div>
+                <p style={{ fontSize: '0.78rem', color: '#64748b', marginBottom: '12px' }}>
+                  Upload an official recruitment flyer, hospital poster, or fellowship brochure to attract qualified eye surgeons and trainees.
+                </p>
+
+                {/* Preview if image is set */}
+                {formData.flyerImage ? (
+                  <div style={{ position: 'relative', borderRadius: '10px', overflow: 'hidden', border: '2px solid #0284c7', maxHeight: '200px', background: '#091a2f', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '12px' }}>
+                    <img 
+                      src={formData.flyerImage} 
+                      alt="Flyer Preview" 
+                      style={{ maxHeight: '200px', width: 'auto', objectFit: 'contain' }} 
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, flyerImage: '' })}
+                      style={{
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        background: '#ef4444',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '28px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 6px rgba(0,0,0,0.3)'
+                      }}
+                      title="Remove Flyer"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {/* Upload from device */}
+                    <label 
+                      htmlFor="flyer-file-upload" 
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '16px',
+                        border: '2px dashed #cbd5e1',
+                        borderRadius: '10px',
+                        background: '#ffffff',
+                        cursor: 'pointer',
+                        transition: 'border-color 0.2s ease'
+                      }}
+                    >
+                      <UploadCloud size={24} color="#0284c7" />
+                      <span style={{ fontSize: '0.86rem', fontWeight: 700, color: '#0f172a' }}>
+                        Click to Upload Flyer Image from Device
+                      </span>
+                      <span style={{ fontSize: '0.74rem', color: '#64748b' }}>
+                        Supports PNG, JPG, JPEG, WEBP
+                      </span>
+                      <input 
+                        id="flyer-file-upload"
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setFormData({ ...formData, flyerImage: reader.result });
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                      />
+                    </label>
+
+                    {/* Or Choose Sample Template Presets */}
+                    <div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
+                        Or Choose a Pre-Designed Flyer Template:
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, flyerImage: '/images/flyers/fellowship_flyer.jpg' })}
+                          style={{
+                            padding: '8px 10px',
+                            border: '1px solid #cbd5e1',
+                            borderRadius: '8px',
+                            background: '#ffffff',
+                            textAlign: 'left',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <img src="/images/flyers/fellowship_flyer.jpg" alt="Fellowship" style={{ width: '32px', height: '42px', objectFit: 'cover', borderRadius: '4px' }} />
+                          <div>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0f172a' }}>Fellowship Flyer</div>
+                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Vitreoretina Program</div>
+                          </div>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => setFormData({ ...formData, flyerImage: '/images/flyers/phaco_job_flyer.jpg' })}
+                          style={{
+                            padding: '8px 10px',
+                            border: '1px solid #cbd5e1',
+                            borderRadius: '8px',
+                            background: '#ffffff',
+                            textAlign: 'left',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          <img src="/images/flyers/phaco_job_flyer.jpg" alt="Phaco Surgeon" style={{ width: '32px', height: '42px', objectFit: 'cover', borderRadius: '4px' }} />
+                          <div>
+                            <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0f172a' }}>Surgeon Job Flyer</div>
+                            <div style={{ fontSize: '0.7rem', color: '#64748b' }}>Phaco Consultant</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Or External URL */}
+                    <div>
+                      <input 
+                        type="url" 
+                        className="form-input" 
+                        style={{ padding: '8px 12px', fontSize: '0.8rem' }}
+                        placeholder="Or paste flyer image URL (https://...)" 
+                        value={formData.flyerImage}
+                        onChange={e => setFormData({ ...formData, flyerImage: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="form-row-3">
                 <div className="form-group">
                   <label className="form-label">Contact Email</label>
@@ -924,6 +1205,37 @@ export default function JobsPage({
                 )}
               </div>
 
+              {/* Flyer Display in Details Modal */}
+              {selectedJobDetail.flyerImage && (
+                <div style={{ marginBottom: '20px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #e2e8f0', background: '#091a2f', textAlign: 'center', position: 'relative' }}>
+                  <img 
+                    src={selectedJobDetail.flyerImage} 
+                    alt="Official Job / Fellowship Flyer" 
+                    style={{ maxHeight: '360px', width: 'auto', maxWidth: '100%', objectFit: 'contain', cursor: 'zoom-in' }}
+                    onClick={() => setSelectedFlyerModal(selectedJobDetail.flyerImage)}
+                  />
+                  <div style={{
+                    padding: '8px 14px',
+                    background: '#0f172a',
+                    color: '#94a3b8',
+                    fontSize: '0.78rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    <span>📄 Official Hospital Flyer / Brochure</span>
+                    <button 
+                      type="button"
+                      onClick={() => setSelectedFlyerModal(selectedJobDetail.flyerImage)}
+                      style={{ color: '#38bdf8', fontWeight: 700, fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
+                    >
+                      <Eye size={13} />
+                      <span>Click to Enlarge / Full Screen</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+
               <div style={{ marginBottom: '18px' }}>
                 <h4 style={{ fontSize: '1rem', fontWeight: 700, marginBottom: '6px' }}>Role Description</h4>
                 <p style={{ fontSize: '0.9rem', color: '#334155', lineHeight: 1.6 }}>
@@ -1000,6 +1312,71 @@ export default function JobsPage({
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* LIGHTBOX MODAL: FULLSCREEN FLYER VIEWER */}
+      {selectedFlyerModal && (
+        <div 
+          className="modal-overlay" 
+          style={{ zIndex: 1200, background: 'rgba(0, 0, 0, 0.88)', padding: '16px' }}
+          onClick={() => setSelectedFlyerModal(null)}
+        >
+          <div 
+            style={{ 
+              position: 'relative', 
+              maxWidth: '850px', 
+              maxHeight: '92vh', 
+              width: '100%',
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              justifyContent: 'center' 
+            }} 
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              type="button"
+              onClick={() => setSelectedFlyerModal(null)}
+              style={{
+                position: 'absolute',
+                top: '-14px',
+                right: '-14px',
+                background: '#ef4444',
+                color: '#ffffff',
+                border: '2px solid #ffffff',
+                borderRadius: '50%',
+                width: '36px',
+                height: '36px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
+                zIndex: 10
+              }}
+              title="Close Flyer (Esc)"
+            >
+              <X size={20} />
+            </button>
+
+            <img 
+              src={selectedFlyerModal} 
+              alt="Job / Fellowship Flyer" 
+              style={{ 
+                maxWidth: '100%', 
+                maxHeight: '85vh', 
+                objectFit: 'contain', 
+                borderRadius: '12px',
+                boxShadow: '0 20px 50px rgba(0,0,0,0.6)',
+                background: '#091a2f'
+              }} 
+            />
+
+            <div style={{ marginTop: '10px', color: '#e2e8f0', fontSize: '0.82rem', fontWeight: 600 }}>
+              Official Recruitment & Fellowship Notification • Press ESC or click outside to close
             </div>
           </div>
         </div>

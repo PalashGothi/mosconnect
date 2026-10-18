@@ -113,7 +113,7 @@ export default function HomePage({
               >
                 <Briefcase size={18} />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>Jobs & Fellowships</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>Jobs & Fellowship</div>
                   <div style={{ fontSize: '0.74rem', opacity: 0.85 }}>Surgeon & Hospital Hiring</div>
                 </div>
                 <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
@@ -327,7 +327,7 @@ export default function HomePage({
               <Briefcase size={26} />
             </div>
             <div className="portal-card-tag" style={{ color: '#9333ea', background: '#faf5ff' }}>CAREER HUB</div>
-            <h3 className="portal-card-title">Ophthalmic Jobs & Careers</h3>
+            <h3 className="portal-card-title">Jobs & Fellowship</h3>
             <p className="portal-card-desc">
               Hospital vacancies, vitreoretina fellowships, anterior segment surgeons, and optometrist openings across Maharashtra eye care centers.
             </p>

@@ -331,7 +331,7 @@ export default function App() {
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('buy')}>Buy Equipment Pluckcards</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('wanted')}>Post Your Requirement Here</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('sell')}>Sell Equipment / Post Ad</span>
-              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('jobs')}>Ophthalmic Job Board</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('jobs')}>Jobs & Fellowship</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('vendors')}>45+ Technicians Directory</span>
               {currentDoctor?.role === 'admin' && (
                 <span style={{ cursor: 'pointer', color: '#38bdf8', fontWeight: 700 }} onClick={() => setActiveTab('admin')}>
