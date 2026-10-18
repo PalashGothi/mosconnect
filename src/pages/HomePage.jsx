@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   ShieldCheck, 
   Sparkles, 
@@ -13,21 +13,14 @@ import {
   Eye, 
   MapPin, 
   Phone, 
-  ExternalLink,
-  ChevronRight,
-  Layers,
-  Pill,
-  Star
+  ExternalLink
 } from 'lucide-react';
 import mosConnectBanner from '../assets/mos-connect-banner.jpg';
 import OpticuraLogo from '../components/OpticuraLogo';
 import WhatsAppIcon from '../components/WhatsAppIcon';
-import OpticuraShowcaseModal from '../components/OpticuraShowcaseModal';
 import { 
   OPTICURA_PRODUCTS, 
-  OPTICURA_CONTACT, 
-  getOpticuraProductWhatsAppUrl,
-  getGeneralOpticuraWhatsAppUrl 
+  OPTICURA_CONTACT 
 } from '../data/opticuraProducts';
 
 export default function HomePage({ 
@@ -39,13 +32,6 @@ export default function HomePage({
   jobsCount = 0,
   wantedCount = 0
 }) {
-  const [selectedOpticuraProduct, setSelectedOpticuraProduct] = useState(null);
-  const [isOpticuraModalOpen, setIsOpticuraModalOpen] = useState(false);
-
-  const handleOpenProduct = (product) => {
-    setSelectedOpticuraProduct(product);
-    setIsOpticuraModalOpen(true);
-  };
 
   return (
     <div className="home-page-container">
@@ -185,135 +171,44 @@ export default function HomePage({
         </div>
       </section>
 
-      {/* 2. OPTICURA OPHTHALMIC PRODUCTS CATALOGUE */}
+      {/* 2. OPTICURA PRODUCTS */}
       <section className="home-opticura-section" id="opticura-products-section">
-        <div className="home-section-header">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '14px', marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ background: '#ffffff', padding: '6px 14px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
-                <img 
-                  src="/images/opticura/opticura-logo.png" 
-                  alt="Opticura - Caring to Cure" 
-                  style={{ height: '36px', width: 'auto', objectFit: 'contain' }}
-                />
-              </div>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#0284c7', letterSpacing: '0.08em' }}>
-                    Dedicated Ophthalmic Formulations
-                  </span>
-                  <span style={{ fontSize: '0.68rem', fontWeight: 700, background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '9999px' }}>
-                    Caring to Cure
-                  </span>
-                </div>
-                <h2 style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0f172a', margin: '4px 0 0 0' }}>
-                  Opticura <span>Pharmaceuticals</span> Range
-                </h2>
-              </div>
+        <div className="home-section-header" style={{ marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ background: '#ffffff', padding: '6px 14px', borderRadius: '12px', boxShadow: '0 4px 12px rgba(0,0,0,0.06)' }}>
+              <img 
+                src="/images/opticura/opticura-logo.png" 
+                alt="Opticura - Caring to Cure" 
+                style={{ height: '36px', width: 'auto', objectFit: 'contain' }}
+              />
             </div>
-
-            {/* Direct Order WhatsApp Helpline with Dr. Atul Kadhane */}
-            <a 
-              href={getGeneralOpticuraWhatsAppUrl('home_header')}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px',
-                background: '#25D366',
-                color: '#ffffff',
-                padding: '9px 18px',
-                borderRadius: '9999px',
-                fontWeight: 700,
-                fontSize: '0.85rem',
-                textDecoration: 'none',
-                boxShadow: '0 4px 14px rgba(37, 211, 102, 0.35)',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              <WhatsAppIcon size={18} />
-              <span>Hospital Supply / WhatsApp: {OPTICURA_CONTACT.whatsappNumber}</span>
-            </a>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, textTransform: 'uppercase', color: '#0284c7', letterSpacing: '0.08em' }}>
+                  Supported by Opticura
+                </span>
+              </div>
+              <h2 style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0f172a', margin: '4px 0 0 0' }}>
+                Opticura Products
+              </h2>
+            </div>
           </div>
-
-          <p style={{ fontSize: '0.92rem', color: '#64748b', maxWidth: '800px', lineHeight: 1.6, margin: 0 }}>
-            Precision post-op steroids, NSAIDs, advanced lubricating tear formulations, anti-infectives, and retinal nutraceuticals tailored for clinical excellence. Click any formulation to view clinical indications, pharmacology, and pack specifications.
-          </p>
         </div>
 
-        {/* 8 Product Cards Grid */}
+        {/* 8 Product Cards Grid - Images Only */}
         <div className="home-products-grid">
           {OPTICURA_PRODUCTS.map((prod) => (
             <div 
               key={prod.id} 
-              className="home-product-card"
-              onClick={() => handleOpenProduct(prod)}
+              className="home-product-image-card"
               id={`home-product-${prod.id}`}
             >
-              <div className="home-product-image-container">
-                <img 
-                  src={prod.image} 
-                  alt={prod.name} 
-                  className="home-product-img"
-                  loading="lazy"
-                />
-                <span 
-                  className="home-product-badge"
-                  style={{ 
-                    background: `${prod.tagColor}15`, 
-                    color: prod.tagColor, 
-                    border: `1px solid ${prod.tagColor}35` 
-                  }}
-                >
-                  {prod.tag}
-                </span>
-              </div>
-
-              <div className="home-product-body">
-                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', textTransform: 'uppercase', marginBottom: '2px' }}>
-                  {prod.category}
-                </div>
-                <h3 className="home-product-name">{prod.name}</h3>
-                <div className="home-product-composition">{prod.composition}</div>
-
-                <div className="home-product-highlights-chips">
-                  {prod.highlights?.slice(0, 2).map((h, i) => (
-                    <span key={i} className="home-product-chip">
-                      ✓ {h}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="home-product-footer">
-                  <span className="home-product-pack">
-                    📦 Pack: <strong>{prod.packSize}</strong>
-                  </span>
-                  
-                  <div style={{ display: 'flex', gap: '6px' }}>
-                    <a
-                      href={getOpticuraProductWhatsAppUrl(prod)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="btn-order-wa-pill"
-                      title="Direct order via WhatsApp"
-                    >
-                      <WhatsAppIcon size={14} />
-                      <span>Order</span>
-                    </a>
-
-                    <button 
-                      type="button" 
-                      className="btn-product-details-pill"
-                      onClick={() => handleOpenProduct(prod)}
-                    >
-                      <span>Specs</span>
-                      <ChevronRight size={13} />
-                    </button>
-                  </div>
-                </div>
-              </div>
+              <img 
+                src={prod.image} 
+                alt={prod.name} 
+                className="home-product-pure-img"
+                loading="lazy"
+              />
             </div>
           ))}
         </div>
@@ -446,12 +341,6 @@ export default function HomePage({
         </div>
       </section>
 
-      {/* Opticura Product Details Modal */}
-      <OpticuraShowcaseModal 
-        isOpen={isOpticuraModalOpen}
-        onClose={() => setIsOpticuraModalOpen(false)}
-        initialProductId={selectedOpticuraProduct?.id}
-      />
     </div>
   );
 }
