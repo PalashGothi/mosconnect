@@ -3605,6 +3605,106 @@ html, body {
   flex-direction: column;
 }
 
+.home-banner-wrapper-flanked {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #071526;
+  padding: 18px 24px;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-banner-wrapper-flanked .home-banner-image-wrapper {
+  flex: 1;
+  max-width: 860px;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #071526;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.home-flank-card {
+  width: 250px;
+  flex-shrink: 0;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(13, 56, 88, 0.88) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 16px;
+  padding: 20px 18px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  backdrop-filter: blur(12px);
+  z-index: 2;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.home-flank-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.55);
+  box-shadow: 0 14px 36px rgba(2, 132, 199, 0.3);
+}
+
+.home-flank-card .flank-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  width: fit-content;
+}
+
+.home-flank-card .flank-title {
+  font-size: 1.02rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 8px 0;
+  line-height: 1.35;
+}
+
+.home-flank-card .flank-desc {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0 0 16px 0;
+  line-height: 1.45;
+}
+
+.btn-flank-wa {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #25D366;
+  color: #ffffff;
+  font-size: 0.84rem;
+  font-weight: 700;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.btn-flank-wa:hover {
+  background: #20bd5a;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+}
+
 .home-banner-image-wrapper {
   width: 100%;
   position: relative;
@@ -3626,7 +3726,7 @@ html, body {
   transition: transform 0.4s ease;
 }
 
-/* Quick Action Grid Below Banner Graphic */
+/* Quick Action Grid Below Banner Graphic (5 Columns) */
 .home-hero-action-bar {
   background: linear-gradient(180deg, #091e36 0%, #061322 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -3635,7 +3735,7 @@ html, body {
 
 .home-hero-action-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 12px;
 }
 
@@ -3663,6 +3763,18 @@ html, body {
   color: #ffffff;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(2, 132, 199, 0.4);
+}
+
+.home-action-btn.sell-accent {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.35) 100%);
+  border-color: rgba(52, 211, 153, 0.35);
+  color: #ecfdf5;
+}
+.home-action-btn.sell-accent:hover {
+  background: #059669;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
 }
 
 .home-action-btn.secondary {
@@ -3875,7 +3987,7 @@ html, body {
 
 .home-portals-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
 
@@ -3990,11 +4102,33 @@ html, body {
 
 /* Responsive Breakpoints for Home Page */
 @media (max-width: 1200px) {
+  .home-banner-wrapper-flanked {
+    gap: 14px;
+    padding: 14px 16px;
+  }
+  .home-flank-card {
+    width: 220px;
+    padding: 16px 14px;
+  }
+  .home-flank-card .flank-title {
+    font-size: 0.94rem;
+  }
   .home-products-grid {
     grid-template-columns: repeat(3, 1fr);
   }
   .home-portals-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .home-banner-wrapper-flanked {
+    flex-direction: column;
+    padding: 16px;
+  }
+  .home-flank-card {
+    width: 100%;
+    max-width: 640px;
   }
 }
 

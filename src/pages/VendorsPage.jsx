@@ -260,16 +260,16 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
           </div>
 
           <h2 className="hero-title" style={{ marginTop: '16px' }}>
-            Verified <span>Engineers & Technicians</span> for Ophthalmic Devices
+            Local Vendors <span>& Technicians</span> for Ophthalmic Devices
           </h2>
           <p className="hero-desc">
-            Direct contacts for {activeVendors.length}+ specialized biomedical engineers, former Zeiss & Appasamy technicians, Phaco probe repair specialists, autoclave engineers, and certified ophthalmic optics experts across Maharashtra. Click any card to flip and view peer reviews!
+            Direct contacts for local equipment vendors, specialized biomedical engineers, former Zeiss & Appasamy technicians, Phaco probe repair specialists, autoclave engineers, and certified ophthalmic optics experts across Maharashtra. Click any card to flip and view peer reviews!
           </p>
 
           <div className="hero-stats-row">
             <div className="hero-stat-item">
-              <span className="hero-stat-num">{activeVendors.length} Engineers</span>
-              <span className="hero-stat-label">Verified Specialists</span>
+              <span className="hero-stat-num">{activeVendors.length} Local Vendors</span>
+              <span className="hero-stat-label">Local Specialists</span>
             </div>
             <div className="hero-stat-item">
               <span className="hero-stat-num">All Maharashtra</span>
@@ -296,10 +296,10 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
             </div>
             <div>
               <div className="guest-notice-title">
-                Guest Mode — Biomedical Engineer Direct Contacts Masked
+                Guest Mode — Local Vendor & Technician Contacts Masked
               </div>
               <div className="guest-notice-sub">
-                Browse verified technicians, brand specializations, and service locations. Direct engineer phone numbers and WhatsApp connections are protected for MOS members.
+                Browse local vendors, brand specializations, and service locations. Direct phone numbers and WhatsApp connections are protected for eye care doctors.
               </div>
             </div>
           </div>
@@ -309,7 +309,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
             id="btn-guest-unlock-vendors"
           >
             <ShieldCheck size={16} />
-            <span>Log In with MOS ID</span>
+            <span>Doctor Login</span>
           </button>
         </div>
       )}
@@ -360,7 +360,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
       {/* Vendor Cards Count & Results */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
         <div style={{ fontSize: '0.9rem', color: '#64748b' }}>
-          Showing <strong>{filteredVendors.length}</strong> verified engineers • <em>Click card or rating to flip & view reviews</em>
+          Showing <strong>{filteredVendors.length}</strong> local vendors & technicians • <em>Click card or rating to flip & view reviews</em>
         </div>
 
         {(searchQuery || selectedCategory !== 'All' || selectedCity !== 'All') && (
@@ -656,7 +656,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                 +{filteredVendors.length - 3} More Biomedical Technicians & Engineers Protected
               </h3>
               <p className="locked-gate-desc">
-                Direct contact numbers, WhatsApp service dispatch links, and verified engineer coverage areas across Maharashtra are restricted to verified MOS members.
+                Direct contact numbers, WhatsApp service dispatch links, and local vendor coverage areas across Maharashtra are restricted to registered eye doctors.
               </p>
               <button 
                 className="btn-locked-gate-login"
@@ -664,7 +664,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                 id="btn-gate-login-vendors"
               >
                 <ShieldCheck size={18} />
-                <span>Log In with MOS ID to Access Full Directory ({filteredVendors.length})</span>
+                <span>Doctor Login to Access Full Directory ({filteredVendors.length})</span>
               </button>
             </div>
           )}

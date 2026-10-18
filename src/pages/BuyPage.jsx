@@ -121,10 +121,10 @@ export default function BuyPage({
           </div>
 
           <h2 className="hero-title" style={{ marginTop: '16px' }}>
-            Buy & Inspect <span>Verified Eye Equipment</span>
+            Buy Equipment
           </h2>
           <p className="hero-desc">
-            Directly connect with 3,745+ verified eye surgeons across Maharashtra. Inspect surgical microscopes, phacoemulsifiers, OCT systems, and slit lamps with complete transparency, clinical logs, and zero brokerage.
+            Directly connect with 3,745+ eye surgeons across Maharashtra. Inspect surgical microscopes, phacoemulsifiers, OCT systems, and slit lamps with complete transparency, clinical logs, and zero brokerage.
           </p>
 
           <div className="hero-stats-row">
@@ -133,7 +133,7 @@ export default function BuyPage({
               <span className="hero-stat-label">MOS Approved Doctors</span>
             </div>
             <div className="hero-stat-item">
-              <span className="hero-stat-num">{listings.length > 0 ? `${listings.length} Active` : 'Verified OT'}</span>
+              <span className="hero-stat-num">{listings.length > 0 ? `${listings.length} Active` : 'Available OT'}</span>
               <span className="hero-stat-label">{listings.length > 0 ? 'Equipment Pluckcards' : 'Equipment Exchange'}</span>
             </div>
             <div className="hero-stat-item">
@@ -264,7 +264,7 @@ export default function BuyPage({
             id="btn-guest-unlock-buy"
           >
             <ShieldCheck size={16} />
-            <span>Log In with MOS ID</span>
+            <span>Doctor Login</span>
           </button>
         </div>
       )}
@@ -343,7 +343,7 @@ export default function BuyPage({
                 id="btn-gate-login-buy"
               >
                 <ShieldCheck size={18} />
-                <span>Log In with MOS ID to Unlock All ({filteredListings.length})</span>
+                <span>Doctor Login to Unlock All ({filteredListings.length})</span>
               </button>
             </div>
           )}

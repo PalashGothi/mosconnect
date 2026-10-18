@@ -332,7 +332,7 @@ export default function App() {
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('wanted')}>Post Your Requirement Here</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('sell')}>Sell Equipment / Post Ad</span>
               <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('jobs')}>Jobs & Fellowship</span>
-              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('vendors')}>45+ Technicians Directory</span>
+              <span style={{ cursor: 'pointer' }} onClick={() => setActiveTab('vendors')}>Local Vendors & Technicians</span>
               {currentDoctor?.role === 'admin' && (
                 <span style={{ cursor: 'pointer', color: '#38bdf8', fontWeight: 700 }} onClick={() => setActiveTab('admin')}>
                   ⚡ Admin Console & Approvals

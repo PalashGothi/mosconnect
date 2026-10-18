@@ -52,15 +52,63 @@ export default function HomePage({
       {/* 1. FULL-SPACE HERO BANNER (With Dr. Atul Kadhane & MOS CONNECT Graphic) */}
       <section className="home-hero-full-section">
         <div className="home-banner-card">
-          <div className="home-banner-image-wrapper">
-            <img 
-              src={mosConnectBanner} 
-              alt="MOS CONNECT - One Platform. One Community. Endless Possibilities. Supported by Opticura" 
-              className="home-banner-full-img"
-            />
+          <div className="home-banner-wrapper-flanked">
+            {/* Left Clickable Display: Non-MOS Member Access */}
+            <div className="home-flank-card left" id="home-flank-left">
+              <div className="flank-badge">ACCESS REQUEST</div>
+              <h3 className="flank-title">
+                Not an MOS member but want to use the application?
+              </h3>
+              <p className="flank-desc">
+                Connect directly for clinic onboarding, equipment inspection, or institutional access.
+              </p>
+              <a
+                href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am not an MOS member but want to use the MOS Connect application.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-flank-wa"
+                id="btn-flank-wa-left"
+              >
+                <WhatsAppIcon size={16} />
+                <span>Contact on WhatsApp</span>
+              </a>
+            </div>
+
+            {/* Center Graphic */}
+            <div className="home-banner-image-wrapper">
+              <img 
+                src={mosConnectBanner} 
+                alt="MOS CONNECT - One Platform. One Community. Endless Possibilities. Supported by Opticura" 
+                className="home-banner-full-img"
+              />
+            </div>
+
+            {/* Right Clickable Display: Register Local Vendor */}
+            <div className="home-flank-card right" id="home-flank-right">
+              <div className="flank-badge" style={{ background: 'rgba(20, 184, 166, 0.2)', color: '#5eead4', borderColor: 'rgba(20, 184, 166, 0.4)' }}>
+                LOCAL VENDOR NETWORK
+              </div>
+              <h3 className="flank-title">
+                Want to register as a local vendor?
+              </h3>
+              <p className="flank-desc">
+                List your biomedical engineering, repair & AMC services for 3,745+ eye doctors across Maharashtra.
+              </p>
+              <a
+                href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I want to register as a local vendor / equipment technician on MOS Connect.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn-flank-wa"
+                style={{ background: '#0d9488' }}
+                id="btn-flank-wa-right"
+              >
+                <WhatsAppIcon size={16} />
+                <span>Contact on WhatsApp</span>
+              </a>
+            </div>
           </div>
 
-          {/* Quick Action Navigation Strip Below Graphic */}
+          {/* Quick Action Navigation Strip Below Graphic (5 Buttons) */}
           <div className="home-hero-action-bar">
             <div className="home-hero-action-grid">
               <button 
@@ -72,7 +120,21 @@ export default function HomePage({
                 <ShoppingBag size={18} />
                 <div style={{ textAlign: 'left' }}>
                   <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>Buy Equipment</div>
-                  <div style={{ fontSize: '0.74rem', opacity: 0.85 }}>Verified Pre-Owned Machines</div>
+                  <div style={{ fontSize: '0.74rem', opacity: 0.85 }}>Pre-Owned Machines</div>
+                </div>
+                <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
+              </button>
+
+              <button 
+                type="button"
+                className="home-action-btn sell-accent"
+                onClick={() => onNavigateTab('sell')}
+                id="btn-home-sell-equipment"
+              >
+                <PlusCircle size={18} />
+                <div style={{ textAlign: 'left' }}>
+                  <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>Sell Equipment</div>
+                  <div style={{ fontSize: '0.74rem', opacity: 0.85 }}>Post Pre-Owned Machines</div>
                 </div>
                 <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
               </button>
@@ -99,7 +161,7 @@ export default function HomePage({
               >
                 <Wrench size={18} />
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>45+ Engineers Directory</div>
+                  <div style={{ fontWeight: 800, fontSize: '0.92rem' }}>Local Vendors & Technicians</div>
                   <div style={{ fontSize: '0.74rem', opacity: 0.85 }}>Zeiss, Phaco & AMC Techs</div>
                 </div>
                 <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
@@ -305,23 +367,39 @@ export default function HomePage({
             </div>
           </div>
 
-          {/* Card 3: 45+ Biomedical Technicians */}
+          {/* Card: Sell Equipment */}
+          <div className="home-portal-card" onClick={() => onNavigateTab('sell')}>
+            <div className="portal-card-icon" style={{ background: '#ecfdf5', color: '#059669' }}>
+              <PlusCircle size={26} />
+            </div>
+            <div className="portal-card-tag" style={{ color: '#059669', background: '#ecfdf5' }}>SELL EQUIPMENT</div>
+            <h3 className="portal-card-title">Sell Pre-Owned Equipment</h3>
+            <p className="portal-card-desc">
+              Have an extra phaco unit, surgical microscope, perimeter, or slit lamp? List your machine directly to 3,745+ eye surgeons with zero brokerage.
+            </p>
+            <div className="portal-card-footer">
+              <span className="portal-card-link" style={{ color: '#059669' }}>Post Equipment for Sale</span>
+              <ArrowRight size={16} />
+            </div>
+          </div>
+
+          {/* Card: Local Vendors & Technicians */}
           <div className="home-portal-card" onClick={() => onNavigateTab('vendors')}>
             <div className="portal-card-icon" style={{ background: '#f0fdf4', color: '#16a34a' }}>
               <Wrench size={26} />
             </div>
             <div className="portal-card-tag" style={{ color: '#16a34a', background: '#f0fdf4' }}>SERVICE NETWORK</div>
-            <h3 className="portal-card-title">45+ Biomedical Engineers</h3>
+            <h3 className="portal-card-title">Local Vendors & Technicians</h3>
             <p className="portal-card-desc">
-              Direct contacts for former Zeiss & Appasamy technicians, phaco handpiece repair, probe recoring, and autoclave AMC across Maharashtra.
+              Direct contacts for local equipment vendors, former Zeiss & Appasamy technicians, phaco handpiece repair, probe recoring, and autoclave AMC across Maharashtra.
             </p>
             <div className="portal-card-footer">
-              <span className="portal-card-link" style={{ color: '#16a34a' }}>View Verified Engineers</span>
+              <span className="portal-card-link" style={{ color: '#16a34a' }}>View Local Vendors</span>
               <ArrowRight size={16} />
             </div>
           </div>
 
-          {/* Card 4: Jobs & Careers */}
+          {/* Card: Jobs & Careers */}
           <div className="home-portal-card" onClick={() => onNavigateTab('jobs')}>
             <div className="portal-card-icon" style={{ background: '#faf5ff', color: '#9333ea' }}>
               <Briefcase size={26} />

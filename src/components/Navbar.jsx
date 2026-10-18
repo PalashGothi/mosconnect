@@ -151,11 +151,10 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'vendors' ? 'active' : ''}`}
             onClick={() => setActiveTab('vendors')}
             id="nav-tab-vendors"
-            title="Verified Equipment Vendors, AMC Engineers & Technicians"
+            title="Local Vendors and Technicians, AMC Engineers & Equipment Specialists"
           >
             <Wrench size={15} />
-            <span>Vendors & Techs</span>
-            <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}+</span>
+            <span>Local Vendors & Techs</span>
           </button>
 
           {/* ADMIN PANEL TAB (Visible for Admin) */}
@@ -374,7 +373,7 @@ export default function Navbar({
               id="btn-login-gate-header"
             >
               <ShieldCheck size={18} color="#38bdf8" />
-              <span>Doctor Login (MOS)</span>
+              <span>Doctor Login</span>
             </button>
           )}
 
@@ -508,7 +507,7 @@ export default function Navbar({
                   }}
                 >
                   <ShieldCheck size={18} color="#38bdf8" />
-                  <span>Doctor Login (MOS ID)</span>
+                  <span>Doctor Login</span>
                 </button>
               )}
             </div>

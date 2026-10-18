@@ -214,27 +214,26 @@ export function matchDoctorNames(registeredName, inputName) {
   return false;
 }
 
-// Verification function without OTP
-export function verifyDoctorLogin(inputMembershipNo, inputName, inputContact) {
-  if (!inputMembershipNo || !inputName) {
-    return { success: false, reason: 'MOS Membership ID and Doctor Name are required.' };
-  }
-  if (!inputContact) {
-    return { success: false, reason: 'Either Email ID or Mobile Number is required.' };
+// Verification function without OTP - Requires ONLY Email or Phone Number (MOS ID not required)
+export function verifyDoctorLogin(inputContact, inputName = '', inputMembershipNo = '') {
+  if (!inputContact || !String(inputContact).trim()) {
+    return { success: false, reason: 'Please enter your registered Email address or Mobile number.' };
   }
 
-  const cleanId = String(inputMembershipNo || '').trim().toLowerCase();
-  const cleanName = String(inputName || '').trim().toLowerCase();
   const cleanContact = String(inputContact || '').trim().toLowerCase();
   const inputDigits = cleanContact.replace(/\D/g, '');
+  const cleanName = String(inputName || '').trim().toLowerCase();
+  const cleanId = String(inputMembershipNo || '').trim().toLowerCase();
 
   // 1. Admin Override Stored Credentials:
-  // MOS ID: 'admin', Name: 'admin', Contact number: 'admin12345'
-  const isIdAdmin = cleanId === 'admin' || cleanId === 'admin-master';
-  const isNameAdmin = cleanName === 'admin' || cleanName.replace(/dr\.?/g, '').trim() === 'admin';
-  const isContactAdmin = cleanContact === 'admin12345' || cleanContact === 'admin@mos.org';
+  // Contact: 'admin', 'admin12345', 'admin@mos.org'
+  const isContactAdmin = 
+    cleanContact === 'admin' || 
+    cleanContact === 'admin12345' || 
+    cleanContact === 'admin@mos.org' ||
+    cleanId === 'admin';
 
-  if (isIdAdmin && isNameAdmin && isContactAdmin) {
+  if (isContactAdmin) {
     return { 
       success: true, 
       member: {
@@ -244,109 +243,153 @@ export function verifyDoctorLogin(inputMembershipNo, inputName, inputContact) {
     };
   }
 
-  // If someone entered 'admin' ID but wrong name or contact
-  if (isIdAdmin) {
-    if (!isNameAdmin) {
-      return { success: false, reason: 'Invalid admin credentials: Name must be "admin".' };
-    }
-    if (!isContactAdmin) {
-      return { success: false, reason: 'Invalid admin credentials: Contact number must be "admin12345".' };
-    }
-  }
-
   // 2. Direct Support for Dr. Atul Kadhane (Opticura Leadership)
-  const isAtulId = cleanId === '3545' || cleanId === '9890617789' || cleanId === 'opticura' || cleanId === 'atul' || cleanId === 'dratul';
-  if (isAtulId) {
-    const isAtulName = matchDoctorNames('Dr. Atul Kadhane', inputName) || 
-                       matchDoctorNames('Dr. Yash Atul Kadhane', inputName) ||
-                       cleanName.includes('atul') || 
-                       cleanName.includes('kadhane');
-    const isAtulContact = inputDigits.includes('9890617789') || 
-                          inputDigits.includes('8208838602') || 
-                          cleanContact.includes('opticura') || 
-                          cleanContact.includes('kadhane') ||
-                          inputDigits.length >= 6;
-    if (isAtulName && isAtulContact) {
-      return {
-        success: true,
-        member: {
-          sNo: '217',
-          membershipNo: '3545',
-          membershipType: 'MOS Member & Platform Administrator',
-          name: 'Dr. Atul Kadhane',
-          email: 'atul.kadhane@opticura.in',
-          mobile: '9890617789',
-          city: 'Amravati / Mumbai',
-          state: 'Maharashtra',
-          isVerified: true,
-          role: 'admin',
-          ratifiedYear: '2025',
-          lastLogin: new Date().toISOString()
-        }
-      };
-    }
+  const isAtulContact = 
+    inputDigits.includes('9890617789') || 
+    cleanContact.includes('atul.kadhane') || 
+    cleanContact === 'opticura' || 
+    cleanContact === 'atul' ||
+    cleanId === '3545';
+
+  if (isAtulContact) {
+    return {
+      success: true,
+      member: {
+        sNo: '217',
+        membershipNo: '3545',
+        membershipType: 'MOS Member & Platform Administrator',
+        name: 'Dr. Atul Kadhane',
+        email: 'atul.kadhane@opticura.in',
+        mobile: '9890617789',
+        city: 'Amravati / Mumbai',
+        state: 'Maharashtra',
+        isVerified: true,
+        role: 'admin',
+        ratifiedYear: '2025',
+        lastLogin: new Date().toISOString()
+      }
+    };
   }
 
   const members = getMembers();
   
-  // Find member by ID (supports leading zero variations or 'MOS-' prefix)
-  const normId = cleanId.replace(/^mos-?/i, '').replace(/^0+/, '');
-  const member = members.find(m => {
+  // Find member by Email OR Mobile Number (or ID if entered)
+  const matchedMember = members.find(m => {
+    const mEmail = (m.email || '').toLowerCase().trim();
+    const mMobile = (m.mobile || '').replace(/\D/g, '');
     const mId = String(m.membershipNo || '').trim().toLowerCase();
-    if (mId === cleanId) return true;
-    const mNorm = mId.replace(/^mos-?/i, '').replace(/^0+/, '');
-    if (mNorm && mNorm === normId) return true;
-    // Allow matching by 10-digit mobile number in ID field
-    const mDigits = String(m.mobile || '').replace(/\D/g, '');
-    if (cleanId.length >= 10 && mDigits && mDigits === cleanId.replace(/\D/g, '')) return true;
+
+    // Check email match
+    if (cleanContact.includes('@') && mEmail) {
+      if (mEmail === cleanContact) return true;
+    }
+
+    // Check mobile match
+    if (inputDigits.length >= 6 && mMobile) {
+      if (mMobile === inputDigits || mMobile.endsWith(inputDigits) || inputDigits.endsWith(mMobile)) {
+        return true;
+      }
+    }
+
+    // Fallback: check if contact matches membership number
+    if (cleanContact === mId || cleanId === mId) {
+      return true;
+    }
+
+    // Fallback: if name match was provided
+    if (cleanName && matchDoctorNames(m.name, cleanName)) {
+      if ((inputDigits.length >= 6 && mMobile.includes(inputDigits.slice(-4))) || (cleanContact.includes('@') && mEmail)) {
+        return true;
+      }
+    }
+
     return false;
   });
 
-  if (!member) {
-    return { success: false, reason: `No record found for MOS Membership ID "${inputMembershipNo}". Please check your membership card.` };
-  }
+  if (matchedMember) {
+    const isDoctorAtul = 
+      String(matchedMember.membershipNo) === '3545' || 
+      String(matchedMember.mobile) === '9890617789' ||
+      matchDoctorNames('Dr. Atul Kadhane', matchedMember.name);
 
-  // Check Name with smart token-based matching (handles missing Dr. prefix, middle initials, etc.)
-  const isNameValid = matchDoctorNames(member.name, inputName);
-
-  if (!isNameValid) {
-    return { 
-      success: false, 
-      reason: `Name doesn't match registered record for MOS #${member.membershipNo} (${member.name}). You can enter just your first or last name.` 
+    return {
+      success: true,
+      member: {
+        ...matchedMember,
+        isVerified: true,
+        role: isDoctorAtul ? 'admin' : (matchedMember.role || 'doctor'),
+        membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : (matchedMember.membershipType || 'Life Membership'),
+        lastLogin: new Date().toISOString()
+      }
     };
   }
 
-  // Check Email OR Mobile
-  const memberEmail = (member.email || '').toLowerCase().trim();
-  const memberMobile = (member.mobile || '').replace(/\D/g, '');
-
-  const emailMatches = cleanContact.includes('@') && memberEmail && (memberEmail === cleanContact || memberEmail.startsWith(cleanContact));
-  const mobileMatches = inputDigits.length >= 6 && memberMobile && (
-    memberMobile.endsWith(inputDigits.slice(-6)) || inputDigits.endsWith(memberMobile.slice(-6))
-  );
-
-  if (!emailMatches && !mobileMatches) {
-    return { 
-      success: false, 
-      reason: `Neither the entered Email nor Mobile Number matches our records for MOS #${member.membershipNo}. Please provide your registered mobile number or email.` 
+  // 3. New User Registration Flow:
+  // If no existing record was found, but a Name was provided, auto-create account!
+  if (cleanName && (inputDigits.length >= 6 || cleanContact.includes('@'))) {
+    const formattedName = inputName.trim().startsWith('Dr.') ? inputName.trim() : `Dr. ${inputName.trim()}`;
+    const newMember = {
+      sNo: String(members.length + 1),
+      membershipNo: `USER-${Math.floor(1000 + Math.random() * 9000)}`,
+      membershipType: 'Registered Eye Care Professional',
+      name: formattedName,
+      email: cleanContact.includes('@') ? cleanContact : '',
+      mobile: inputDigits || cleanContact,
+      city: 'Maharashtra',
+      state: 'Maharashtra',
+      isVerified: true,
+      role: 'doctor',
+      ratifiedYear: '2026',
+      lastLogin: new Date().toISOString()
+    };
+    saveMember(newMember);
+    return {
+      success: true,
+      isNewUser: true,
+      member: newMember
     };
   }
 
-  const isDoctorAtul = 
-    String(member.membershipNo) === '3545' || 
-    String(member.mobile) === '9890617789' ||
-    matchDoctorNames('Dr. Atul Kadhane', member.name) ||
-    matchDoctorNames('Dr. Yash Atul Kadhane', member.name);
+  return { 
+    success: false, 
+    isNewUserPrompt: true,
+    reason: `No doctor account found for "${inputContact}". Please enter your Name below to sign in or register.` 
+  };
+}
 
+// Dedicated helper to register a new user with just Name and Email/Mobile
+export function registerNewDoctorUser({ name, contact, city = 'Maharashtra' }) {
+  if (!name || !String(name).trim()) {
+    return { success: false, reason: 'Doctor name is required.' };
+  }
+  if (!contact || !String(contact).trim()) {
+    return { success: false, reason: 'Email ID or Mobile Number is required.' };
+  }
+
+  const cleanContact = String(contact || '').trim().toLowerCase();
+  const inputDigits = cleanContact.replace(/\D/g, '');
+  const members = getMembers();
+
+  const formattedName = name.trim().startsWith('Dr.') ? name.trim() : `Dr. ${name.trim()}`;
+  const newMember = {
+    sNo: String(members.length + 1),
+    membershipNo: `USER-${Math.floor(1000 + Math.random() * 9000)}`,
+    membershipType: 'Registered Eye Care Professional',
+    name: formattedName,
+    email: cleanContact.includes('@') ? cleanContact : '',
+    mobile: inputDigits || cleanContact,
+    city: city.trim() || 'Maharashtra',
+    state: 'Maharashtra',
+    isVerified: true,
+    role: 'doctor',
+    ratifiedYear: '2026',
+    lastLogin: new Date().toISOString()
+  };
+
+  saveMember(newMember);
   return {
     success: true,
-    member: {
-      ...member,
-      isVerified: true,
-      role: isDoctorAtul ? 'admin' : (member.role || 'doctor'),
-      membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : (member.membershipType || 'Life Membership'),
-      lastLogin: new Date().toISOString()
-    }
+    member: newMember
   };
 }
 

@@ -133,15 +133,24 @@ export default function AdminPage({
     return filteredMembers.slice(start, start + pageSize);
   }, [filteredMembers, currentPage]);
 
-  // Handle Manual Member Submit
+  // Handle Manual Member Submit (Only Doctor Name + Email or Phone required)
   const handleManualMemberSubmit = (e) => {
     e.preventDefault();
-    if (!manualMember.membershipNo.trim() || !manualMember.name.trim()) return;
+    if (!manualMember.name.trim()) {
+      alert('Please enter doctor name.');
+      return;
+    }
+    if (!manualMember.email.trim() && !manualMember.mobile.trim()) {
+      alert('Please provide either an Email ID or Mobile number.');
+      return;
+    }
+
+    const assignedId = manualMember.membershipNo.trim() || `USER-${Math.floor(1000 + Math.random() * 9000)}`;
 
     const newMem = {
       sNo: String(members.length + 1),
-      membershipNo: manualMember.membershipNo.trim(),
-      membershipType: manualMember.membershipType || 'Life Membership',
+      membershipNo: assignedId,
+      membershipType: manualMember.membershipType || 'Registered Doctor',
       name: manualMember.name.trim().startsWith('Dr.') ? manualMember.name.trim() : `Dr. ${manualMember.name.trim()}`,
       email: manualMember.email.trim().toLowerCase(),
       mobile: manualMember.mobile.trim().replace(/\D/g, ''),
@@ -1159,16 +1168,14 @@ export default function AdminPage({
             <form onSubmit={handleManualMemberSubmit} style={{ padding: '24px' }}>
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">MOS Membership ID *</label>
+                  <label className="form-label">MOS Membership ID (Optional)</label>
                   <input 
                     type="text"
                     className="form-input"
-                    placeholder="e.g. 3850 or 03850A"
-                    required
+                    placeholder="e.g. 3850 (Leave blank to auto-generate)"
                     value={manualMember.membershipNo}
                     onChange={e => setManualMember({ ...manualMember, membershipNo: e.target.value })}
                     id="input-add-member-id"
-                    autoFocus
                   />
                 </div>
 
