@@ -63,11 +63,35 @@ export default function Pluckcard({
         style={{ cursor: 'pointer' }}
         title="Click to view photos & equipment details"
       >
-        <img 
-          src={listing.image || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop&q=80'} 
-          alt={listing.title} 
-          loading="lazy"
-        />
+        {listing.image ? (
+          <img 
+            src={listing.image} 
+            alt={listing.title} 
+            loading="lazy"
+          />
+        ) : (
+          <div style={{
+            width: '100%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            color: '#94a3b8',
+            padding: '20px',
+            textAlign: 'center'
+          }}>
+            <Building2 size={36} color="#38bdf8" />
+            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f8fafc' }}>
+              {listing.brand || 'Ophthalmic'} {listing.category || 'Equipment'}
+            </span>
+            <span style={{ fontSize: '0.72rem', color: '#94a3b8' }}>
+              Photos Available on Doctor Request
+            </span>
+          </div>
+        )}
 
         {/* Condition Ribbon */}
         <div className={`condition-badge ${getConditionClass(listing.condition)}`}>

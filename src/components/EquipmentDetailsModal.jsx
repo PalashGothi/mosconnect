@@ -51,7 +51,7 @@ export default function EquipmentDetailsModal({
   // Build images list
   const images = (listing.images && listing.images.length > 0)
     ? listing.images
-    : (listing.image ? [listing.image] : ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop&q=80']);
+    : (listing.image ? [listing.image] : []);
 
   const cleanPhone = listing.sellerMobile 
     ? listing.sellerMobile.replace(/\D/g, '') 
@@ -208,16 +208,28 @@ export default function EquipmentDetailsModal({
                 boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
               }}
             >
-              <img 
-                src={images[activeImgIndex]} 
-                alt={`${listing.title} view ${activeImgIndex + 1}`}
-                style={{ 
-                  width: '100%', 
-                  height: '100%', 
-                  objectFit: 'contain',
-                  transition: 'all 0.3s ease'
-                }} 
-              />
+              {images.length > 0 && images[activeImgIndex] ? (
+                <img 
+                  src={images[activeImgIndex]} 
+                  alt={`${listing.title} view ${activeImgIndex + 1}`}
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'contain',
+                    transition: 'all 0.3s ease'
+                  }} 
+                />
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', color: '#94a3b8', padding: '24px', textAlign: 'center' }}>
+                  <Building2 size={44} color="#38bdf8" />
+                  <span style={{ fontSize: '1rem', fontWeight: 700, color: '#f8fafc' }}>
+                    {listing.brand || 'Ophthalmic'} {listing.model || listing.category}
+                  </span>
+                  <span style={{ fontSize: '0.82rem', color: '#94a3b8', maxWidth: '300px' }}>
+                    No photos attached by seller. Direct inspection and pictures available on request from doctor.
+                  </span>
+                </div>
+              )}
 
               {/* Condition Badge in Image */}
               <div 

@@ -23,15 +23,7 @@ import {
 import Pluckcard from '../components/Pluckcard';
 import OpticuraLogo from '../components/OpticuraLogo';
 
-// Preset sample photos for quick medical ad creation
-const PRESET_EQUIPMENT_PHOTOS = [
-  { label: 'Operating Microscope', url: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop&q=80' },
-  { label: 'Phacoemulsification System', url: 'https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&auto=format&fit=crop&q=80' },
-  { label: 'Slit Lamp Stereoscopic', url: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=800&auto=format&fit=crop&q=80' },
-  { label: 'Retinal Fundus Camera / OCT', url: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=800&auto=format&fit=crop&q=80' },
-  { label: 'Autorefractometer / Keratometer', url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80' },
-  { label: 'YAG / Green Laser System', url: 'https://images.unsplash.com/photo-1551076805-e1869033e561?w=800&auto=format&fit=crop&q=80' }
-];
+
 
 export default function SellPage({ 
   currentDoctor, 
@@ -58,8 +50,8 @@ export default function SellPage({
     warranty: 'Under Active AMC',
     description: '',
     accessoriesText: 'Foot switch, Dust cover, Manual',
-    image: PRESET_EQUIPMENT_PHOTOS[0].url,
-    clinicName: 'My Eye Clinic'
+    image: '',
+    clinicName: ''
   });
 
   // Filter listings posted by this doctor
@@ -579,40 +571,23 @@ export default function SellPage({
                 </div>
 
                 <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>
-                  Or paste direct image path / URL or pick a standard preset:
+                  Or enter direct image URL / file path (Optional):
                 </div>
 
                 <input 
                   type="text"
                   className="form-input"
-                  placeholder="https://example.com/photo.jpg or /images/listings/machine.jpg"
+                  placeholder="https://example.com/machine.jpg or leave blank"
                   value={formData.image}
                   onChange={e => handleInputChange('image', e.target.value)}
                   id="input-sell-photo-url"
-                  style={{ marginBottom: '12px' }}
                 />
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                  {PRESET_EQUIPMENT_PHOTOS.map((preset, idx) => (
-                    <div 
-                      key={idx}
-                      onClick={() => handleInputChange('image', preset.url)}
-                      style={{
-                        padding: '6px',
-                        border: formData.image === preset.url ? '2px solid #0284c7' : '1px solid #e2e8f0',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        background: '#f8fafc',
-                        textAlign: 'center'
-                      }}
-                    >
-                      <img src={preset.url} alt={preset.label} style={{ width: '100%', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
-                      <div style={{ fontSize: '0.72rem', fontWeight: 600, marginTop: '4px', color: '#334155' }}>
-                        {preset.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {!formData.image && (
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '6px' }}>
+                    ℹ️ No photo attached. Real photos of your equipment and serial plates help buyers contact you faster.
+                  </div>
+                )}
               </div>
 
               <div className="form-group">
