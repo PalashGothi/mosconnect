@@ -16,7 +16,9 @@ import {
   Camera,
   Layers,
   ArrowRight,
-  Lock
+  Lock,
+  UploadCloud,
+  X
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
 import OpticuraLogo from '../components/OpticuraLogo';
@@ -98,6 +100,17 @@ export default function SellPage({
 
   const handleInputChange = (field, val) => {
     setFormData(prev => ({ ...prev, [field]: val }));
+  };
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        handleInputChange('image', event.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmitAd = (e) => {
@@ -517,8 +530,69 @@ export default function SellPage({
               </div>
 
               <div className="form-group">
-                <label className="form-label">Select Equipment Photo Preset or Paste Custom Photo URL</label>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px', marginBottom: '12px' }}>
+                <label className="form-label">Upload Equipment Photo / Attach Image URL</label>
+
+                {/* Device Upload Button */}
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap' }}>
+                  <label 
+                    htmlFor="input-sell-image-file"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 18px',
+                      background: '#f0f9ff',
+                      border: '2px dashed #38bdf8',
+                      borderRadius: '12px',
+                      color: '#0284c7',
+                      fontWeight: 700,
+                      fontSize: '0.86rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    <UploadCloud size={18} />
+                    <span>Upload Photo from Device</span>
+                  </label>
+                  <input 
+                    type="file" 
+                    id="input-sell-image-file" 
+                    accept="image/*" 
+                    style={{ display: 'none' }}
+                    onChange={handleImageUpload}
+                  />
+
+                  {formData.image && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f8fafc', padding: '4px 10px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <img src={formData.image} alt="Preview" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '6px' }} />
+                      <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 600 }}>Photo attached</span>
+                      <button 
+                        type="button" 
+                        onClick={() => handleInputChange('image', '')}
+                        style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+                        title="Remove photo"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: '8px' }}>
+                  Or paste direct image path / URL or pick a standard preset:
+                </div>
+
+                <input 
+                  type="text"
+                  className="form-input"
+                  placeholder="https://example.com/photo.jpg or /images/listings/machine.jpg"
+                  value={formData.image}
+                  onChange={e => handleInputChange('image', e.target.value)}
+                  id="input-sell-photo-url"
+                  style={{ marginBottom: '12px' }}
+                />
+
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                   {PRESET_EQUIPMENT_PHOTOS.map((preset, idx) => (
                     <div 
                       key={idx}
@@ -539,13 +613,6 @@ export default function SellPage({
                     </div>
                   ))}
                 </div>
-                <input 
-                  type="text"
-                  className="form-input"
-                  placeholder="https://example.com/photo.jpg"
-                  value={formData.image}
-                  onChange={e => handleInputChange('image', e.target.value)}
-                />
               </div>
 
               <div className="form-group">

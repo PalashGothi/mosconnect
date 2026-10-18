@@ -1,1 +1,67 @@
-[]
+[
+  {
+    "id": "list-dr-bhide-megatron-s3",
+    "title": "Megatron S3 Phaco plus vitrectomy system with all accessories",
+    "category": "Phaco Machines",
+    "brand": "Other Brand",
+    "model": "Geuder Megatron S3 Combined Anterior & Posterior System",
+    "year": 2020,
+    "price": 1250000,
+    "priceFormatted": "₹ 12,50,000",
+    "isNegotiable": true,
+    "condition": "Excellent Working Condition",
+    "warranty": "Tested & Verified with All Accessories",
+    "description": "Megatron S3 Phaco plus vitrectomy system with all accessories in Pune. Complete combined anterior and posterior system with all operational accessories, handpieces, and foot pedal. Excellent working condition, available for inspection in Pune.",
+    "sellerName": "Dr.Bhide Santosh S",
+    "sellerMembershipNo": "357",
+    "sellerCity": "Pune",
+    "sellerMobile": "9822300504",
+    "sellerEmail": "santosh.bhide7@gmail.com",
+    "clinicName": "Matrumandir Eye Hospital",
+    "image": "/images/listings/megatron_s3_1.jpeg",
+    "accessories": [
+      "Phaco Handpiece",
+      "Vitrectomy Cutter Handpiece",
+      "Foot Pedal",
+      "Infusion & Aspiration Tubing",
+      "Full Accessory Set",
+      "Power Cord"
+    ],
+    "status": "Available",
+    "createdAt": "2026-10-18T11:45:00.000Z",
+    "views": 18,
+    "inquiries": 3
+  },
+  {
+    "id": "list-dr-bhide-topcon-camera",
+    "title": "Topcon Non-Mydriatic Retinal Camera with FFA Facility",
+    "category": "OCT & Fundus",
+    "brand": "Topcon",
+    "model": "TRC-NW8F Non-Mydriatic Retinal Camera with FFA",
+    "year": 2019,
+    "price": 1450000,
+    "priceFormatted": "₹ 14,50,000",
+    "isNegotiable": true,
+    "condition": "Excellent Working Condition",
+    "warranty": "Clean Optics & Complete Digital Camera Station",
+    "description": "Topcon TRC-NW8F Non-Mydriatic Retinal Camera with dedicated Fluorescein Angiography (FFA) facility and color fundus imaging. High resolution digital sensor station with external live viewing monitor and motorized table. In excellent working clinical condition, available for immediate inspection in Pune.",
+    "sellerName": "Dr.Bhide Santosh S",
+    "sellerMembershipNo": "357",
+    "sellerCity": "Pune",
+    "sellerMobile": "9822300504",
+    "sellerEmail": "santosh.bhide7@gmail.com",
+    "clinicName": "Matrumandir Eye Hospital",
+    "image": "/images/listings/topcon_trc_nw8f_1.jpg",
+    "accessories": [
+      "Nikon Digital SLR Camera Mount",
+      "High-Resolution Viewing Monitor",
+      "Motorized Chinrest Table",
+      "Power Supply Unit",
+      "Software Workstation"
+    ],
+    "status": "Available",
+    "createdAt": "2026-10-18T11:46:00.000Z",
+    "views": 24,
+    "inquiries": 5
+  }
+]
