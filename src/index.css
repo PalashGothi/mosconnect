@@ -144,46 +144,51 @@ input, select, textarea {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--slate-200);
   box-shadow: var(--shadow-sm);
-  padding: 12px 28px;
+  padding: 8px 18px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 20px;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .nav-brand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   text-decoration: none;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .brand-icon-wrapper {
-  width: 44px;
-  height: 44px;
+  width: 38px;
+  height: 38px;
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
+  flex-shrink: 0;
 }
 
 .brand-info h1 {
-  font-size: 1.35rem;
+  font-size: 1.22rem;
   font-weight: 800;
   color: var(--navy-900);
   line-height: 1.1;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .brand-info h1 span {
@@ -191,31 +196,35 @@ input, select, textarea {
 }
 
 .brand-tagline {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 600;
   color: var(--slate-500);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 
 /* Navigation Links */
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
+  flex-shrink: 1;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
+  gap: 5px;
+  padding: 5px 9px;
   border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: var(--slate-600);
   transition: var(--transition);
   position: relative;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .nav-item:hover {
@@ -229,9 +238,9 @@ input, select, textarea {
 }
 
 .nav-badge {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 2px 7px;
+  padding: 1px 6px;
   border-radius: var(--radius-full);
   background: var(--cyan-500);
   color: var(--white);
@@ -245,7 +254,8 @@ input, select, textarea {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn-post-ad {
@@ -254,29 +264,31 @@ input, select, textarea {
   gap: 8px;
   background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
   color: var(--white);
-  padding: 9px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius-full);
   font-weight: 600;
-  font-size: 0.88rem;
-  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+  font-size: 0.84rem;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
   transition: var(--transition);
+  white-space: nowrap;
 }
 
 .btn-post-ad:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.4);
 }
 
 /* Doctor Session Profile Button */
 .user-profile-btn {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 14px 6px 8px;
+  gap: 8px;
+  padding: 5px 10px 5px 6px;
   background: var(--slate-100);
   border: 1px solid var(--slate-200);
   border-radius: var(--radius-full);
   transition: var(--transition);
+  max-width: 220px;
 }
 
 .user-profile-btn:hover {
@@ -286,8 +298,8 @@ input, select, textarea {
 }
 
 .avatar-circle {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: var(--white);
@@ -295,7 +307,8 @@ input, select, textarea {
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.82rem;
+  flex-shrink: 0;
 }
 
 .doctor-info-preview {
@@ -303,19 +316,24 @@ input, select, textarea {
 }
 
 .doctor-name {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 700;
   color: var(--slate-900);
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
 }
 
 .doctor-mos-tag {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   font-weight: 600;
   color: var(--emerald-600);
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
 }
 
 .btn-login-gate {
@@ -339,10 +357,11 @@ input, select, textarea {
 /* Main Content Area */
 .main-content {
   flex: 1;
-  padding: 24px 32px 64px 32px;
-  max-width: 1440px;
+  padding: 20px 24px 64px 24px;
+  max-width: 1536px;
   width: 100%;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
 /* Hero Section */
@@ -2179,7 +2198,45 @@ input, select, textarea {
   color: #64748b;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for desktop displays (100% zoom on 1260px-1536px screens) */
+@media (max-width: 1480px) {
+  .navbar {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+  .nav-item {
+    padding: 5px 9px;
+    font-size: 0.8rem;
+    gap: 5px;
+  }
+  .brand-info h1 {
+    font-size: 1.15rem;
+  }
+  .brand-tagline {
+    display: none;
+  }
+  .nav-brand-opticura {
+    display: none;
+  }
+  .doctor-info-preview .doctor-name {
+    max-width: 95px;
+  }
+}
+
+@media (max-width: 1260px) {
+  .nav-item {
+    padding: 5px 7px;
+    font-size: 0.76rem;
+    gap: 4px;
+  }
+  .doctor-info-preview {
+    display: none;
+  }
+  .user-profile-btn {
+    padding: 4px 6px;
+  }
+}
+
 @media (max-width: 1024px) {
   .sell-layout {
     grid-template-columns: 1fr;

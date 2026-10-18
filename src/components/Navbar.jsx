@@ -84,14 +84,11 @@ export default function Navbar({
         {/* Brand */}
         <div className="nav-brand" onClick={() => setActiveTab('home')}>
           <div className="brand-icon-wrapper">
-            <Eye size={24} strokeWidth={2.5} />
+            <Eye size={20} strokeWidth={2.5} />
           </div>
           <div className="brand-info">
             <h1>MOS <span>Connect</span></h1>
-            <span className="brand-tagline">Supported by Opticura • Eye Care Network</span>
-          </div>
-          <div style={{ marginLeft: '8px' }}>
-            <OpticuraLogo variant="compact" height={26} showBadge={false} />
+            <span className="brand-tagline">Eye Care Network • Opticura</span>
           </div>
         </div>
 
@@ -101,8 +98,9 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'home' ? 'active' : ''}`}
             onClick={() => setActiveTab('home')}
             id="nav-tab-home"
+            title="MOS Connect Home"
           >
-            <Home size={18} />
+            <Home size={15} />
             <span>Home</span>
           </button>
 
@@ -110,8 +108,9 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'buy' ? 'active' : ''}`}
             onClick={() => setActiveTab('buy')}
             id="nav-tab-buy"
+            title="Browse Verified Pre-Owned Ophthalmic Equipment"
           >
-            <ShoppingBag size={18} />
+            <ShoppingBag size={15} />
             <span>Buy Equipment</span>
             {listingsCount > 0 && <span className="nav-badge">{listingsCount}</span>}
           </button>
@@ -120,9 +119,9 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'wanted' ? 'active' : ''}`}
             onClick={() => setActiveTab('wanted')}
             id="nav-tab-wanted"
-            title="Post your requirement here"
+            title="Post your equipment requirements here"
           >
-            <MessageSquareQuote size={18} />
+            <MessageSquareQuote size={15} />
             <span>Post Requirement</span>
             {wantedCount > 0 && <span className="nav-badge verified-badge">{wantedCount}</span>}
           </button>
@@ -131,8 +130,9 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'sell' ? 'active' : ''}`}
             onClick={() => setActiveTab('sell')}
             id="nav-tab-sell"
+            title="Sell Your Ophthalmic Equipment"
           >
-            <PlusCircle size={18} />
+            <PlusCircle size={15} />
             <span>Sell Equipment</span>
           </button>
 
@@ -140,8 +140,9 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'jobs' ? 'active' : ''}`}
             onClick={() => setActiveTab('jobs')}
             id="nav-tab-jobs"
+            title="Explore Ophthalmic Jobs & Surgical Fellowships"
           >
-            <Briefcase size={18} />
+            <Briefcase size={15} />
             <span>Jobs & Fellowship</span>
             {jobsCount > 0 && <span className="nav-badge" style={{ background: '#0284c7' }}>{jobsCount}</span>}
           </button>
@@ -150,9 +151,10 @@ export default function Navbar({
             className={`nav-item ${activeTab === 'vendors' ? 'active' : ''}`}
             onClick={() => setActiveTab('vendors')}
             id="nav-tab-vendors"
+            title="Verified Equipment Vendors, AMC Engineers & Technicians"
           >
-            <Wrench size={18} />
-            <span>Vendors & Technicians</span>
+            <Wrench size={15} />
+            <span>Vendors & Techs</span>
             <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}+</span>
           </button>
 
@@ -162,13 +164,14 @@ export default function Navbar({
               className={`nav-item ${activeTab === 'admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('admin')}
               id="nav-tab-admin"
+              title="MOS Administrator Moderation Console"
               style={{
                 background: activeTab === 'admin' ? '#0f172a' : '#f8fafc',
                 color: activeTab === 'admin' ? '#ffffff' : '#0f172a',
                 border: '1px solid #cbd5e1'
               }}
             >
-              <Settings size={18} color={activeTab === 'admin' ? '#38bdf8' : '#0284c7'} />
+              <Settings size={15} color={activeTab === 'admin' ? '#38bdf8' : '#0284c7'} />
               <span>Admin Panel</span>
               {pendingJobsCount > 0 && (
                 <span className="nav-badge" style={{ background: '#f59e0b', color: '#ffffff' }}>
