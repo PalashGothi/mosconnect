@@ -155,6 +155,7 @@ export default function Navbar({
           >
             <Wrench size={15} />
             <span>Local Vendors & Techs</span>
+            {vendorsCount > 0 && <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}</span>}
           </button>
 
           {/* ADMIN PANEL TAB (Visible for Admin) */}
@@ -453,7 +454,7 @@ export default function Navbar({
                   <Wrench size={20} />
                   <span>Vendors & Technicians</span>
                 </div>
-                <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}+</span>
+                {vendorsCount > 0 && <span className="nav-badge" style={{ background: '#0d9488' }}>{vendorsCount}</span>}
               </button>
 
               {isAdmin && (
