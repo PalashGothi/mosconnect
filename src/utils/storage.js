@@ -214,26 +214,41 @@ export function matchDoctorNames(registeredName, inputName) {
   return false;
 }
 
-// Verification function without OTP - Requires ONLY Email or Phone Number (MOS ID not required)
-export function verifyDoctorLogin(inputContact, inputName = '', inputMembershipNo = '') {
-  if (!inputContact || !String(inputContact).trim()) {
-    return { success: false, reason: 'Please enter your registered Email address or Mobile number.' };
+// Verification function without OTP - Requires Doctor Name + Email/Mobile (MOS ID is optional)
+export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputContact = '') {
+  // Gracefully handle if called with (contact, name) or (id, name, contact)
+  let membershipNo = '';
+  let name = '';
+  let contact = '';
+
+  if (arguments.length === 2) {
+    contact = inputMembershipNo || '';
+    name = inputName || '';
+  } else {
+    membershipNo = inputMembershipNo || '';
+    name = inputName || '';
+    contact = inputContact || '';
   }
 
-  const cleanContact = String(inputContact || '').trim().toLowerCase();
+  if (!name || !String(name).trim()) {
+    return { success: false, reason: 'Doctor Name is required.' };
+  }
+  if (!contact || !String(contact).trim()) {
+    return { success: false, reason: 'Registered Email OR Mobile Number is required.' };
+  }
+
+  const cleanId = String(membershipNo || '').trim().toLowerCase();
+  const cleanName = String(name || '').trim().toLowerCase();
+  const cleanContact = String(contact || '').trim().toLowerCase();
   const inputDigits = cleanContact.replace(/\D/g, '');
-  const cleanName = String(inputName || '').trim().toLowerCase();
-  const cleanId = String(inputMembershipNo || '').trim().toLowerCase();
 
   // 1. Admin Override Stored Credentials:
-  // Contact: 'admin', 'admin12345', 'admin@mos.org'
-  const isContactAdmin = 
-    cleanContact === 'admin' || 
-    cleanContact === 'admin12345' || 
-    cleanContact === 'admin@mos.org' ||
-    cleanId === 'admin';
+  // ID: 'admin' (or blank), Name: 'admin', Contact: 'admin12345' or 'admin@mos.org'
+  const isIdAdmin = !cleanId || cleanId === 'admin' || cleanId === 'admin-master';
+  const isNameAdmin = cleanName === 'admin' || cleanName.replace(/dr\.?/g, '').trim() === 'admin';
+  const isContactAdmin = cleanContact === 'admin12345' || cleanContact === 'admin@mos.org' || cleanContact === 'admin';
 
-  if (isContactAdmin) {
+  if (isIdAdmin && isNameAdmin && isContactAdmin) {
     return { 
       success: true, 
       member: {
@@ -244,14 +259,11 @@ export function verifyDoctorLogin(inputContact, inputName = '', inputMembershipN
   }
 
   // 2. Direct Support for Dr. Atul Kadhane (Opticura Leadership)
-  const isAtulContact = 
-    inputDigits.includes('9890617789') || 
-    cleanContact.includes('atul.kadhane') || 
-    cleanContact === 'opticura' || 
-    cleanContact === 'atul' ||
-    cleanId === '3545';
+  const isAtulContact = inputDigits.includes('9890617789') || cleanContact.includes('atul.kadhane') || cleanContact === 'opticura' || cleanContact === 'atul';
+  const isAtulName = matchDoctorNames('Dr. Atul Kadhane', name) || cleanName.includes('atul') || cleanName.includes('kadhane');
+  const isAtulId = cleanId === '3545' || !cleanId;
 
-  if (isAtulContact) {
+  if ((isAtulContact || isAtulName) && isAtulId) {
     return {
       success: true,
       member: {
@@ -272,38 +284,34 @@ export function verifyDoctorLogin(inputContact, inputName = '', inputMembershipN
   }
 
   const members = getMembers();
-  
-  // Find member by Email OR Mobile Number (or ID if entered)
+
+  // 3. Database lookup in Approved Members
   const matchedMember = members.find(m => {
+    const mId = String(m.membershipNo || '').trim().toLowerCase();
     const mEmail = (m.email || '').toLowerCase().trim();
     const mMobile = (m.mobile || '').replace(/\D/g, '');
-    const mId = String(m.membershipNo || '').trim().toLowerCase();
 
-    // Check email match
+    // If MOS ID was entered, it must match
+    if (cleanId) {
+      const idMatches = mId === cleanId || mId.endsWith(cleanId) || cleanId.endsWith(mId);
+      if (!idMatches) return false;
+    }
+
+    // Name match
+    const nameMatches = matchDoctorNames(m.name, name);
+    if (!nameMatches) return false;
+
+    // Contact match (Email or Mobile)
+    let contactMatches = false;
     if (cleanContact.includes('@') && mEmail) {
-      if (mEmail === cleanContact) return true;
+      contactMatches = (mEmail === cleanContact);
+    } else if (inputDigits.length >= 6 && mMobile) {
+      contactMatches = (mMobile === inputDigits || mMobile.endsWith(inputDigits) || inputDigits.endsWith(mMobile));
+    } else if (cleanContact === mId) {
+      contactMatches = true;
     }
 
-    // Check mobile match
-    if (inputDigits.length >= 6 && mMobile) {
-      if (mMobile === inputDigits || mMobile.endsWith(inputDigits) || inputDigits.endsWith(mMobile)) {
-        return true;
-      }
-    }
-
-    // Fallback: check if contact matches membership number
-    if (cleanContact === mId || cleanId === mId) {
-      return true;
-    }
-
-    // Fallback: if name match was provided
-    if (cleanName && matchDoctorNames(m.name, cleanName)) {
-      if ((inputDigits.length >= 6 && mMobile.includes(inputDigits.slice(-4))) || (cleanContact.includes('@') && mEmail)) {
-        return true;
-      }
-    }
-
-    return false;
+    return contactMatches;
   });
 
   if (matchedMember) {
@@ -324,36 +332,9 @@ export function verifyDoctorLogin(inputContact, inputName = '', inputMembershipN
     };
   }
 
-  // 3. New User Registration Flow:
-  // If no existing record was found, but a Name was provided, auto-create account!
-  if (cleanName && (inputDigits.length >= 6 || cleanContact.includes('@'))) {
-    const formattedName = inputName.trim().startsWith('Dr.') ? inputName.trim() : `Dr. ${inputName.trim()}`;
-    const newMember = {
-      sNo: String(members.length + 1),
-      membershipNo: `USER-${Math.floor(1000 + Math.random() * 9000)}`,
-      membershipType: 'Registered Eye Care Professional',
-      name: formattedName,
-      email: cleanContact.includes('@') ? cleanContact : '',
-      mobile: inputDigits || cleanContact,
-      city: 'Maharashtra',
-      state: 'Maharashtra',
-      isVerified: true,
-      role: 'doctor',
-      ratifiedYear: '2026',
-      lastLogin: new Date().toISOString()
-    };
-    saveMember(newMember);
-    return {
-      success: true,
-      isNewUser: true,
-      member: newMember
-    };
-  }
-
   return { 
     success: false, 
-    isNewUserPrompt: true,
-    reason: `No doctor account found for "${inputContact}". Please enter your Name below to sign in or register.` 
+    reason: 'Credentials could not be verified in the approved eye doctor directory. Please verify your Name and Mobile/Email, or contact Dr. Atul Kadhane on WhatsApp for access.' 
   };
 }
 

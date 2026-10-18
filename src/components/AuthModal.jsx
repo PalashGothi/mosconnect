@@ -6,22 +6,17 @@ import {
   Mail, 
   ArrowRight, 
   AlertCircle,
-  UserCheck,
-  UserPlus,
-  LogIn,
-  MapPin
+  UserCheck
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import OpticuraLogo from './OpticuraLogo';
 import { OPTICURA_CONTACT } from '../data/opticuraProducts';
-import { verifyDoctorLogin, registerNewDoctorUser } from '../utils/storage';
+import { verifyDoctorLogin } from '../utils/storage';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
-  const [contactInfo, setContactInfo] = useState('');
+  const [membershipNo, setMembershipNo] = useState('');
   const [doctorName, setDoctorName] = useState('');
-  const [city, setCity] = useState('');
-  const [showNameFieldOnLogin, setShowNameFieldOnLogin] = useState(false);
+  const [contactInfo, setContactInfo] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   const [verifiedMemberInfo, setVerifiedMemberInfo] = useState(null);
@@ -32,43 +27,17 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
     e.preventDefault();
     setErrorMessage('');
 
-    if (authMode === 'login') {
-      const result = verifyDoctorLogin(contactInfo, doctorName);
-      if (result.success) {
-        setVerifiedMemberInfo(result.member);
-        setIsSuccess(true);
-        setTimeout(() => {
-          onLoginSuccess(result.member);
-          setIsSuccess(false);
-          onClose();
-        }, 600);
-      } else {
-        if (result.isNewUserPrompt && !showNameFieldOnLogin) {
-          setShowNameFieldOnLogin(true);
-          setErrorMessage('Account not found with this Email/Phone. Please enter your Doctor Name to complete sign in.');
-        } else {
-          setErrorMessage(result.reason || 'Login failed. Please enter a valid Email address or Mobile number.');
-        }
-      }
+    const result = verifyDoctorLogin(membershipNo, doctorName, contactInfo);
+    if (result.success) {
+      setVerifiedMemberInfo(result.member);
+      setIsSuccess(true);
+      setTimeout(() => {
+        onLoginSuccess(result.member);
+        setIsSuccess(false);
+        onClose();
+      }, 600);
     } else {
-      // Register New User flow (Requires only Name + Email/Mobile)
-      const result = registerNewDoctorUser({
-        name: doctorName,
-        contact: contactInfo,
-        city: city || 'Maharashtra'
-      });
-
-      if (result.success) {
-        setVerifiedMemberInfo(result.member);
-        setIsSuccess(true);
-        setTimeout(() => {
-          onLoginSuccess(result.member);
-          setIsSuccess(false);
-          onClose();
-        }, 600);
-      } else {
-        setErrorMessage(result.reason || 'Registration failed. Please provide your Name and Email/Mobile number.');
-      }
+      setErrorMessage(result.reason || 'Verification failed. Please check your credentials.');
     }
   };
 
@@ -89,238 +58,168 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               <OpticuraLogo variant="card" height={32} />
             </div>
             <div className="auth-seal-icon">
-              <ShieldCheck size={30} />
+              <ShieldCheck size={32} />
             </div>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#0f172a' }}>
+            <h2 style={{ fontSize: '1.45rem', fontWeight: 800, color: '#0f172a' }}>
               Doctor Login
             </h2>
-            <p style={{ fontSize: '0.84rem', color: '#64748b', marginTop: '4px' }}>
-              Eye Care Professional Network • Supported by Opticura
+            <p style={{ fontSize: '0.86rem', color: '#64748b', marginTop: '4px' }}>
+              Platform supported by Opticura • Direct credential verification for approved members of Maharashtra Ophthalmological Society
             </p>
-
-            {/* Auth Mode Tabs (Log In vs New User) */}
-            <div 
-              style={{ 
-                display: 'flex', 
-                background: '#f1f5f9', 
-                padding: '4px', 
-                borderRadius: '10px', 
-                marginTop: '16px',
-                gap: '4px'
-              }}
-            >
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode('login');
-                  setErrorMessage('');
-                  setShowNameFieldOnLogin(false);
-                }}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: authMode === 'login' ? '#ffffff' : 'transparent',
-                  color: authMode === 'login' ? '#0f172a' : '#64748b',
-                  fontWeight: authMode === 'login' ? 700 : 600,
-                  fontSize: '0.86rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: authMode === 'login' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
-                  cursor: 'pointer'
-                }}
-                id="tab-auth-login"
-              >
-                <LogIn size={15} />
-                <span>Doctor Login</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setAuthMode('register');
-                  setErrorMessage('');
-                }}
-                style={{
-                  flex: 1,
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: authMode === 'register' ? '#ffffff' : 'transparent',
-                  color: authMode === 'register' ? '#0f172a' : '#64748b',
-                  fontWeight: authMode === 'register' ? 700 : 600,
-                  fontSize: '0.86rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  boxShadow: authMode === 'register' ? '0 2px 6px rgba(0,0,0,0.06)' : 'none',
-                  cursor: 'pointer'
-                }}
-                id="tab-auth-register"
-              >
-                <UserPlus size={15} />
-                <span>New User</span>
-              </button>
-            </div>
           </div>
 
           {isSuccess ? (
-            <div style={{ textAlign: 'center', padding: '24px 0' }}>
-              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px auto' }}>
-                <CheckCircle2 size={34} />
+            <div style={{ textAlign: 'center', padding: '28px 0' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#ecfdf5', color: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
+                <CheckCircle2 size={38} />
               </div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#0f172a' }}>
                 Welcome, {verifiedMemberInfo?.name}!
               </h3>
-              <p style={{ fontSize: '0.86rem', color: '#059669', fontWeight: 600, marginTop: '4px' }}>
-                Logged in successfully • Direct platform access granted
+              <p style={{ fontSize: '0.88rem', color: '#059669', fontWeight: 600, marginTop: '6px' }}>
+                {verifiedMemberInfo?.role === 'admin' ? 'Super Administrator Access Granted' : 'Membership Verified Successfully'}
               </p>
             </div>
           ) : (
-            <form onSubmit={handleLoginSubmit} style={{ marginTop: '16px' }}>
+            <form onSubmit={handleLoginSubmit}>
               {errorMessage && (
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '10px 12px', marginBottom: '14px', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <AlertCircle size={16} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
-                  <span style={{ fontSize: '0.82rem', color: '#b91c1c', lineHeight: 1.4 }}>
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '8px', padding: '12px 14px', marginBottom: '16px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <AlertCircle size={18} color="#ef4444" style={{ flexShrink: 0, marginTop: '2px' }} />
+                  <span style={{ fontSize: '0.84rem', color: '#b91c1c', lineHeight: 1.45 }}>
                     {errorMessage}
                   </span>
                 </div>
               )}
 
-              {/* REGISTER TAB: DOCTOR NAME */}
-              {(authMode === 'register' || showNameFieldOnLogin) && (
-                <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                    <span>Doctor Full Name *</span>
-                    <span style={{ color: '#0284c7', fontSize: '0.72rem', fontWeight: 600 }}>Prefix optional</span>
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <UserCheck size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                    <input 
-                      type="text"
-                      className="form-input"
-                      style={{ paddingLeft: '40px', fontSize: '0.9rem', height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%' }}
-                      placeholder="e.g. Dr. Rajesh Deshmukh"
-                      required
-                      value={doctorName}
-                      onChange={e => setDoctorName(e.target.value)}
-                      id="input-auth-name"
-                      autoFocus={authMode === 'register' || showNameFieldOnLogin}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* PRIMARY FIELD: EMAIL OR MOBILE NUMBER */}
-              <div className="form-group" style={{ marginBottom: '14px' }}>
-                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '6px' }}>
-                  <span>Email ID OR Mobile Number *</span>
-                  <span style={{ color: '#0284c7', fontSize: '0.72rem', fontWeight: 600 }}>Required</span>
+              {/* FIELD 1: MOS MEMBERSHIP ID (OPTIONAL) */}
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>MOS Membership ID</span>
+                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>Optional</span>
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <Mail size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <ShieldCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                   <input 
                     type="text"
                     className="form-input"
-                    style={{ paddingLeft: '40px', fontSize: '0.9rem', height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%' }}
-                    placeholder="e.g. 9822012345 or doctor@gmail.com"
-                    required
-                    value={contactInfo}
-                    onChange={e => setContactInfo(e.target.value)}
-                    id="input-auth-contact"
-                    autoFocus={authMode === 'login' && !showNameFieldOnLogin}
+                    style={{ paddingLeft: '42px' }}
+                    placeholder="e.g. 3760, 3761, 03751A (Optional)"
+                    value={membershipNo}
+                    onChange={e => setMembershipNo(e.target.value)}
+                    id="input-login-mos-id"
+                    autoFocus
                   />
                 </div>
               </div>
 
-              {/* REGISTER TAB: CITY (OPTIONAL) */}
-              {authMode === 'register' && (
-                <div className="form-group" style={{ marginBottom: '14px' }}>
-                  <label className="form-label" style={{ fontSize: '0.82rem', fontWeight: 700, color: '#334155', marginBottom: '6px', display: 'block' }}>
-                    <span>City / District (Optional)</span>
-                  </label>
-                  <div style={{ position: 'relative' }}>
-                    <MapPin size={17} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                    <input 
-                      type="text"
-                      className="form-input"
-                      style={{ paddingLeft: '40px', fontSize: '0.9rem', height: '42px', borderRadius: '8px', border: '1px solid #cbd5e1', width: '100%' }}
-                      placeholder="e.g. Mumbai, Pune, Nagpur, Nashik"
-                      value={city}
-                      onChange={e => setCity(e.target.value)}
-                      id="input-auth-city"
-                    />
-                  </div>
+              {/* FIELD 2: DOCTOR NAME */}
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Doctor Name *</span>
+                  <span style={{ color: '#0284c7', fontSize: '0.75rem', fontWeight: 600 }}>Dr. prefix optional</span>
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <UserCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input 
+                    type="text"
+                    className="form-input"
+                    style={{ paddingLeft: '42px' }}
+                    placeholder="e.g. Atul Kadhane or Aishwarya Patil"
+                    required
+                    value={doctorName}
+                    onChange={e => setDoctorName(e.target.value)}
+                    id="input-login-name"
+                  />
                 </div>
-              )}
+              </div>
+
+              {/* FIELD 3: EMAIL OR PHONE NUMBER */}
+              <div className="form-group">
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Registered Email OR Mobile Number *</span>
+                  <span style={{ color: '#0284c7', fontSize: '0.75rem', fontWeight: 600 }}>At least one required</span>
+                </label>
+                <div style={{ position: 'relative' }}>
+                  <Mail size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <input 
+                    type="text"
+                    className="form-input"
+                    style={{ paddingLeft: '42px' }}
+                    placeholder="e.g. doctor@email.com or 9822012345"
+                    required
+                    value={contactInfo}
+                    onChange={e => setContactInfo(e.target.value)}
+                    id="input-login-contact"
+                  />
+                </div>
+              </div>
 
               {/* SUBMIT BUTTON */}
               <button 
                 type="submit"
-                id="btn-submit-auth"
+                id="btn-submit-verify-login"
                 style={{
                   width: '100%',
-                  marginTop: '8px',
+                  marginTop: '12px',
                   background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
                   color: '#ffffff',
-                  padding: '12px',
-                  borderRadius: '8px',
+                  padding: '13px',
+                  borderRadius: '10px',
                   fontWeight: 800,
-                  fontSize: '0.94rem',
+                  fontSize: '0.96rem',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxShadow: '0 4px 12px rgba(2, 132, 199, 0.3)',
-                  border: 'none',
-                  cursor: 'pointer'
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
+                  cursor: 'pointer',
+                  border: 'none'
                 }}
               >
-                <span>{authMode === 'login' ? (showNameFieldOnLogin ? 'Save Name & Log In' : 'Doctor Login') : 'Register & Enter Platform'}</span>
-                <ArrowRight size={17} />
+                <span>Verify & Login (Direct Access)</span>
+                <ArrowRight size={18} />
               </button>
 
-              {/* Need assistance / WhatsApp */}
+              {/* Not an MOS Member? Contact Dr. Atul Kadhane */}
               <div 
                 style={{ 
-                  marginTop: '18px', 
-                  padding: '12px 14px', 
-                  background: '#f8fafc', 
-                  border: '1px solid #e2e8f0', 
-                  borderRadius: '10px', 
+                  marginTop: '20px', 
+                  padding: '14px 16px', 
+                  background: '#f0fdf4', 
+                  border: '1.5px solid #86efac', 
+                  borderRadius: '12px', 
                   textAlign: 'center' 
                 }}
               >
-                <p style={{ fontSize: '0.78rem', color: '#64748b', margin: '0 0 8px 0', lineHeight: 1.4 }}>
-                  Need help logging in or accessing the platform? Contact <strong>{OPTICURA_CONTACT.drName}</strong> on WhatsApp.
+                <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                  <span>Not an MOS Member?</span>
+                </div>
+                <p style={{ fontSize: '0.8rem', color: '#374151', margin: '4px 0 10px 0', lineHeight: 1.4 }}>
+                  Interested in accessing this platform, selling equipment, or joining the network? Contact <strong>{OPTICURA_CONTACT.drName}</strong> directly on WhatsApp.
                 </p>
                 <a
-                  href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I need assistance logging into the MOS Connect platform supported by Opticura.')}`}
+                  href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am not currently an MOS member, but I am interested in accessing / joining the MOS Connect platform supported by Opticura.')}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     display: 'inline-flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '6px',
+                    gap: '8px',
                     background: '#25D366',
                     color: '#ffffff',
                     fontWeight: 700,
-                    fontSize: '0.8rem',
-                    padding: '8px 14px',
-                    borderRadius: '6px',
+                    fontSize: '0.84rem',
+                    padding: '9px 16px',
+                    borderRadius: '8px',
                     textDecoration: 'none',
-                    boxShadow: '0 2px 6px rgba(37, 211, 102, 0.25)',
+                    boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
                     width: '100%'
                   }}
                   id="btn-auth-contact-dr-atul"
                 >
-                  <WhatsAppIcon size={15} />
-                  <span>Chat on WhatsApp (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
+                  <WhatsAppIcon size={16} />
+                  <span>Chat with {OPTICURA_CONTACT.drName} (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
                 </a>
               </div>
             </form>
