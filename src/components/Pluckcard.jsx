@@ -57,7 +57,12 @@ export default function Pluckcard({
   return (
     <div className="pluckcard" id={`pluckcard-${listing.id}`}>
       {/* Top Media Area */}
-      <div className="pluckcard-media">
+      <div 
+        className="pluckcard-media"
+        onClick={() => onOpenDetails(listing)}
+        style={{ cursor: 'pointer' }}
+        title="Click to view photos & equipment details"
+      >
         <img 
           src={listing.image || 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&auto=format&fit=crop&q=80'} 
           alt={listing.title} 
@@ -222,11 +227,11 @@ export default function Pluckcard({
 
                 <button 
                   className="btn-pluckcard-detail"
-                  onClick={onOpenAuth}
-                  title="Log in to view full specs"
+                  onClick={() => onOpenDetails(listing)}
+                  title="View photos & equipment specs"
                   id={`btn-detail-${listing.id}`}
                 >
-                  <Lock size={14} />
+                  <Info size={15} />
                 </button>
               </>
             )}

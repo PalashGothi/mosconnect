@@ -420,13 +420,21 @@ export function getListings() {
       }
     }
     
-    // Auto-merge any initial listings that do not exist yet in local storage
-    const existingIds = new Set(current.map(l => l.id));
+    // Auto-merge any initial listings that do not exist yet in local storage, or enrich with images
+    const existingMap = new Map(current.map(l => [l.id, l]));
     let hasNew = false;
     for (const init of initialListings) {
-      if (!existingIds.has(init.id)) {
+      if (!existingMap.has(init.id)) {
         current.push(init);
         hasNew = true;
+      } else {
+        const item = existingMap.get(init.id);
+        if ((!item.images || item.images.length === 0) && init.images && init.images.length > 0) {
+          item.images = init.images;
+          if (init.reasonForSale) item.reasonForSale = init.reasonForSale;
+          if (init.callingHours) item.callingHours = init.callingHours;
+          hasNew = true;
+        }
       }
     }
 

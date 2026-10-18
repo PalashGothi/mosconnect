@@ -18,6 +18,7 @@ import {
   Lock
 } from 'lucide-react';
 import Pluckcard from '../components/Pluckcard';
+import EquipmentDetailsModal from '../components/EquipmentDetailsModal';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import OpticuraLogo from '../components/OpticuraLogo';
 import OpticuraShowcaseModal from '../components/OpticuraShowcaseModal';
@@ -38,8 +39,15 @@ export default function BuyPage({
   const [selectedCondition, setSelectedCondition] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
   const [sortBy, setSortBy] = useState('newest');
+  const [selectedListing, setSelectedListing] = useState(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [isOpticuraModalOpen, setIsOpticuraModalOpen] = useState(false);
   const [selectedOpticuraId, setSelectedOpticuraId] = useState(null);
+
+  const handleOpenEquipmentDetails = (listing) => {
+    setSelectedListing(listing);
+    setIsDetailsModalOpen(true);
+  };
 
   const categories = [
     'All',
@@ -305,10 +313,7 @@ export default function BuyPage({
               listing={listing}
               isSaved={savedItems.includes(listing.id)}
               onToggleSave={onToggleSave}
-              onOpenDetails={() => {
-                setSelectedOpticuraId(null);
-                setIsOpticuraModalOpen(true);
-              }}
+              onOpenDetails={handleOpenEquipmentDetails}
               currentDoctor={currentDoctor}
               onOpenAuth={onOpenAuth}
             />
@@ -344,6 +349,15 @@ export default function BuyPage({
           )}
         </div>
       )}
+
+      {/* Equipment Details Modal with Full Specs, Photos & Contact */}
+      <EquipmentDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        listing={selectedListing}
+        currentDoctor={currentDoctor}
+        onOpenAuth={onOpenAuth}
+      />
 
       {/* Opticura Ophthalmic Products Showcase Modal */}
       <OpticuraShowcaseModal

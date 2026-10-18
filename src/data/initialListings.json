@@ -19,6 +19,12 @@
     "sellerEmail": "santosh.bhide7@gmail.com",
     "clinicName": "Matrumandir Eye Hospital",
     "image": "/images/listings/megatron_s3_1.jpeg",
+    "images": [
+      "/images/listings/megatron_s3_1.jpeg",
+      "/images/listings/megatron_s3_2.jpeg",
+      "/images/listings/megatron_s3_3.jpeg",
+      "/images/listings/megatron_s3_4.jpeg"
+    ],
     "accessories": [
       "Phaco Handpiece",
       "Vitrectomy Cutter Handpiece",
@@ -52,6 +58,10 @@
     "sellerEmail": "santosh.bhide7@gmail.com",
     "clinicName": "Matrumandir Eye Hospital",
     "image": "/images/listings/topcon_trc_nw8f_1.jpg",
+    "images": [
+      "/images/listings/topcon_trc_nw8f_1.jpg",
+      "/images/listings/topcon_trc_nw8f_2.jpg"
+    ],
     "accessories": [
       "Nikon Digital SLR Camera Mount",
       "High-Resolution Viewing Monitor",
@@ -84,6 +94,22 @@
     "sellerEmail": "amit2gr8@gmail.com",
     "clinicName": "Aashish Eye Clinic",
     "image": "/images/listings/centurion_gold_1.jpeg",
+    "images": [
+      "/images/listings/centurion_gold_1.jpeg",
+      "/images/listings/centurion_gold_2.jpeg",
+      "/images/listings/centurion_gold_3.jpeg",
+      "/images/listings/centurion_gold_4.jpeg",
+      "/images/listings/centurion_gold_5.jpeg",
+      "/images/listings/centurion_gold_6.jpeg",
+      "/images/listings/centurion_gold_7.jpeg",
+      "/images/listings/centurion_gold_8.jpeg",
+      "/images/listings/centurion_gold_9.jpeg",
+      "/images/listings/centurion_gold_10.jpeg",
+      "/images/listings/centurion_gold_11.jpeg",
+      "/images/listings/centurion_gold_12.jpeg",
+      "/images/listings/centurion_gold_arm_1.jpg",
+      "/images/listings/centurion_gold_arm_2.jpg"
+    ],
     "accessories": [
       "Active Sentry Handpiece",
       "2 Phaco Handpieces",
@@ -104,11 +130,15 @@
     "brand": "Zeiss",
     "model": "Humphrey Perimeter HFA-3 (Model 830)",
     "year": 2017,
+    "yearOfPurchase": 2023,
     "price": 1100000,
     "priceFormatted": "₹ 11,00,000",
     "isNegotiable": true,
     "condition": "Excellent Working Condition",
     "warranty": "Under Active Zeiss AMC",
+    "currentMaintenance": "Nil (Zero issues)",
+    "reasonForSale": "Upgrading to model 840",
+    "callingHours": "18:00 - 22:00 hrs",
     "description": "Zeiss Humphrey Perimeter HFA-3 Model 830. Year of manufacture: 2017. Year of purchase: 2023. Under active Zeiss AMC. Current maintenance: Nil (Zero issues, working flawlessly). Expected price: about ₹ 11 Lakhs. Reason for sale: Upgrading to model 840. Location: Nagpur. Contact number and calling time: 7875554696, between 18:00 - 22:00 hrs.",
     "sellerName": "Dr.MOKADAM SHAUNAK PRAFULL",
     "sellerMembershipNo": "646",
@@ -117,6 +147,14 @@
     "sellerEmail": "shaunakpm@gmail.com",
     "clinicName": "Anjani Eye Hospital",
     "image": "/images/listings/zeiss_hfa3_2.jpeg",
+    "images": [
+      "/images/listings/zeiss_hfa3_2.jpeg",
+      "/images/listings/zeiss_hfa3_1.jpeg",
+      "/images/listings/zeiss_hfa3_3.jpeg",
+      "/images/listings/zeiss_hfa3_4.jpeg",
+      "/images/listings/zeiss_hfa3_5.jpeg",
+      "/images/listings/zeiss_hfa3_6.jpeg"
+    ],
     "accessories": [
       "Patient Response Trigger",
       "Keyboard & Tracking Mouse",
