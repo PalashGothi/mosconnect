@@ -412,11 +412,30 @@ export function deleteJob(jobId) {
 export function getListings() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.LISTINGS);
+    let current = [];
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+      if (Array.isArray(parsed)) {
+        current = parsed;
       }
+    }
+    
+    // Auto-merge any initial listings that do not exist yet in local storage
+    const existingIds = new Set(current.map(l => l.id));
+    let hasNew = false;
+    for (const init of initialListings) {
+      if (!existingIds.has(init.id)) {
+        current.push(init);
+        hasNew = true;
+      }
+    }
+
+    if (current.length > 0) {
+      if (hasNew || !saved) {
+        localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(current));
+        triggerCloudSync();
+      }
+      return current;
     }
   } catch (e) {
     console.error('Error reading listings from localStorage', e);
