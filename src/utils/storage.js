@@ -199,7 +199,14 @@ export function applyCloudRecord(record) {
     // 5. VENDOR REVIEWS
     if (record.vendorReviews && typeof record.vendorReviews === 'object') {
       const localReviews = getAllVendorReviews();
-      const mergedReviews = { ...localReviews, ...record.vendorReviews };
+      const cleanedCloud = {};
+      Object.keys(record.vendorReviews).forEach(k => {
+        const filtered = filterOutMockReviews(record.vendorReviews[k]);
+        if (filtered.length > 0) {
+          cleanedCloud[k] = filtered;
+        }
+      });
+      const mergedReviews = { ...localReviews, ...cleanedCloud };
       localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(mergedReviews));
     }
   } catch (e) {
@@ -208,7 +215,19 @@ export function applyCloudRecord(record) {
   return changed;
 }
 
-// One-time cleanup of initial mock listings, wanted posts, and jobs
+// Helper to filter out any fabricated mock reviews
+export function filterOutMockReviews(reviewList) {
+  if (!Array.isArray(reviewList)) return [];
+  return reviewList.filter(r => {
+    if (!r) return false;
+    if (r.id === 'rev-1' || r.id === 'rev-2' || r.id === 'rev-3' || r.id === 'rev-4') return false;
+    if (String(r.id).startsWith('rev-default-')) return false;
+    if (r.doctorName === 'Dr. Verified MOS Member') return false;
+    return true;
+  });
+}
+
+// One-time cleanup of initial mock listings, wanted posts, jobs, and fabricated vendor reviews
 try {
   const mockCleaned = localStorage.getItem('mos_mock_data_cleaned_v2');
   if (!mockCleaned) {
@@ -216,6 +235,11 @@ try {
     localStorage.removeItem(STORAGE_KEYS.WANTED_POSTS);
     localStorage.removeItem(STORAGE_KEYS.JOBS);
     localStorage.setItem('mos_mock_data_cleaned_v2', 'true');
+  }
+  const fakeReviewsCleaned = localStorage.getItem('mos_fake_reviews_purged_v3');
+  if (!fakeReviewsCleaned) {
+    localStorage.removeItem(STORAGE_KEYS.VENDOR_REVIEWS);
+    localStorage.setItem('mos_fake_reviews_purged_v3', 'true');
   }
 } catch (e) {
   // ignore
@@ -760,19 +784,28 @@ export function getVendors() {
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        return parsed.map(v => {
+          if (!v) return v;
+          const { rating, ...rest } = v;
+          return rest;
+        });
       }
     }
   } catch (e) {
     console.error('Error reading vendors from localStorage', e);
   }
-  // Initialize with vendors data
+  // Initialize with vendors data without rating
+  const cleanVendors = vendorsData.map(v => {
+    if (!v) return v;
+    const { rating, ...rest } = v;
+    return rest;
+  });
   try {
-    localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(vendorsData));
+    localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(cleanVendors));
   } catch (err) {
     console.warn('localStorage error setting vendors', err);
   }
-  return vendorsData;
+  return cleanVendors;
 }
 
 export function saveVendor(newVendor) {
@@ -820,81 +853,31 @@ export function deleteVendor(id) {
 }
 
 // ================= VENDOR REVIEWS & RATINGS =================
-const INITIAL_VENDOR_REVIEWS = {
-  'v-1': [
-    {
-      id: 'rev-1',
-      doctorName: 'Dr. Amit Khare',
-      membershipNo: '1842',
-      city: 'Pune',
-      rating: 5,
-      comment: 'Prompt response on a Sunday when our Zeiss Lumera microscope halogen unit failed. Arrived within 3 hours.',
-      date: '12 Oct 2026'
-    },
-    {
-      id: 'rev-2',
-      doctorName: 'Dr. Snehal Deshmukh',
-      membershipNo: '2904',
-      city: 'Mumbai',
-      rating: 5,
-      comment: 'Repaired our Phaco handpiece and recalibrated pressure sensors. Flawless OT performance since then.',
-      date: '28 Sep 2026'
-    }
-  ],
-  'v-2': [
-    {
-      id: 'rev-3',
-      doctorName: 'Dr. Rajesh Kulkarni',
-      membershipNo: '3115',
-      city: 'Nashik',
-      rating: 5,
-      comment: 'Very knowledgeable regarding ophthalmic electronics and PCB repair. Fixed our Topcon slit lamp power unit.',
-      date: '04 Oct 2026'
-    }
-  ],
-  'v-3': [
-    {
-      id: 'rev-4',
-      doctorName: 'Dr. Priya Shinde',
-      membershipNo: '2240',
-      city: 'Nagpur',
-      rating: 5,
-      comment: 'Reliable AMC service for our OT equipment. Highly courteous engineers with genuine spare parts.',
-      date: '18 Sep 2026'
-    }
-  ]
-};
+const INITIAL_VENDOR_REVIEWS = {};
 
 export function getAllVendorReviews() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.VENDOR_REVIEWS);
     if (saved) {
-      return JSON.parse(saved);
+      const parsed = JSON.parse(saved);
+      const cleaned = {};
+      Object.keys(parsed).forEach(k => {
+        const filtered = filterOutMockReviews(parsed[k]);
+        if (filtered.length > 0) {
+          cleaned[k] = filtered;
+        }
+      });
+      return cleaned;
     }
   } catch (e) {
     console.error('Error reading vendor reviews from localStorage', e);
-  }
-  try {
-    localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(INITIAL_VENDOR_REVIEWS));
-  } catch (e) {
-    console.warn('Failed to initialize vendor reviews', e);
   }
   return INITIAL_VENDOR_REVIEWS;
 }
 
 export function getVendorReviews(vendorId) {
   const all = getAllVendorReviews();
-  return all[vendorId] || [
-    {
-      id: `rev-default-${vendorId}`,
-      doctorName: 'Dr. Verified MOS Member',
-      membershipNo: 'MOS Surgeon',
-      city: 'Maharashtra',
-      rating: 5,
-      comment: 'Verified service engineer recommended for ophthalmic surgical equipment maintenance and AMC support.',
-      date: 'Recent'
-    }
-  ];
+  return all[vendorId] || [];
 }
 
 export function saveVendorReview(vendorId, review) {

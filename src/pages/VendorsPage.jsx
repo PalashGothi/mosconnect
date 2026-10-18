@@ -15,6 +15,7 @@ import {
   Award,
   Lock,
   RotateCw,
+  MessageSquare,
   MessageSquarePlus,
   X,
   Check
@@ -67,10 +68,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
       window.location.href = directUrl;
     }
 
-    // Prompt user to leave a review for the vendor
-    setTimeout(() => {
-      openReviewModal(vendor);
-    }, 400);
+
   };
 
   const openReviewModal = (vendor) => {
@@ -360,7 +358,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
       {/* Vendor Cards Count & Results */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
         <div style={{ fontSize: '0.9rem', color: '#64748b' }}>
-          Showing <strong>{filteredVendors.length}</strong> local vendors & technicians • <em>Click card or rating to flip & view reviews</em>
+          Showing <strong>{filteredVendors.length}</strong> local vendors & technicians • <em>Click card to view details or add reviews</em>
         </div>
 
         {(searchQuery || selectedCategory !== 'All' || selectedCity !== 'All') && (
@@ -399,9 +397,10 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
             const callLink = `tel:+91${primaryPhone.slice(-10)}`;
             const isFlipped = flippedVendorIds.has(vendor.id);
             const reviews = getVendorReviews(vendor.id);
-            const avgRating = reviews.length > 0
+            const hasReviews = reviews.length > 0;
+            const avgRating = hasReviews
               ? (reviews.reduce((sum, r) => sum + (r.rating || 5), 0) / reviews.length).toFixed(1)
-              : '5.0';
+              : null;
 
             return (
               <div 
@@ -442,11 +441,25 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                           e.stopPropagation();
                           toggleFlip(vendor.id);
                         }}
-                        title="Click to flip card and view doctor reviews"
+                        title={hasReviews ? "Click to view doctor reviews" : "No reviews yet • Click to add feedback"}
+                        style={{
+                          background: hasReviews ? '#f0fdf4' : '#f8fafc',
+                          borderColor: hasReviews ? '#bbf7d0' : '#e2e8f0',
+                          color: hasReviews ? '#166534' : '#475569'
+                        }}
                       >
-                        <Star size={13} fill="#166534" />
-                        <span>⭐ {avgRating} ({reviews.length} Reviews)</span>
-                        <RotateCw size={12} style={{ marginLeft: '2px' }} />
+                        {hasReviews ? (
+                          <>
+                            <Star size={13} fill="#16a34a" color="#16a34a" />
+                            <span>⭐ {avgRating} ({reviews.length} {reviews.length === 1 ? 'Review' : 'Reviews'})</span>
+                          </>
+                        ) : (
+                          <>
+                            <MessageSquare size={13} color="#64748b" />
+                            <span>Reviews (0) • Add Feedback</span>
+                          </>
+                        )}
+                        <RotateCw size={12} style={{ marginLeft: '4px', opacity: 0.6 }} />
                       </button>
 
                       <span style={{ fontSize: '0.74rem', color: '#94a3b8' }}>
@@ -576,21 +589,50 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                     </div>
 
                     {/* Overall Score Summary */}
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: '8px', marginBottom: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>{avgRating}</span>
-                        <div style={{ color: '#fbbf24', fontSize: '0.85rem' }}>★★★★★</div>
+                    {hasReviews ? (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(255,255,255,0.05)', padding: '8px 12px', borderRadius: '8px', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontSize: '1.25rem', fontWeight: 800, color: '#38bdf8' }}>{avgRating}</span>
+                          <div style={{ color: '#fbbf24', fontSize: '0.85rem' }}>
+                            {'★'.repeat(Math.round(Number(avgRating)))}{'☆'.repeat(5 - Math.round(Number(avgRating)))}
+                          </div>
+                        </div>
+                        <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
+                          {reviews.length} {reviews.length === 1 ? 'Surgeon Review' : 'Surgeon Reviews'}
+                        </span>
                       </div>
-                      <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>
-                        {reviews.length} Verified Surgeon Feedback
-                      </span>
-                    </div>
+                    ) : (
+                      <div style={{ background: 'rgba(255,255,255,0.05)', padding: '10px 14px', borderRadius: '8px', marginBottom: '12px', border: '1px dashed rgba(255,255,255,0.18)', textAlign: 'center' }}>
+                        <div style={{ fontSize: '0.84rem', fontWeight: 700, color: '#38bdf8' }}>
+                          No reviews yet
+                        </div>
+                        <div style={{ fontSize: '0.76rem', color: '#94a3b8', marginTop: '2px' }}>
+                          Be the first ophthalmologist to rate service quality, spares, and responsiveness.
+                        </div>
+                      </div>
+                    )}
 
                     {/* Scrollable Reviews List */}
                     <div className="vendor-reviews-scroll">
-                      {reviews.length === 0 ? (
-                        <div style={{ textAlign: 'center', padding: '30px 10px', color: '#94a3b8', fontSize: '0.85rem' }}>
-                          No reviews yet. Be the first surgeon to share feedback!
+                      {!hasReviews ? (
+                        <div style={{ textAlign: 'center', padding: '36px 14px', color: '#94a3b8', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                          <MessageSquarePlus size={32} color="#38bdf8" style={{ opacity: 0.8 }} />
+                          <div style={{ fontWeight: 700, color: '#f1f5f9', fontSize: '0.92rem' }}>No doctor reviews yet</div>
+                          <p style={{ fontSize: '0.78rem', color: '#94a3b8', lineHeight: 1.4, margin: '2px 0 10px 0' }}>
+                            Have you availed machine repair, AMC, or spares from this vendor? Share your clinical experience.
+                          </p>
+                          <button
+                            type="button"
+                            className="btn-add-review-cta"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openReviewModal(vendor);
+                            }}
+                            style={{ margin: '0 auto', fontSize: '0.82rem', padding: '7px 16px' }}
+                          >
+                            <MessageSquarePlus size={14} />
+                            <span>+ Add First Review</span>
+                          </button>
                         </div>
                       ) : (
                         reviews.map((rev) => (
@@ -624,7 +666,7 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                         }}
                       >
                         <MessageSquarePlus size={15} />
-                        <span>+ Write Review</span>
+                        <span>{reviews.length === 0 ? '+ Write First Review' : '+ Write Review'}</span>
                       </button>
 
                       <button 
@@ -805,7 +847,8 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
                       Cancel
                     </button>
                     <button 
-                      type="submit" 
+                      type="submit"
+                      id="btn-submit-vendor-review" 
                       style={{ padding: '8px 20px', borderRadius: '8px', border: 'none', background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', color: '#ffffff', fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                     >
                       <CheckCircle2 size={15} />

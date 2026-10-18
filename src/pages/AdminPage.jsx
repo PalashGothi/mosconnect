@@ -301,8 +301,7 @@ export default function AdminPage({
       description: vendorForm.description.trim(),
       experience: vendorForm.experience.trim() || '5+ Years',
       verified: vendorForm.verified,
-      badge: vendorForm.badge.trim() || 'Verified Specialist',
-      rating: editingVendor?.rating || 4.9
+      badge: vendorForm.badge.trim() || 'Verified Specialist'
     };
 
     if (editingVendor && onUpdateVendor) {
