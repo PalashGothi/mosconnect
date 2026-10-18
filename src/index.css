@@ -1604,9 +1604,18 @@ input, select, textarea {
   padding: 11px 14px;
   border-radius: var(--radius-md);
   border: 1px solid var(--slate-200);
-  background: var(--slate-50);
+  background: var(--white);
   font-size: 0.92rem;
   color: var(--slate-800);
+}
+
+.form-select option, 
+select.filter-select option, 
+select option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  font-size: 15px;
+  padding: 8px 12px;
 }
 
 .form-input:focus, .form-textarea:focus, .form-select:focus {
@@ -2863,8 +2872,13 @@ html, body {
     display: flex;
   }
 
+  .navbar .btn-post-ad,
+  .nav-actions .btn-post-ad {
+    display: none !important;
+  }
+
   .btn-post-ad {
-    display: none;
+    display: inline-flex !important;
   }
 
   .doctor-info-preview {

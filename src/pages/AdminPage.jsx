@@ -96,6 +96,7 @@ export default function AdminPage({
   const [uploadStats, setUploadStats] = useState(null);
   const [uploadError, setUploadError] = useState('');
   const [isUploading, setIsUploading] = useState(false);
+  const [adminNotice, setAdminNotice] = useState('');
 
   // Statistics
   const pendingJobsCount = useMemo(() => jobs.filter(j => j.status === 'pending').length, [jobs]);
@@ -548,6 +549,15 @@ export default function AdminPage({
       </div>
 
       {/* Global Alerts / Notifications */}
+      {adminNotice && (
+        <div className="otp-sim-toast" style={{ borderLeftColor: '#10b981', marginBottom: '20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <CheckCircle2 size={20} color="#10b981" />
+            <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{adminNotice}</span>
+          </div>
+        </div>
+      )}
+
       {uploadStats && (
         <div className="otp-sim-toast" style={{ borderLeftColor: '#10b981', marginBottom: '20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -715,7 +725,11 @@ export default function AdminPage({
                   <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', borderTop: '1px solid #f1f5f9', paddingTop: '12px' }}>
                     {job.status !== 'approved' && (
                       <button
-                        onClick={() => onUpdateJobStatus(job.id, 'approved', currentDoctor?.name)}
+                        onClick={() => {
+                          onUpdateJobStatus(job.id, 'approved', currentDoctor?.name);
+                          setAdminNotice(`✓ Approved: "${job.title}" has been published live to the public careers board.`);
+                          setTimeout(() => setAdminNotice(''), 6000);
+                        }}
                         style={{
                           background: '#059669',
                           color: '#ffffff',
@@ -737,7 +751,11 @@ export default function AdminPage({
 
                     {job.status !== 'rejected' && (
                       <button
-                        onClick={() => onUpdateJobStatus(job.id, 'rejected', currentDoctor?.name)}
+                        onClick={() => {
+                          onUpdateJobStatus(job.id, 'rejected', currentDoctor?.name);
+                          setAdminNotice(`Job "${job.title}" has been marked as rejected.`);
+                          setTimeout(() => setAdminNotice(''), 6000);
+                        }}
                         style={{
                           background: '#fee2e2',
                           color: '#ef4444',
@@ -758,7 +776,11 @@ export default function AdminPage({
                     )}
 
                     <button
-                      onClick={() => onDeleteJob(job.id)}
+                      onClick={() => {
+                        onDeleteJob(job.id);
+                        setAdminNotice(`Job "${job.title}" has been deleted.`);
+                        setTimeout(() => setAdminNotice(''), 6000);
+                      }}
                       style={{
                         padding: '8px 12px',
                         color: '#64748b',

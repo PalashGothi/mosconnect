@@ -3,7 +3,7 @@ import initialWantedPosts from '../data/initialWantedPosts.json';
 import initialJobs from '../data/initialJobs.json';
 import mosMembers from '../data/mosMembers.json';
 import vendorsData from '../data/vendors.json';
-import { pushCloudDataDebounced } from '../services/cloudSync';
+import { pushCloudDataDebounced } from '../services/cloudSync.js';
 
 const STORAGE_KEYS = {
   LISTINGS: 'mos_eyeequip_listings',
@@ -16,6 +16,38 @@ const STORAGE_KEYS = {
   INQUIRIES: 'mos_eyeequip_inquiries',
   VENDOR_REVIEWS: 'mos_eyeequip_vendor_reviews'
 };
+
+const TOMBSTONE_KEYS = {
+  DELETED_JOBS: 'mos_deleted_job_ids',
+  DELETED_LISTINGS: 'mos_deleted_listing_ids',
+  DELETED_VENDORS: 'mos_deleted_vendor_ids'
+};
+
+function getDeletedIds(key) {
+  try {
+    const s = localStorage.getItem(key);
+    return s ? JSON.parse(s) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function recordDeletedId(key, id) {
+  try {
+    const ids = getDeletedIds(key);
+    if (!ids.includes(id)) {
+      ids.push(id);
+      localStorage.setItem(key, JSON.stringify(ids));
+    }
+  } catch (e) {}
+}
+
+function unrecordDeletedId(key, id) {
+  try {
+    const ids = getDeletedIds(key).filter(x => x !== id);
+    localStorage.setItem(key, JSON.stringify(ids));
+  } catch (e) {}
+}
 
 /**
  * Trigger background push to cloud (JSONBin.io)
@@ -31,31 +63,144 @@ export function triggerCloudSync() {
 }
 
 /**
- * Apply cloud data downloaded from JSONBin.io to local cache
+ * Apply cloud data downloaded from JSONBin.io to local cache using smart bidirectional merge
  */
 export function applyCloudRecord(record) {
   if (!record || typeof record !== 'object') return false;
   let changed = false;
   try {
+    const deletedJobIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_JOBS);
+    const deletedListingIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_LISTINGS);
+    const deletedVendorIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_VENDORS);
+
+    // 1. SMART MERGE LISTINGS
     if (Array.isArray(record.listings)) {
-      localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(record.listings));
-      changed = true;
+      const localListings = getListings();
+      const listingMap = new Map();
+      localListings.forEach(l => {
+        if (l && l.id && !deletedListingIds.includes(l.id)) {
+          listingMap.set(l.id, l);
+        }
+      });
+
+      record.listings.forEach(cloudL => {
+        if (!cloudL || !cloudL.id || deletedListingIds.includes(cloudL.id)) return;
+        const existing = listingMap.get(cloudL.id);
+        if (!existing) {
+          listingMap.set(cloudL.id, cloudL);
+          changed = true;
+        } else {
+          // Preserve local rich images if cloud copy was sanitized
+          const keepImage = existing.image || cloudL.image;
+          const keepImages = (existing.images && existing.images.length > 0) ? existing.images : cloudL.images;
+          listingMap.set(cloudL.id, {
+            ...cloudL,
+            ...existing,
+            image: keepImage,
+            images: keepImages
+          });
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(Array.from(listingMap.values())));
     }
+
+    // 2. SMART MERGE WANTED POSTS
     if (Array.isArray(record.wantedPosts)) {
-      localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(record.wantedPosts));
-      changed = true;
+      const localPosts = getWantedPosts();
+      const postMap = new Map();
+      localPosts.forEach(p => {
+        if (p && p.id) postMap.set(p.id, p);
+      });
+
+      record.wantedPosts.forEach(cloudP => {
+        if (!cloudP || !cloudP.id) return;
+        const existing = postMap.get(cloudP.id);
+        if (!existing) {
+          postMap.set(cloudP.id, cloudP);
+          changed = true;
+        } else {
+          // Merge replies from both local and cloud
+          const exReplies = Array.isArray(existing.replies) ? existing.replies : [];
+          const clReplies = Array.isArray(cloudP.replies) ? cloudP.replies : [];
+          const replyMap = new Map();
+          exReplies.forEach(r => replyMap.set(r.id || `${r.doctorName}-${r.timestamp}`, r));
+          clReplies.forEach(r => replyMap.set(r.id || `${r.doctorName}-${r.timestamp}`, r));
+          const allReplies = Array.from(replyMap.values());
+          if (allReplies.length !== exReplies.length) {
+            changed = true;
+          }
+          postMap.set(cloudP.id, {
+            ...cloudP,
+            ...existing,
+            replies: allReplies
+          });
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(Array.from(postMap.values())));
     }
+
+    // 3. SMART MERGE JOBS
     if (Array.isArray(record.jobs)) {
-      localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(record.jobs));
-      changed = true;
+      const localJobs = getJobs();
+      const jobMap = new Map();
+      localJobs.forEach(j => {
+        if (j && j.id && !deletedJobIds.includes(j.id)) {
+          jobMap.set(j.id, j);
+        }
+      });
+
+      record.jobs.forEach(cloudJ => {
+        if (!cloudJ || !cloudJ.id || deletedJobIds.includes(cloudJ.id)) return;
+        const existing = jobMap.get(cloudJ.id);
+        if (!existing) {
+          jobMap.set(cloudJ.id, cloudJ);
+          changed = true;
+        } else {
+          // CRITICAL: If job is approved locally or in cloud, keep approved! Never revert to pending
+          const keepStatus = (existing.status === 'approved' || cloudJ.status === 'approved') ? 'approved' : cloudJ.status;
+          const keepApprovedAt = existing.approvedAt || cloudJ.approvedAt;
+          const keepApprovedBy = existing.approvedBy || cloudJ.approvedBy;
+          const keepFlyer = existing.flyerImage || cloudJ.flyerImage;
+          if (existing.status !== keepStatus) {
+            changed = true;
+          }
+          jobMap.set(cloudJ.id, {
+            ...cloudJ,
+            ...existing,
+            status: keepStatus,
+            approvedAt: keepApprovedAt,
+            approvedBy: keepApprovedBy,
+            flyerImage: keepFlyer
+          });
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(Array.from(jobMap.values())));
     }
+
+    // 4. SMART MERGE VENDORS
     if (Array.isArray(record.vendors) && record.vendors.length > 0) {
-      localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(record.vendors));
-      changed = true;
+      const localVendors = getVendors();
+      const vendorMap = new Map();
+      localVendors.forEach(v => {
+        if (v && v.id && !deletedVendorIds.includes(v.id)) {
+          vendorMap.set(v.id, v);
+        }
+      });
+      record.vendors.forEach(cloudV => {
+        if (!cloudV || !cloudV.id || deletedVendorIds.includes(cloudV.id)) return;
+        if (!vendorMap.has(cloudV.id)) {
+          vendorMap.set(cloudV.id, cloudV);
+          changed = true;
+        }
+      });
+      localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(Array.from(vendorMap.values())));
     }
+
+    // 5. VENDOR REVIEWS
     if (record.vendorReviews && typeof record.vendorReviews === 'object') {
-      localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(record.vendorReviews));
-      changed = true;
+      const localReviews = getAllVendorReviews();
+      const mergedReviews = { ...localReviews, ...record.vendorReviews };
+      localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(mergedReviews));
     }
   } catch (e) {
     console.error('Error applying cloud record to localStorage', e);
@@ -392,6 +537,7 @@ export function getJobs() {
 }
 
 export function saveJob(newJob) {
+  unrecordDeletedId(TOMBSTONE_KEYS.DELETED_JOBS, newJob.id);
   const jobs = getJobs();
   const index = jobs.findIndex(j => j.id === newJob.id);
   let updated;
@@ -425,6 +571,7 @@ export function updateJobStatus(jobId, status, adminName = 'MOS Admin') {
 }
 
 export function deleteJob(jobId) {
+  recordDeletedId(TOMBSTONE_KEYS.DELETED_JOBS, jobId);
   const jobs = getJobs();
   const updated = jobs.filter(j => j.id !== jobId);
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
@@ -477,6 +624,7 @@ export function getListings() {
 }
 
 export function saveListing(newListing) {
+  unrecordDeletedId(TOMBSTONE_KEYS.DELETED_LISTINGS, newListing.id);
   const listings = getListings();
   const index = listings.findIndex(l => l.id === newListing.id);
   let updated;
@@ -492,6 +640,7 @@ export function saveListing(newListing) {
 }
 
 export function deleteListing(id) {
+  recordDeletedId(TOMBSTONE_KEYS.DELETED_LISTINGS, id);
   const listings = getListings();
   const updated = listings.filter(l => l.id !== id);
   localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(updated));
@@ -627,6 +776,9 @@ export function getVendors() {
 }
 
 export function saveVendor(newVendor) {
+  if (newVendor.id) {
+    unrecordDeletedId(TOMBSTONE_KEYS.DELETED_VENDORS, newVendor.id);
+  }
   const vendors = getVendors();
   let updated;
   if (newVendor.id) {
@@ -655,6 +807,7 @@ export function saveVendor(newVendor) {
 }
 
 export function deleteVendor(id) {
+  recordDeletedId(TOMBSTONE_KEYS.DELETED_VENDORS, id);
   const vendors = getVendors();
   const updated = vendors.filter(v => v.id !== id);
   try {

@@ -143,11 +143,24 @@ export default function JobsPage({
   // Jobs posted by this doctor
   const myPostedJobs = useMemo(() => {
     if (!currentDoctor) return [];
-    return jobs.filter(j => 
-      j.postedBy?.membershipNo === currentDoctor.membershipNo ||
-      j.postedBy?.email?.toLowerCase() === currentDoctor.email?.toLowerCase() ||
-      (currentDoctor.role === 'admin' && j.postedBy?.membershipNo === 'ADMIN-MASTER')
-    );
+    const docMobile = currentDoctor.mobile ? currentDoctor.mobile.replace(/\D/g, '') : '';
+    const docEmail = currentDoctor.email ? currentDoctor.email.toLowerCase().trim() : '';
+    const docName = currentDoctor.name ? currentDoctor.name.toLowerCase().trim() : '';
+
+    return jobs.filter(j => {
+      const p = j.postedBy || {};
+      const pMobile = p.mobile ? p.mobile.replace(/\D/g, '') : '';
+      const pEmail = p.email ? p.email.toLowerCase().trim() : '';
+      const pName = p.name ? p.name.toLowerCase().trim() : '';
+
+      return (
+        (currentDoctor.membershipNo && p.membershipNo === currentDoctor.membershipNo) ||
+        (docMobile && pMobile && (pMobile === docMobile || pMobile.endsWith(docMobile) || docMobile.endsWith(pMobile))) ||
+        (docEmail && pEmail && pEmail === docEmail) ||
+        (docName && pName && (pName.includes(docName) || docName.includes(pName))) ||
+        (currentDoctor.role === 'admin')
+      );
+    });
   }, [jobs, currentDoctor]);
 
   const handlePostSubmit = (e) => {
@@ -262,16 +275,18 @@ export default function JobsPage({
 
       {/* Tabs Header & Post Action */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ display: 'flex', background: '#e2e8f0', padding: '4px', borderRadius: '9999px' }}>
+        <div className="jobs-tab-pills" style={{ display: 'flex', background: '#e2e8f0', padding: '4px', borderRadius: '9999px', flexWrap: 'wrap', gap: '4px' }}>
           <button 
             style={{
-              padding: '8px 20px',
+              padding: '8px 18px',
               borderRadius: '9999px',
               fontWeight: 700,
               fontSize: '0.86rem',
               background: activeTab === 'browse' ? '#0f172a' : 'transparent',
               color: activeTab === 'browse' ? '#ffffff' : '#475569',
-              transition: 'all 0.2s ease'
+              transition: 'all 0.2s ease',
+              border: 'none',
+              cursor: 'pointer'
             }}
             onClick={() => setActiveTab('browse')}
             id="tab-browse-jobs"
@@ -281,7 +296,7 @@ export default function JobsPage({
 
           <button 
             style={{
-              padding: '8px 20px',
+              padding: '8px 18px',
               borderRadius: '9999px',
               fontWeight: 700,
               fontSize: '0.86rem',
@@ -290,7 +305,9 @@ export default function JobsPage({
               transition: 'all 0.2s ease',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px'
+              gap: '6px',
+              border: 'none',
+              cursor: 'pointer'
             }}
             onClick={() => {
               if (!currentDoctor) {
@@ -497,7 +514,7 @@ export default function JobsPage({
             </div>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(380px, 1fr))', gap: '24px' }}>
-              {(currentDoctor ? filteredJobs : filteredJobs.slice(0, 2)).map(job => {
+              {filteredJobs.map(job => {
                 const cleanPhone = job.contactPhone ? job.contactPhone.replace(/\D/g, '') : '';
                 const waPhone = job.contactWhatsApp ? job.contactWhatsApp.replace(/\D/g, '') : cleanPhone;
                 const waText = encodeURIComponent(
@@ -702,26 +719,27 @@ export default function JobsPage({
                 );
               })}
 
-              {/* Membership Gate for Jobs */}
-              {!currentDoctor && filteredJobs.length > 2 && (
-                <div className="pluckcard-locked-gate-card" id="jobs-lock-gate">
-                  <div className="locked-gate-icon">
-                    <Lock size={30} />
+              {/* Doctor Login CTA Card for Guests */}
+              {!currentDoctor && (
+                <div className="pluckcard-locked-gate-card" id="jobs-lock-gate" style={{ minHeight: 'auto', padding: '30px 20px' }}>
+                  <div className="locked-gate-icon" style={{ width: '48px', height: '48px', margin: '0 auto 12px auto' }}>
+                    <ShieldCheck size={26} />
                   </div>
-                  <span className="locked-gate-tag">MOS MEMBER EXCLUSIVE CAREER PORTAL</span>
-                  <h3 className="locked-gate-title">
-                    +{filteredJobs.length - 2} More Ophthalmic Positions Protected
+                  <span className="locked-gate-tag">VERIFIED DOCTORS DIRECT CONTACTS</span>
+                  <h3 className="locked-gate-title" style={{ fontSize: '1.15rem' }}>
+                    Are You an Eye Surgeon or Fellow?
                   </h3>
-                  <p className="locked-gate-desc">
-                    Complete salary compensation ranges, hospital HR direct contacts, and WhatsApp apply links across Maharashtra are reserved for verified MOS ophthalmologists.
+                  <p className="locked-gate-desc" style={{ fontSize: '0.84rem' }}>
+                    Log in with your MOS membership or mobile number to unlock direct hospital WhatsApp apply chats, phone numbers, and official HR email addresses.
                   </p>
                   <button 
                     className="btn-locked-gate-login"
                     onClick={onOpenAuth}
                     id="btn-gate-login-jobs"
+                    style={{ marginTop: '10px' }}
                   >
-                    <ShieldCheck size={18} />
-                    <span>Log In with MOS ID to View All Vacancies ({filteredJobs.length})</span>
+                    <ShieldCheck size={17} />
+                    <span>Doctor Login to Contact Hospitals</span>
                   </button>
                 </div>
               )}
@@ -1051,7 +1069,7 @@ export default function JobsPage({
                       <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#475569', marginBottom: '6px' }}>
                         Or Choose a Pre-Designed Flyer Template:
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '8px' }}>
                         <button
                           type="button"
                           onClick={() => setFormData({ ...formData, flyerImage: '/images/flyers/fellowship_flyer.jpg' })}
@@ -1148,7 +1166,7 @@ export default function JobsPage({
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '20px', flexWrap: 'wrap' }}>
                 <button 
                   type="button" 
                   className="btn-pluckcard-call" 
@@ -1161,6 +1179,7 @@ export default function JobsPage({
                   type="submit" 
                   className="btn-post-ad"
                   id="btn-submit-post-job"
+                  style={{ display: 'inline-flex', padding: '10px 22px', fontWeight: 700 }}
                 >
                   <span>Submit Vacancy for Approval</span>
                 </button>
