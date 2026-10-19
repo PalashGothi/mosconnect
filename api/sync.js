@@ -43,6 +43,7 @@ export default async function handler(req, res) {
         }
       } catch (e) {}
 
+      // Smart merge customMembers
       const existingMembers = Array.isArray(existingData.customMembers) ? existingData.customMembers : [];
       const incomingMembers = Array.isArray(payload.customMembers) ? payload.customMembers : [];
 
@@ -59,14 +60,58 @@ export default async function handler(req, res) {
         ...(Array.isArray(payload.deletedMemberIds) ? payload.deletedMemberIds : [])
       ];
       const deletedSet = new Set(deletedIds.map(id => String(id).toLowerCase().trim()));
-
       const mergedCustomMembers = Array.from(memberMap.values()).filter(m => !deletedSet.has(String(m.membershipNo).toLowerCase().trim()));
+
+      // Smart merge listings
+      const existingListings = Array.isArray(existingData.listings) ? existingData.listings : [];
+      const incomingListings = Array.isArray(payload.listings) ? payload.listings : [];
+      const listingMap = new Map();
+      existingListings.forEach(l => { if (l && l.id) listingMap.set(String(l.id), l); });
+      incomingListings.forEach(l => { if (l && l.id) listingMap.set(String(l.id), l); });
+      const deletedListingIds = [
+        ...(Array.isArray(existingData.deletedListingIds) ? existingData.deletedListingIds : []),
+        ...(Array.isArray(payload.deletedListingIds) ? payload.deletedListingIds : [])
+      ];
+      const deletedListingSet = new Set(deletedListingIds.map(id => String(id)));
+      const mergedListings = Array.from(listingMap.values()).filter(l => !deletedListingSet.has(String(l.id)));
+
+      // Smart merge vendors
+      const existingVendors = Array.isArray(existingData.vendors) ? existingData.vendors : [];
+      const incomingVendors = Array.isArray(payload.vendors) ? payload.vendors : [];
+      const vendorMap = new Map();
+      existingVendors.forEach(v => { if (v && v.id) vendorMap.set(String(v.id), v); });
+      incomingVendors.forEach(v => { if (v && v.id) vendorMap.set(String(v.id), v); });
+      const deletedVendorIds = [
+        ...(Array.isArray(existingData.deletedVendorIds) ? existingData.deletedVendorIds : []),
+        ...(Array.isArray(payload.deletedVendorIds) ? payload.deletedVendorIds : [])
+      ];
+      const deletedVendorSet = new Set(deletedVendorIds.map(id => String(id)));
+      const mergedVendors = Array.from(vendorMap.values()).filter(v => !deletedVendorSet.has(String(v.id)));
+
+      // Smart merge jobs
+      const existingJobs = Array.isArray(existingData.jobs) ? existingData.jobs : [];
+      const incomingJobs = Array.isArray(payload.jobs) ? payload.jobs : [];
+      const jobMap = new Map();
+      existingJobs.forEach(j => { if (j && j.id) jobMap.set(String(j.id), j); });
+      incomingJobs.forEach(j => { if (j && j.id) jobMap.set(String(j.id), j); });
+      const deletedJobIds = [
+        ...(Array.isArray(existingData.deletedJobIds) ? existingData.deletedJobIds : []),
+        ...(Array.isArray(payload.deletedJobIds) ? payload.deletedJobIds : [])
+      ];
+      const deletedJobSet = new Set(deletedJobIds.map(id => String(id)));
+      const mergedJobs = Array.from(jobMap.values()).filter(j => !deletedJobSet.has(String(j.id)));
 
       const mergedPayload = {
         ...existingData,
         ...payload,
         customMembers: mergedCustomMembers,
         deletedMemberIds: Array.from(deletedSet),
+        listings: mergedListings,
+        deletedListingIds: Array.from(deletedListingSet),
+        vendors: mergedVendors,
+        deletedVendorIds: Array.from(deletedVendorSet),
+        jobs: mergedJobs,
+        deletedJobIds: Array.from(deletedJobSet),
         lastUpdated: Date.now()
       };
 

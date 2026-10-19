@@ -22,6 +22,7 @@ import {
   deleteJob,
   getMembers,
   saveMember,
+  updateMember,
   deleteMember,
   addMembersBulk,
   getVendors,
@@ -120,6 +121,11 @@ export default function App() {
     }
   };
 
+  const handleUpdateListing = (updatedListing) => {
+    const updated = saveListing(updatedListing);
+    setListings(updated);
+  };
+
   // Jobs Handlers
   const handleAddJob = (newJob) => {
     const updated = saveJob(newJob);
@@ -141,6 +147,11 @@ export default function App() {
   // Member Management Handlers
   const handleAddMember = (newMember) => {
     const updated = saveMember(newMember);
+    setMembers(updated);
+  };
+
+  const handleUpdateMember = (updatedMember, oldMembershipNo) => {
+    const updated = updateMember(updatedMember, oldMembershipNo);
     setMembers(updated);
   };
 
@@ -277,6 +288,7 @@ export default function App() {
             currentDoctor={currentDoctor}
             listings={listings}
             onAddListing={handleAddListing}
+            onUpdateListing={handleUpdateListing}
             onDeleteListing={handleDeleteListing}
             onUpdateStatus={handleUpdateStatus}
             onOpenAuth={() => setIsAuthOpen(true)}
@@ -289,6 +301,7 @@ export default function App() {
             jobs={jobs}
             currentDoctor={currentDoctor}
             onAddJob={handleAddJob}
+            onUpdateJob={handleAddJob}
             onOpenAuth={() => setIsAuthOpen(true)}
             onOpenAdminPanel={() => setActiveTab('admin')}
           />
@@ -313,6 +326,7 @@ export default function App() {
             onUpdateJobStatus={handleUpdateJobStatus}
             onDeleteJob={handleDeleteJob}
             onAddMember={handleAddMember}
+            onUpdateMember={handleUpdateMember}
             onDeleteMember={handleDeleteMember}
             onBulkAddMembers={handleBulkAddMembers}
             onAddVendor={handleAddVendor}

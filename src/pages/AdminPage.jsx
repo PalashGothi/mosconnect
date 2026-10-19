@@ -37,6 +37,7 @@ export default function AdminPage({
   onUpdateJobStatus, 
   onDeleteJob,
   onAddMember,
+  onUpdateMember,
   onDeleteMember,
   onBulkAddMembers,
   onAddVendor,
@@ -83,6 +84,7 @@ export default function AdminPage({
 
   // Manual Member Modal State
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [editingMember, setEditingMember] = useState(null);
   const [manualMember, setManualMember] = useState({
     membershipNo: '',
     membershipType: 'MOS Member',
@@ -190,7 +192,39 @@ export default function AdminPage({
     return filteredMembers.slice(start, start + pageSize);
   }, [filteredMembers, currentPage]);
 
-  // Handle Manual Member Submit (Only Doctor Name + Email or Phone required)
+  const handleOpenAddMember = () => {
+    setEditingMember(null);
+    setManualMember({
+      membershipNo: '',
+      membershipType: 'MOS Member',
+      name: '',
+      email: '',
+      mobile: '',
+      address: '',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      ratifiedYear: '2026'
+    });
+    setShowAddMemberModal(true);
+  };
+
+  const handleOpenEditMember = (m) => {
+    setEditingMember(m);
+    setManualMember({
+      membershipNo: m.membershipNo || '',
+      membershipType: m.membershipType || 'MOS Member',
+      name: m.name || '',
+      email: m.email || '',
+      mobile: m.mobile || '',
+      address: m.address || '',
+      city: m.city || 'Mumbai',
+      state: m.state || 'Maharashtra',
+      ratifiedYear: m.ratifiedYear || '2026'
+    });
+    setShowAddMemberModal(true);
+  };
+
+  // Handle Manual Member Submit (Add or Edit)
   const handleManualMemberSubmit = (e) => {
     e.preventDefault();
     if (!manualMember.name.trim()) {
@@ -199,6 +233,35 @@ export default function AdminPage({
     }
     if (!manualMember.email.trim() && !manualMember.mobile.trim()) {
       alert('Please provide either an Email ID or Mobile number.');
+      return;
+    }
+
+    if (editingMember) {
+      const assignedId = manualMember.membershipNo.trim() || editingMember.membershipNo;
+      const updatedMem = {
+        ...editingMember,
+        membershipNo: assignedId,
+        membershipType: manualMember.membershipType || 'MOS Member',
+        name: formatDoctorName(manualMember.name),
+        email: manualMember.email.trim().toLowerCase(),
+        mobile: manualMember.mobile.trim().replace(/\D/g, ''),
+        address: manualMember.address.trim(),
+        city: manualMember.city.trim() || 'Maharashtra',
+        state: manualMember.state.trim() || 'Maharashtra',
+        ratifiedYear: manualMember.ratifiedYear || editingMember.ratifiedYear || '2026',
+        isCustom: true,
+        updatedAt: new Date().toISOString()
+      };
+
+      if (onUpdateMember) {
+        onUpdateMember(updatedMem, editingMember.membershipNo);
+      } else if (onAddMember) {
+        onAddMember(updatedMem);
+      }
+      setShowAddMemberModal(false);
+      setEditingMember(null);
+      setUploadStats({ message: `Member ${updatedMem.name} (#${updatedMem.membershipNo}) updated successfully!` });
+      setTimeout(() => setUploadStats(null), 4000);
       return;
     }
 
@@ -842,7 +905,7 @@ export default function AdminPage({
               </label>
 
               <button
-                onClick={() => setShowAddMemberModal(true)}
+                onClick={handleOpenAddMember}
                 className="btn-post-ad"
                 style={{ padding: '9px 16px', fontSize: '0.84rem' }}
                 id="btn-add-member-manually"
@@ -967,7 +1030,31 @@ export default function AdminPage({
                     <td style={{ padding: '12px 16px', color: '#64748b' }}>
                       {m.state || 'Maharashtra'}
                     </td>
-                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                    <td style={{ padding: '12px 16px', textAlign: 'center', whiteSpace: 'nowrap' }}>
+                      <button
+                        onClick={() => handleOpenEditMember(m)}
+                        style={{
+                          background: '#f0f9ff',
+                          border: '1px solid #bae6fd',
+                          color: '#0284c7',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          marginRight: '8px',
+                          transition: 'all 0.2s'
+                        }}
+                        title="Edit Member Details"
+                        id={`btn-edit-member-${m.membershipNo}`}
+                      >
+                        <Edit2 size={13} />
+                        <span>Edit</span>
+                      </button>
+
                       <button
                         onClick={() => onDeleteMember && onDeleteMember(m.membershipNo, m.name)}
                         style={{
@@ -1038,26 +1125,47 @@ export default function AdminPage({
                   <div>✉️ {m.email || '—'}</div>
                   <div>📍 {m.city || '—'}, {m.state || 'Maharashtra'}</div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+                  <button
+                    onClick={() => handleOpenEditMember(m)}
+                    style={{
+                      background: '#f0f9ff',
+                      border: '1px solid #bae6fd',
+                      color: '#0284c7',
+                      padding: '6px 14px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '0.78rem',
+                      fontWeight: 700
+                    }}
+                    id={`btn-mob-edit-member-${m.membershipNo}`}
+                  >
+                    <Edit2 size={13} />
+                    <span>Edit</span>
+                  </button>
+
                   <button
                     onClick={() => onDeleteMember && onDeleteMember(m.membershipNo, m.name)}
                     style={{
                       background: '#fef2f2',
                       border: '1px solid #fecaca',
                       color: '#dc2626',
-                      padding: '5px 12px',
+                      padding: '6px 14px',
                       borderRadius: '6px',
                       cursor: 'pointer',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '5px',
-                      fontSize: '0.75rem',
+                      fontSize: '0.78rem',
                       fontWeight: 700
                     }}
                     id={`btn-mob-delete-member-${m.membershipNo}`}
                   >
                     <Trash2 size={13} />
-                    <span>Delete Member</span>
+                    <span>Delete</span>
                   </button>
                 </div>
               </div>
@@ -1377,8 +1485,10 @@ export default function AdminPage({
         <div className="modal-overlay" onClick={() => setShowAddMemberModal(false)}>
           <div className="modal-card" style={{ maxWidth: '580px' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Add Member Manually to MOS Register</h3>
-              <button className="modal-close-btn" onClick={() => setShowAddMemberModal(false)}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                {editingMember ? `Edit Member Details (#${editingMember.membershipNo})` : 'Add Member Manually to MOS Register'}
+              </h3>
+              <button className="modal-close-btn" onClick={() => { setShowAddMemberModal(false); setEditingMember(null); }}>
                 <X size={20} />
               </button>
             </div>
@@ -1490,7 +1600,7 @@ export default function AdminPage({
                 <button 
                   type="button" 
                   className="btn-pluckcard-call" 
-                  onClick={() => setShowAddMemberModal(false)}
+                  onClick={() => { setShowAddMemberModal(false); setEditingMember(null); }}
                 >
                   Cancel
                 </button>
@@ -1500,7 +1610,7 @@ export default function AdminPage({
                   className="btn-post-ad"
                   id="btn-submit-add-member"
                 >
-                  <span>Save Member to Database</span>
+                  <span>{editingMember ? 'Update Member Details' : 'Save Member to Database'}</span>
                 </button>
               </div>
             </form>

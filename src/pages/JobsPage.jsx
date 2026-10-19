@@ -24,7 +24,8 @@ import {
   Image as ImageIcon,
   UploadCloud,
   GraduationCap,
-  ZoomIn
+  ZoomIn,
+  Edit2
 } from 'lucide-react';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import OpticuraLogo from '../components/OpticuraLogo';
@@ -47,6 +48,7 @@ export default function JobsPage({
   const [selectedFlyerModal, setSelectedFlyerModal] = useState(null);
   const [onlyFlyersFilter, setOnlyFlyersFilter] = useState(false);
   const [submissionSuccess, setSubmissionSuccess] = useState('');
+  const [editingJob, setEditingJob] = useState(null);
 
   // Handle ESC key for modal dismissal
   useEffect(() => {
@@ -163,6 +165,27 @@ export default function JobsPage({
     });
   }, [jobs, currentDoctor]);
 
+  const handleStartEditJob = (job) => {
+    setEditingJob(job);
+    setFormData({
+      title: job.title || '',
+      hospital: job.hospital || '',
+      city: job.city || currentDoctor?.city || 'Mumbai',
+      state: job.state || 'Maharashtra',
+      specialization: job.specialization || 'Phaco / Cataract',
+      jobType: job.jobType || 'Fellowship',
+      experience: job.experience || 'MS / DNB Ophthalmology',
+      salary: job.salary || '₹ 1,50,000 - ₹ 2,50,000 / month',
+      description: job.description || '',
+      requirementsText: Array.isArray(job.requirements) ? job.requirements.join(', ') : (job.requirements || ''),
+      flyerImage: job.flyerImage || '',
+      contactEmail: job.contactEmail || currentDoctor?.email || '',
+      contactPhone: job.contactPhone || currentDoctor?.mobile || '',
+      contactWhatsApp: job.contactWhatsApp || currentDoctor?.mobile || ''
+    });
+    setShowPostModal(true);
+  };
+
   const handlePostSubmit = (e) => {
     e.preventDefault();
     if (!currentDoctor) {
@@ -173,6 +196,34 @@ export default function JobsPage({
     const requirementsArray = formData.requirementsText
       ? formData.requirementsText.split(',').map(s => s.trim()).filter(Boolean)
       : ['MS / DNB in Ophthalmology', 'MMC Registered'];
+
+    if (editingJob) {
+      const updatedJob = {
+        ...editingJob,
+        title: formData.title,
+        hospital: formData.hospital,
+        city: formData.city,
+        state: formData.state || 'Maharashtra',
+        specialization: formData.specialization,
+        jobType: formData.jobType,
+        experience: formData.experience,
+        salary: formData.salary,
+        description: formData.description,
+        requirements: requirementsArray,
+        flyerImage: formData.flyerImage || null,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone,
+        contactWhatsApp: formData.contactWhatsApp,
+        updatedAt: new Date().toISOString()
+      };
+
+      onAddJob(updatedJob);
+      setShowPostModal(false);
+      setEditingJob(null);
+      setSubmissionSuccess(`Job "${updatedJob.title}" updated successfully!`);
+      setTimeout(() => setSubmissionSuccess(''), 5000);
+      return;
+    }
 
     const newJob = {
       id: `job-${Date.now()}`,
@@ -831,6 +882,27 @@ export default function JobsPage({
                     >
                       View Post
                     </button>
+
+                    <button 
+                      style={{ 
+                        padding: '7px 14px', 
+                        background: '#f0f9ff', 
+                        border: '1px solid #bae6fd', 
+                        borderRadius: '8px', 
+                        fontSize: '0.82rem', 
+                        fontWeight: 700, 
+                        color: '#0284c7', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px', 
+                        cursor: 'pointer' 
+                      }}
+                      onClick={() => handleStartEditJob(job)}
+                      id={`btn-edit-job-${job.id}`}
+                    >
+                      <Edit2 size={13} />
+                      <span>Edit Job</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -841,11 +913,13 @@ export default function JobsPage({
 
       {/* MODAL: POST A JOB / FELLOWSHIP */}
       {showPostModal && (
-        <div className="modal-overlay" onClick={() => setShowPostModal(false)}>
+        <div className="modal-overlay" onClick={() => { setShowPostModal(false); setEditingJob(null); }}>
           <div className="modal-card" style={{ maxWidth: '680px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Post Ophthalmic Job or Fellowship Vacancy</h3>
-              <button className="modal-close-btn" onClick={() => setShowPostModal(false)}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>
+                {editingJob ? `Edit Job Vacancy: ${editingJob.title}` : 'Post Ophthalmic Job or Fellowship Vacancy'}
+              </h3>
+              <button className="modal-close-btn" onClick={() => { setShowPostModal(false); setEditingJob(null); }}>
                 <X size={20} />
               </button>
             </div>
@@ -1170,7 +1244,7 @@ export default function JobsPage({
                 <button 
                   type="button" 
                   className="btn-pluckcard-call" 
-                  onClick={() => setShowPostModal(false)}
+                  onClick={() => { setShowPostModal(false); setEditingJob(null); }}
                 >
                   Cancel
                 </button>
@@ -1181,7 +1255,7 @@ export default function JobsPage({
                   id="btn-submit-post-job"
                   style={{ display: 'inline-flex', padding: '10px 22px', fontWeight: 700 }}
                 >
-                  <span>Submit Vacancy for Approval</span>
+                  <span>{editingJob ? 'Save Changes' : 'Submit Vacancy for Approval'}</span>
                 </button>
               </div>
             </form>

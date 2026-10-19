@@ -86,14 +86,58 @@ function syncApiPlugin() {
                 ...(Array.isArray(parsed.deletedMemberIds) ? parsed.deletedMemberIds : [])
               ];
               const deletedSet = new Set(deletedIds.map(id => String(id).toLowerCase().trim()));
-
               const mergedCustomMembers = Array.from(memberMap.values()).filter(m => !deletedSet.has(String(m.membershipNo).toLowerCase().trim()));
+
+              // Smart merge listings
+              const existingListings = Array.isArray(cacheState.listings) ? cacheState.listings : [];
+              const incomingListings = Array.isArray(parsed.listings) ? parsed.listings : [];
+              const listingMap = new Map();
+              existingListings.forEach(l => { if (l && l.id) listingMap.set(String(l.id), l); });
+              incomingListings.forEach(l => { if (l && l.id) listingMap.set(String(l.id), l); });
+              const deletedListingIds = [
+                ...(Array.isArray(cacheState.deletedListingIds) ? cacheState.deletedListingIds : []),
+                ...(Array.isArray(parsed.deletedListingIds) ? parsed.deletedListingIds : [])
+              ];
+              const deletedListingSet = new Set(deletedListingIds.map(id => String(id)));
+              const mergedListings = Array.from(listingMap.values()).filter(l => !deletedListingSet.has(String(l.id)));
+
+              // Smart merge vendors
+              const existingVendors = Array.isArray(cacheState.vendors) ? cacheState.vendors : [];
+              const incomingVendors = Array.isArray(parsed.vendors) ? parsed.vendors : [];
+              const vendorMap = new Map();
+              existingVendors.forEach(v => { if (v && v.id) vendorMap.set(String(v.id), v); });
+              incomingVendors.forEach(v => { if (v && v.id) vendorMap.set(String(v.id), v); });
+              const deletedVendorIds = [
+                ...(Array.isArray(cacheState.deletedVendorIds) ? cacheState.deletedVendorIds : []),
+                ...(Array.isArray(parsed.deletedVendorIds) ? parsed.deletedVendorIds : [])
+              ];
+              const deletedVendorSet = new Set(deletedVendorIds.map(id => String(id)));
+              const mergedVendors = Array.from(vendorMap.values()).filter(v => !deletedVendorSet.has(String(v.id)));
+
+              // Smart merge jobs
+              const existingJobs = Array.isArray(cacheState.jobs) ? cacheState.jobs : [];
+              const incomingJobs = Array.isArray(parsed.jobs) ? parsed.jobs : [];
+              const jobMap = new Map();
+              existingJobs.forEach(j => { if (j && j.id) jobMap.set(String(j.id), j); });
+              incomingJobs.forEach(j => { if (j && j.id) jobMap.set(String(j.id), j); });
+              const deletedJobIds = [
+                ...(Array.isArray(cacheState.deletedJobIds) ? cacheState.deletedJobIds : []),
+                ...(Array.isArray(parsed.deletedJobIds) ? parsed.deletedJobIds : [])
+              ];
+              const deletedJobSet = new Set(deletedJobIds.map(id => String(id)));
+              const mergedJobs = Array.from(jobMap.values()).filter(j => !deletedJobSet.has(String(j.id)));
 
               cacheState = {
                 ...cacheState,
                 ...parsed,
                 customMembers: mergedCustomMembers,
                 deletedMemberIds: Array.from(deletedSet),
+                listings: mergedListings,
+                deletedListingIds: Array.from(deletedListingSet),
+                vendors: mergedVendors,
+                deletedVendorIds: Array.from(deletedVendorSet),
+                jobs: mergedJobs,
+                deletedJobIds: Array.from(deletedJobSet),
                 lastUpdated: Date.now()
               };
 

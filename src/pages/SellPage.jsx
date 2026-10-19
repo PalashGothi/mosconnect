@@ -9,6 +9,7 @@ import {
   IndianRupee, 
   Eye, 
   Trash2, 
+  Edit2,
   CheckCircle, 
   AlertCircle,
   Clock,
@@ -23,12 +24,11 @@ import {
 import Pluckcard from '../components/Pluckcard';
 import OpticuraLogo from '../components/OpticuraLogo';
 
-
-
 export default function SellPage({ 
   currentDoctor, 
   listings, 
   onAddListing, 
+  onUpdateListing,
   onDeleteListing,
   onUpdateStatus,
   onOpenAuth,
@@ -36,6 +36,28 @@ export default function SellPage({
 }) {
   const [activeSubTab, setActiveSubTab] = useState('post'); // 'post' or 'my-listings'
   const [successToast, setSuccessToast] = useState('');
+
+  // Edit Listing State
+  const [editingListing, setEditingListing] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    title: '',
+    category: 'Microscopes',
+    brand: 'Zeiss',
+    model: '',
+    year: '2021',
+    price: '',
+    isNegotiable: true,
+    condition: 'Like New (Mint)',
+    warranty: 'Under Active AMC',
+    description: '',
+    accessoriesText: '',
+    image: '',
+    clinicName: '',
+    sellerCity: '',
+    sellerMobile: '',
+    status: 'Available'
+  });
 
   // Form State
   const [formData, setFormData] = useState({
@@ -154,6 +176,68 @@ export default function SellPage({
     
     // Switch to My Listings
     setActiveSubTab('my-listings');
+    setTimeout(() => setSuccessToast(''), 5000);
+  };
+
+  const handleStartEdit = (item) => {
+    setEditingListing(item);
+    setEditFormData({
+      title: item.title || '',
+      category: item.category || 'Microscopes',
+      brand: item.brand || 'Zeiss',
+      model: item.model || '',
+      year: item.year || '2021',
+      price: item.price ? String(item.price) : '',
+      isNegotiable: item.isNegotiable !== false,
+      condition: item.condition || 'Like New (Mint)',
+      warranty: item.warranty || 'Under Active AMC',
+      description: item.description || '',
+      accessoriesText: Array.isArray(item.accessories) ? item.accessories.join(', ') : (item.accessories || ''),
+      image: item.image || (Array.isArray(item.images) ? item.images[0] : '') || '',
+      clinicName: item.clinicName || '',
+      sellerCity: item.sellerCity || currentDoctor?.city || 'Maharashtra',
+      sellerMobile: item.sellerMobile || currentDoctor?.mobile || '',
+      status: item.status || 'Available'
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = (e) => {
+    e.preventDefault();
+    if (!editingListing) return;
+    const priceNum = Number(String(editFormData.price || '').replace(/[^\d]/g, '')) || 0;
+    const accessoriesArray = editFormData.accessoriesText
+      ? editFormData.accessoriesText.split(',').map(s => s.trim()).filter(Boolean)
+      : (editingListing.accessories || ['Standard Accessories']);
+
+    const updatedListing = {
+      ...editingListing,
+      title: editFormData.title.trim(),
+      category: editFormData.category,
+      brand: editFormData.brand,
+      model: editFormData.model.trim() || 'Standard Model',
+      year: Number(editFormData.year) || 2021,
+      price: priceNum,
+      priceFormatted: `₹ ${priceNum.toLocaleString('en-IN')}`,
+      isNegotiable: editFormData.isNegotiable,
+      condition: editFormData.condition,
+      warranty: editFormData.warranty,
+      description: editFormData.description.trim(),
+      accessories: accessoriesArray,
+      clinicName: editFormData.clinicName.trim(),
+      sellerCity: editFormData.sellerCity.trim(),
+      sellerMobile: editFormData.sellerMobile.trim(),
+      status: editFormData.status || editingListing.status || 'Available',
+      image: editFormData.image || editingListing.image,
+      updatedAt: new Date().toISOString()
+    };
+
+    if (onUpdateListing) {
+      onUpdateListing(updatedListing);
+    }
+    setShowEditModal(false);
+    setEditingListing(null);
+    setSuccessToast(`Updated! Changes to "${updatedListing.title}" (${updatedListing.priceFormatted}) have been saved.`);
     setTimeout(() => setSuccessToast(''), 5000);
   };
 
@@ -752,6 +836,29 @@ export default function SellPage({
                     )}
 
                     <button 
+                      type="button"
+                      style={{ 
+                        padding: '6px 12px', 
+                        background: '#f0f9ff', 
+                        border: '1px solid #bae6fd', 
+                        borderRadius: '8px', 
+                        fontSize: '0.8rem', 
+                        fontWeight: 700, 
+                        color: '#0284c7', 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '5px', 
+                        cursor: 'pointer' 
+                      }}
+                      onClick={() => handleStartEdit(item)}
+                      title="Edit price, description, model or specs"
+                      id={`btn-edit-listing-${item.id}`}
+                    >
+                      <Edit2 size={13} />
+                      <span>Edit Details</span>
+                    </button>
+
+                    <button 
                       style={{ padding: '8px', color: '#e11d48' }}
                       onClick={() => onDeleteListing(item.id)}
                       title="Delete Listing"
@@ -764,6 +871,281 @@ export default function SellPage({
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* MODAL: EDIT LISTING DETAILS */}
+      {showEditModal && editingListing && (
+        <div className="modal-overlay" onClick={() => setShowEditModal(false)}>
+          <div className="modal-card" style={{ maxWidth: '680px', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div>
+                <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a' }}>Edit Equipment Listing</h3>
+                <p style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '2px' }}>
+                  Update price, technical details, clinical description or availability.
+                </p>
+              </div>
+              <button className="modal-close-btn" onClick={() => setShowEditModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleSaveEdit} style={{ padding: '24px' }}>
+              <div className="form-group">
+                <label className="form-label">Equipment Title *</label>
+                <input 
+                  type="text"
+                  className="form-input"
+                  required
+                  value={editFormData.title}
+                  onChange={e => setEditFormData({ ...editFormData, title: e.target.value })}
+                  placeholder="e.g. Carl Zeiss OPMI Lumera T Surgical Microscope"
+                  id="input-edit-listing-title"
+                />
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Category *</label>
+                  <select 
+                    className="form-select"
+                    value={editFormData.category}
+                    onChange={e => setEditFormData({ ...editFormData, category: e.target.value })}
+                    id="select-edit-listing-category"
+                  >
+                    {categories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Brand / Manufacturer *</label>
+                  <select 
+                    className="form-select"
+                    value={editFormData.brand}
+                    onChange={e => setEditFormData({ ...editFormData, brand: e.target.value })}
+                    id="select-edit-listing-brand"
+                  >
+                    {brands.map(b => (
+                      <option key={b} value={b}>{b}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Model / Optical Series</label>
+                  <input 
+                    type="text"
+                    className="form-input"
+                    value={editFormData.model}
+                    onChange={e => setEditFormData({ ...editFormData, model: e.target.value })}
+                    placeholder="e.g. Lumera T, Centurion Vision System"
+                    id="input-edit-listing-model"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Year of Manufacture</label>
+                  <input 
+                    type="number"
+                    className="form-input"
+                    value={editFormData.year}
+                    onChange={e => setEditFormData({ ...editFormData, year: e.target.value })}
+                    min="1995"
+                    max={new Date().getFullYear()}
+                    id="input-edit-listing-year"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row" style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', marginBottom: '16px' }}>
+                <div className="form-group" style={{ marginBottom: 0 }}>
+                  <label className="form-label" style={{ fontWeight: 800, color: '#0f172a' }}>
+                    Asking Price (₹ INR) *
+                  </label>
+                  <div style={{ position: 'relative' }}>
+                    <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', fontWeight: 800, color: '#0284c7' }}>₹</span>
+                    <input 
+                      type="text"
+                      className="form-input"
+                      required
+                      style={{ paddingLeft: '28px', fontWeight: 800, fontSize: '1.05rem' }}
+                      value={editFormData.price}
+                      onChange={e => setEditFormData({ ...editFormData, price: e.target.value })}
+                      placeholder="e.g. 1450000"
+                      id="input-edit-listing-price"
+                    />
+                  </div>
+                  {editFormData.price && (
+                    <div style={{ fontSize: '0.8rem', color: '#0284c7', fontWeight: 700, marginTop: '4px' }}>
+                      Display Price: ₹ {Number(String(editFormData.price).replace(/[^\d]/g, '') || 0).toLocaleString('en-IN')}
+                    </div>
+                  )}
+                </div>
+
+                <div className="form-group" style={{ marginBottom: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <label className="form-label">Price Flexibility</label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', marginTop: '6px' }}>
+                    <input 
+                      type="checkbox"
+                      checked={editFormData.isNegotiable}
+                      onChange={e => setEditFormData({ ...editFormData, isNegotiable: e.target.checked })}
+                    />
+                    <span style={{ fontSize: '0.88rem', fontWeight: 600, color: '#334155' }}>Price is Negotiable</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Condition *</label>
+                  <select 
+                    className="form-select"
+                    value={editFormData.condition}
+                    onChange={e => setEditFormData({ ...editFormData, condition: e.target.value })}
+                  >
+                    <option value="Like New (Mint)">Like New (Mint) - Spotless Optics</option>
+                    <option value="Excellent">Excellent - Light Clinical Use</option>
+                    <option value="Good Working Condition">Good Working Condition</option>
+                    <option value="Refurbished / Serviced">Refurbished / Certified Serviced</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Warranty / AMC Status</label>
+                  <select 
+                    className="form-select"
+                    value={editFormData.warranty}
+                    onChange={e => setEditFormData({ ...editFormData, warranty: e.target.value })}
+                  >
+                    <option value="Under Active AMC">Under Active OEM AMC</option>
+                    <option value="6 Months Warranty">6 Months Service Warranty</option>
+                    <option value="Direct Clinical Condition">Direct Clinical Transfer (Test on Site)</option>
+                    <option value="As Is Condition">As Is Condition</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Availability Status</label>
+                  <select 
+                    className="form-select"
+                    value={editFormData.status}
+                    onChange={e => setEditFormData({ ...editFormData, status: e.target.value })}
+                    id="select-edit-listing-status"
+                  >
+                    <option value="Available">● Available for Sale</option>
+                    <option value="Reserved">● Reserved / Advance Received</option>
+                    <option value="Sold">● Sold Out</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Location / City</label>
+                  <input 
+                    type="text"
+                    className="form-input"
+                    value={editFormData.sellerCity}
+                    onChange={e => setEditFormData({ ...editFormData, sellerCity: e.target.value })}
+                    placeholder="e.g. Pune, Mumbai, Nagpur"
+                    id="input-edit-listing-city"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Clinic / Hospital Name</label>
+                  <input 
+                    type="text"
+                    className="form-input"
+                    value={editFormData.clinicName}
+                    onChange={e => setEditFormData({ ...editFormData, clinicName: e.target.value })}
+                    placeholder="e.g. Netralaya Eye Clinic"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Contact Mobile / WhatsApp</label>
+                  <input 
+                    type="text"
+                    className="form-input"
+                    value={editFormData.sellerMobile}
+                    onChange={e => setEditFormData({ ...editFormData, sellerMobile: e.target.value })}
+                    placeholder="98XXXXXXXX"
+                    id="input-edit-listing-mobile"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Clinical Description & Optical Clarity</label>
+                <textarea 
+                  className="form-textarea"
+                  rows={3}
+                  value={editFormData.description}
+                  onChange={e => setEditFormData({ ...editFormData, description: e.target.value })}
+                  placeholder="Detail machine usage, surgical history, laser hours, probe condition..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Included Accessories (comma separated)</label>
+                <input 
+                  type="text"
+                  className="form-input"
+                  value={editFormData.accessoriesText}
+                  onChange={e => setEditFormData({ ...editFormData, accessoriesText: e.target.value })}
+                  placeholder="Foot pedal, Dust cover, Monitor arm, Spare handpiece"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Photo / Image URL</label>
+                <input 
+                  type="text"
+                  className="form-input"
+                  value={editFormData.image}
+                  onChange={e => setEditFormData({ ...editFormData, image: e.target.value })}
+                  placeholder="Image URL or Base64"
+                />
+                {editFormData.image && (
+                  <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <img 
+                      src={editFormData.image} 
+                      alt="Preview" 
+                      style={{ width: '64px', height: '48px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #cbd5e1' }} 
+                    />
+                    <span style={{ fontSize: '0.78rem', color: '#64748b' }}>Current image preview</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="admin-modal-actions" style={{ marginTop: '24px' }}>
+                <button 
+                  type="button" 
+                  className="btn-pluckcard-call" 
+                  onClick={() => setShowEditModal(false)}
+                >
+                  Cancel
+                </button>
+
+                <button 
+                  type="submit" 
+                  className="btn-post-ad"
+                  id="btn-save-edit-listing"
+                  style={{ background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)' }}
+                >
+                  <CheckCircle size={16} />
+                  <span>Save Changes</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

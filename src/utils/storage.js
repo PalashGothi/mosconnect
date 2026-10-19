@@ -528,6 +528,18 @@ export function saveMember(newMember) {
   return updated;
 }
 
+export function updateMember(updatedMember, oldMembershipNo = null) {
+  if (!updatedMember || !updatedMember.membershipNo) return getMembers();
+  const newId = String(updatedMember.membershipNo).trim();
+  const oldId = oldMembershipNo ? String(oldMembershipNo).trim() : newId;
+
+  if (oldId && oldId.toLowerCase() !== newId.toLowerCase()) {
+    deleteMember(oldId);
+  }
+
+  return saveMember(updatedMember);
+}
+
 export function deleteMember(membershipNo) {
   if (!membershipNo) return getMembers();
   const rawId = String(membershipNo).trim();

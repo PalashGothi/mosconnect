@@ -248,10 +248,10 @@
         "email": "cvvaze@gmail.com",
         "mobile": "9765248936"
       },
-      "status": "approved",
+      "status": "pending",
       "postedAt": "2026-10-18T12:05:00.000Z",
-      "approvedAt": "2026-10-18T12:05:00.000Z",
-      "approvedBy": "Dr. Atul Kadhane"
+      "approvedAt": null,
+      "approvedBy": null
     },
     {
       "id": "job-1792339130486",
@@ -278,10 +278,10 @@
         "email": "cvvaze@gmail.com",
         "mobile": "9765248936"
       },
-      "status": "approved",
+      "status": "pending",
       "postedAt": "2026-10-18T15:58:50.486Z",
-      "approvedAt": "2026-10-18T16:02:02.285Z",
-      "approvedBy": "Dr. Atul Kadhane"
+      "approvedAt": null,
+      "approvedBy": null
     },
     {
       "id": "job-1792337643176",
@@ -308,10 +308,10 @@
         "email": "cvvaze@gmail.com",
         "mobile": "9765248936"
       },
-      "status": "approved",
+      "status": "pending",
       "postedAt": "2026-10-18T15:34:03.176Z",
-      "approvedAt": "2026-10-18T15:37:35.086Z",
-      "approvedBy": "Administrator"
+      "approvedAt": null,
+      "approvedBy": null
     }
   ],
   "vendors": [
