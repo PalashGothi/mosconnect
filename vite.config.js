@@ -68,9 +68,32 @@ function syncApiPlugin() {
           req.on('end', () => {
             try {
               const parsed = JSON.parse(body);
+
+              // Smart merge customMembers
+              const existingMembers = Array.isArray(cacheState.customMembers) ? cacheState.customMembers : [];
+              const incomingMembers = Array.isArray(parsed.customMembers) ? parsed.customMembers : [];
+
+              const memberMap = new Map();
+              existingMembers.forEach(m => {
+                if (m && m.membershipNo) memberMap.set(String(m.membershipNo).toLowerCase().trim(), m);
+              });
+              incomingMembers.forEach(m => {
+                if (m && m.membershipNo) memberMap.set(String(m.membershipNo).toLowerCase().trim(), m);
+              });
+
+              const deletedIds = [
+                ...(Array.isArray(cacheState.deletedMemberIds) ? cacheState.deletedMemberIds : []),
+                ...(Array.isArray(parsed.deletedMemberIds) ? parsed.deletedMemberIds : [])
+              ];
+              const deletedSet = new Set(deletedIds.map(id => String(id).toLowerCase().trim()));
+
+              const mergedCustomMembers = Array.from(memberMap.values()).filter(m => !deletedSet.has(String(m.membershipNo).toLowerCase().trim()));
+
               cacheState = {
                 ...cacheState,
                 ...parsed,
+                customMembers: mergedCustomMembers,
+                deletedMemberIds: Array.from(deletedSet),
                 lastUpdated: Date.now()
               };
 

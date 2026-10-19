@@ -30,8 +30,8 @@
       ],
       "status": "Available",
       "createdAt": "2026-10-18T11:45:00.000Z",
-      "views": 18,
-      "inquiries": 3,
+      "views": 28,
+      "inquiries": 5,
       "images": [
         "/images/listings/megatron_s3_1.jpeg",
         "/images/listings/megatron_s3_2.jpeg",
@@ -68,8 +68,8 @@
       ],
       "status": "Available",
       "createdAt": "2026-10-18T11:46:00.000Z",
-      "views": 24,
-      "inquiries": 5,
+      "views": 36,
+      "inquiries": 7,
       "images": [
         "/images/listings/topcon_trc_nw8f_1.jpg",
         "/images/listings/topcon_trc_nw8f_2.jpg"
@@ -164,7 +164,9 @@
         "/images/listings/zeiss_hfa3_6.jpeg"
       ],
       "reasonForSale": "Upgrading to model 840",
-      "callingHours": "18:00 - 22:00 hrs"
+      "callingHours": "18:00 - 22:00 hrs",
+      "yearOfPurchase": 2023,
+      "currentMaintenance": "Nil (Zero issues)"
     }
   ],
   "wantedPosts": [
@@ -185,66 +187,6 @@
     }
   ],
   "jobs": [
-    {
-      "id": "job-1792339130486",
-      "title": "Senior Phaco & Cornea Fellow",
-      "hospital": "Vaze Eye Institute",
-      "city": "Pune",
-      "state": "Maharashtra",
-      "specialization": "Phaco / Cataract",
-      "jobType": "Fellowship",
-      "experience": "MS / DNB Ophthalmology",
-      "salary": "₹ 1,50,000 / month",
-      "description": "",
-      "requirements": [
-        "MS / DNB in Ophthalmology",
-        "MMC Registration"
-      ],
-      "flyerImage": null,
-      "contactEmail": "chinmay@vaze.com",
-      "contactPhone": "9765248936",
-      "contactWhatsApp": "",
-      "postedBy": {
-        "name": "Dr.Chinmay Vishwanath Vaze",
-        "membershipNo": "2800",
-        "email": "cvvaze@gmail.com",
-        "mobile": "9765248936"
-      },
-      "status": "approved",
-      "postedAt": "2026-10-18T15:58:50.486Z",
-      "approvedAt": "2026-10-18T16:02:02.285Z",
-      "approvedBy": "Dr. Atul Kadhane"
-    },
-    {
-      "id": "job-1792337643176",
-      "title": "Pediatric Ophthalmologist Fellow",
-      "hospital": "Vaze Eye Clinic",
-      "city": "Pune",
-      "state": "Maharashtra",
-      "specialization": "Pediatric / Strabismus",
-      "jobType": "Fellowship",
-      "experience": "MS / DNB",
-      "salary": "2,00,000 / month",
-      "description": "Great fellowship opportunity for young ophthalmologist.",
-      "requirements": [
-        "MS / DNB in Ophthalmology",
-        "MMC Registration"
-      ],
-      "flyerImage": null,
-      "contactEmail": "cvvaze@gmail.com",
-      "contactPhone": "9765248936",
-      "contactWhatsApp": "9765248936",
-      "postedBy": {
-        "name": "Dr.Chinmay Vishwanath Vaze",
-        "membershipNo": "2800",
-        "email": "cvvaze@gmail.com",
-        "mobile": "9765248936"
-      },
-      "status": "approved",
-      "postedAt": "2026-10-18T15:34:03.176Z",
-      "approvedAt": "2026-10-18T15:37:35.086Z",
-      "approvedBy": "Administrator"
-    },
     {
       "id": "job-suraj-eye-vitreoretinal-surgeon",
       "title": "Vitreoretinal Surgeon",
@@ -310,70 +252,69 @@
       "postedAt": "2026-10-18T12:05:00.000Z",
       "approvedAt": "2026-10-18T12:05:00.000Z",
       "approvedBy": "Dr. Atul Kadhane"
+    },
+    {
+      "id": "job-1792339130486",
+      "title": "Senior Phaco & Cornea Fellow",
+      "hospital": "Vaze Eye Institute",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "specialization": "Phaco / Cataract",
+      "jobType": "Fellowship",
+      "experience": "MS / DNB Ophthalmology",
+      "salary": "₹ 1,50,000 / month",
+      "description": "",
+      "requirements": [
+        "MS / DNB in Ophthalmology",
+        "MMC Registration"
+      ],
+      "flyerImage": null,
+      "contactEmail": "chinmay@vaze.com",
+      "contactPhone": "9765248936",
+      "contactWhatsApp": "",
+      "postedBy": {
+        "name": "Dr.Chinmay Vishwanath Vaze",
+        "membershipNo": "2800",
+        "email": "cvvaze@gmail.com",
+        "mobile": "9765248936"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T15:58:50.486Z",
+      "approvedAt": "2026-10-18T16:02:02.285Z",
+      "approvedBy": "Dr. Atul Kadhane"
+    },
+    {
+      "id": "job-1792337643176",
+      "title": "Pediatric Ophthalmologist Fellow",
+      "hospital": "Vaze Eye Clinic",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "specialization": "Pediatric / Strabismus",
+      "jobType": "Fellowship",
+      "experience": "MS / DNB",
+      "salary": "2,00,000 / month",
+      "description": "Great fellowship opportunity for young ophthalmologist.",
+      "requirements": [
+        "MS / DNB in Ophthalmology",
+        "MMC Registration"
+      ],
+      "flyerImage": null,
+      "contactEmail": "cvvaze@gmail.com",
+      "contactPhone": "9765248936",
+      "contactWhatsApp": "9765248936",
+      "postedBy": {
+        "name": "Dr.Chinmay Vishwanath Vaze",
+        "membershipNo": "2800",
+        "email": "cvvaze@gmail.com",
+        "mobile": "9765248936"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T15:34:03.176Z",
+      "approvedAt": "2026-10-18T15:37:35.086Z",
+      "approvedBy": "Administrator"
     }
   ],
   "vendors": [
-    {
-      "id": "v-1791738711270",
-      "company": "Apex Ophthalmic Solutions",
-      "name": "Engr. Rajesh Sharma",
-      "phones": [
-        "+919822001122"
-      ],
-      "city": "Pune",
-      "state": "Maharashtra",
-      "coverage": "All Maharashtra",
-      "categories": [
-        "Microscopes",
-        "Phaco",
-        "Lasers"
-      ],
-      "brands": [
-        "Zeiss",
-        "Topcon",
-        "Alcon"
-      ],
-      "experience": "10+ Years",
-      "verified": true,
-      "badge": "Verified Service Center",
-      "address": "Pune, Maharashtra",
-      "services": [
-        "Machine Repair",
-        "Spares",
-        "AMC Maintenance"
-      ],
-      "description": "Specialized biomedical service engineers and ophthalmic suppliers for Maharashtra eye care centers."
-    },
-    {
-      "id": "v-1791738236045",
-      "name": "Suresh More",
-      "company": "Pune Eye Laser Care & Optics",
-      "city": "Pune",
-      "state": "Maharashtra",
-      "coverage": "All Maharashtra",
-      "phones": [
-        "+919822998877"
-      ],
-      "email": "",
-      "address": "",
-      "categories": [
-        "Lasers",
-        "Microscopes"
-      ],
-      "brands": [
-        "Zeiss",
-        "Lumenis"
-      ],
-      "services": [
-        "Machine Repair",
-        "Spares",
-        "AMC Maintenance"
-      ],
-      "description": "",
-      "experience": "10+ Years",
-      "verified": true,
-      "badge": "Verified Service Center"
-    },
     {
       "id": "v-01",
       "name": "Gajendra Nirale",
@@ -1837,6 +1778,67 @@
       "experience": "16+ Years",
       "verified": true,
       "badge": "Display & Touchscreen Masters"
+    },
+    {
+      "id": "v-1791738711270",
+      "company": "Apex Ophthalmic Solutions",
+      "name": "Engr. Rajesh Sharma",
+      "phones": [
+        "+919822001122"
+      ],
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "All Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco",
+        "Lasers"
+      ],
+      "brands": [
+        "Zeiss",
+        "Topcon",
+        "Alcon"
+      ],
+      "experience": "10+ Years",
+      "verified": true,
+      "badge": "Verified Service Center",
+      "address": "Pune, Maharashtra",
+      "services": [
+        "Machine Repair",
+        "Spares",
+        "AMC Maintenance"
+      ],
+      "description": "Specialized biomedical service engineers and ophthalmic suppliers for Maharashtra eye care centers."
+    },
+    {
+      "id": "v-1791738236045",
+      "name": "Suresh More",
+      "company": "Pune Eye Laser Care & Optics",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "All Maharashtra",
+      "phones": [
+        "+919822998877"
+      ],
+      "email": "",
+      "address": "",
+      "categories": [
+        "Lasers",
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss",
+        "Lumenis"
+      ],
+      "services": [
+        "Machine Repair",
+        "Spares",
+        "AMC Maintenance"
+      ],
+      "description": "",
+      "experience": "10+ Years",
+      "verified": true,
+      "badge": "Verified Service Center"
     }
   ],
   "vendorReviews": {
@@ -1883,13 +1885,14 @@
     }
   ],
   "deletedMemberIds": [
-    "USER-4692",
-    "USER-6585",
-    "USER-4579",
-    "USER-2200"
+    "user-4692",
+    "user-6585",
+    "user-4579",
+    "user-2200",
+    "user-7711"
   ],
   "deletedJobIds": [],
   "deletedListingIds": [],
   "deletedVendorIds": [],
-  "lastUpdated": 1792381982852
+  "lastUpdated": 1792425488904
 }

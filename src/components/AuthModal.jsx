@@ -11,7 +11,8 @@ import {
 import WhatsAppIcon from './WhatsAppIcon';
 import OpticuraLogo from './OpticuraLogo';
 import { OPTICURA_CONTACT } from '../data/opticuraProducts';
-import { verifyDoctorLogin } from '../utils/storage';
+import { verifyDoctorLogin, applyCloudRecord } from '../utils/storage';
+import { fetchLatestCloudData } from '../services/cloudSync';
 
 export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [membershipNo, setMembershipNo] = useState('');
@@ -19,25 +20,46 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const [contactInfo, setContactInfo] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [verifiedMemberInfo, setVerifiedMemberInfo] = useState(null);
 
   if (!isOpen) return null;
 
-  const handleLoginSubmit = (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setIsLoading(true);
 
-    const result = verifyDoctorLogin(membershipNo, doctorName, contactInfo);
-    if (result.success) {
-      setVerifiedMemberInfo(result.member);
-      setIsSuccess(true);
-      setTimeout(() => {
-        onLoginSuccess(result.member);
-        setIsSuccess(false);
-        onClose();
-      }, 600);
-    } else {
-      setErrorMessage(result.reason || 'Verification failed. Please check your credentials.');
+    try {
+      // 1. Try local verification first
+      let result = verifyDoctorLogin(membershipNo, doctorName, contactInfo);
+
+      // 2. If not matched locally (e.g. freshly opened incognito or other device), fetch fresh cloud data
+      if (!result.success) {
+        try {
+          const fresh = await fetchLatestCloudData();
+          if (fresh) {
+            applyCloudRecord(fresh);
+            result = verifyDoctorLogin(membershipNo, doctorName, contactInfo);
+          }
+        } catch (fetchErr) {
+          console.warn('[Auth] Live cloud verification error:', fetchErr);
+        }
+      }
+
+      if (result.success) {
+        setVerifiedMemberInfo(result.member);
+        setIsSuccess(true);
+        setTimeout(() => {
+          onLoginSuccess(result.member);
+          setIsSuccess(false);
+          onClose();
+        }, 600);
+      } else {
+        setErrorMessage(result.reason || 'Verification failed. Please check your credentials.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -158,6 +180,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
               <button 
                 type="submit"
                 id="btn-submit-verify-login"
+                disabled={isLoading}
                 style={{
                   width: '100%',
                   marginTop: '12px',
@@ -172,11 +195,12 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                   justifyContent: 'center',
                   gap: '8px',
                   boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)',
-                  cursor: 'pointer',
+                  cursor: isLoading ? 'wait' : 'pointer',
+                  opacity: isLoading ? 0.8 : 1,
                   border: 'none'
                 }}
               >
-                <span>Verify & Login (Direct Access)</span>
+                <span>{isLoading ? 'Verifying Credentials...' : 'Verify & Login (Direct Access)'}</span>
                 <ArrowRight size={18} />
               </button>
 

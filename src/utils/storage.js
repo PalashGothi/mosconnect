@@ -676,10 +676,19 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
     return { success: false, reason: 'Registered Email OR Mobile Number is required.' };
   }
 
+  const norm = str => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const digits = str => String(str || '').replace(/\D/g, '');
+  const last10Digits = str => digits(str).slice(-10);
+
   const cleanId = String(membershipNo || '').trim().toLowerCase();
+  const cleanIdNorm = norm(cleanId);
+  const cleanIdDigits = digits(cleanId);
+
   const cleanName = String(name || '').trim().toLowerCase();
   const cleanContact = String(contact || '').trim().toLowerCase();
-  const inputDigits = cleanContact.replace(/\D/g, '');
+  const inputDigits = digits(cleanContact);
+  const inputLast10 = last10Digits(cleanContact);
+  const isIdProvided = !!cleanId;
 
   // 1. Admin Override Stored Credentials:
   // ID: 'admin' (or blank), Name: 'admin', Contact: 'admin12345' or 'admin@mos.org'
@@ -727,30 +736,63 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
   // 3. Database lookup in Approved Members
   const matchedMember = members.find(m => {
     const mId = String(m.membershipNo || '').trim().toLowerCase();
-    const mEmail = (m.email || '').toLowerCase().trim();
-    const mMobile = (m.mobile || '').replace(/\D/g, '');
+    const mIdNorm = norm(mId);
+    const mIdDigits = digits(mId);
 
-    // If MOS ID was entered, it must match
-    if (cleanId) {
-      const idMatches = mId === cleanId || mId.endsWith(cleanId) || cleanId.endsWith(mId);
+    const mEmail = (m.email || '').toLowerCase().trim();
+    const mMobile = (m.mobile || '').trim();
+    const mDigits = digits(mMobile);
+    const mLast10 = last10Digits(mMobile);
+
+    // 1. Check ID Match (if user entered an ID)
+    let idMatches = false;
+    if (isIdProvided) {
+      idMatches = 
+        mId === cleanId || 
+        mIdNorm === cleanIdNorm ||
+        mId.endsWith(cleanId) || 
+        cleanId.endsWith(mId) ||
+        (cleanIdDigits.length >= 3 && mIdDigits.endsWith(cleanIdDigits)) ||
+        (cleanIdDigits.length >= 3 && cleanIdDigits.endsWith(mIdDigits));
+      
+      // If user typed an ID, but it doesn't match this record at all, skip
       if (!idMatches) return false;
     }
 
-    // Name match
+    // 2. Check Name Match
     const nameMatches = matchDoctorNames(m.name, name);
-    if (!nameMatches) return false;
 
-    // Contact match (Email or Mobile)
+    // 3. Check Contact Match (Email or Phone or ID)
     let contactMatches = false;
-    if (cleanContact.includes('@') && mEmail) {
-      contactMatches = (mEmail === cleanContact);
-    } else if (inputDigits.length >= 6 && mMobile) {
-      contactMatches = (mMobile === inputDigits || mMobile.endsWith(inputDigits) || inputDigits.endsWith(mMobile));
-    } else if (cleanContact === mId) {
-      contactMatches = true;
+    if (cleanContact.includes('@')) {
+      // Email entered
+      if (mEmail && (mEmail === cleanContact || mEmail.includes(cleanContact) || cleanContact.includes(mEmail))) {
+        contactMatches = true;
+      }
+    } else if (inputLast10.length >= 7) {
+      // Phone number entered
+      if (mLast10 && (mLast10 === inputLast10 || mDigits.endsWith(inputDigits) || inputDigits.endsWith(mDigits))) {
+        contactMatches = true;
+      }
     }
 
-    return contactMatches;
+    // Also check if contact entered matches membership ID (e.g. USER-5038)
+    if (!contactMatches && cleanContact) {
+      if (cleanContact === mId || norm(cleanContact) === mIdNorm || (inputDigits.length >= 4 && inputDigits === mIdDigits)) {
+        contactMatches = true;
+      }
+    }
+
+    // Final matching decision:
+    // If ID was provided and matched:
+    //   -> Either Name matches OR Contact matches!
+    if (isIdProvided && idMatches) {
+      return nameMatches || contactMatches;
+    }
+
+    // If ID was NOT provided:
+    //   -> Name must match AND Contact must match
+    return nameMatches && contactMatches;
   });
 
   if (matchedMember) {
