@@ -1,10 +1,17 @@
 /**
- * Real-Time Cloud Sync Service
- * Provides instant cross-device synchronization between phone, laptop, and tablet
- * for listings, wanted posts, jobs, members (custom & deletions), vendors, and reviews.
+ * Real-Time Cross-Device Cloud Sync Service
+ * Seamlessly syncs listings, wanted posts, jobs, members (custom & deletions), vendors, and reviews
+ * across phone, laptop, and tablet using zero-CORS /api/sync endpoint and cloud backup.
  */
 
-const STORAGE_ENDPOINT = import.meta.env.VITE_CLOUD_STORAGE_URL || 'https://extendsclass.com/api/json-storage/bin/baefecf';
+const FALLBACK_BIN = 'https://extendsclass.com/api/json-storage/bin/baefecf';
+
+function getApiEndpoint() {
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    return `${window.location.origin}/api/sync`;
+  }
+  return '/api/sync';
+}
 
 let isSyncing = false;
 let pushTimeout = null;
@@ -29,11 +36,12 @@ function notifyListeners(data) {
  * Fetch the latest shared data from Cloud
  */
 export async function fetchLatestCloudData() {
-  if (!STORAGE_ENDPOINT) return null;
+  const timestamp = Date.now();
+  const apiEndpoint = `${getApiEndpoint()}?t=${timestamp}`;
 
+  // 1. Try internal /api/sync endpoint first (0ms CORS)
   try {
-    const bustUrl = `${STORAGE_ENDPOINT}?t=${Date.now()}`;
-    const res = await fetch(bustUrl, {
+    const res = await fetch(apiEndpoint, {
       method: 'GET',
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
@@ -41,29 +49,49 @@ export async function fetchLatestCloudData() {
       }
     });
 
-    if (!res.ok) {
-      console.warn(`[CloudSync] Fetch error (${res.status}):`, await res.text());
-      return null;
-    }
-
-    const json = await res.json();
-    // Handle both direct object and wrapped response forms
-    if (json && typeof json === 'object') {
-      if (json.data && typeof json.data === 'string') {
-        try {
-          return JSON.parse(json.data);
-        } catch (e) {}
+    if (res.ok) {
+      const json = await res.json();
+      if (json && typeof json === 'object') {
+        return normalizeRecord(json);
       }
-      if (json.record && typeof json.record === 'object') {
-        return json.record;
-      }
-      return json;
     }
-    return null;
   } catch (err) {
-    console.warn('[CloudSync] Network error during fetchLatestCloudData:', err);
-    return null;
+    // API endpoint might be unreachable or offline, attempt direct fallback
   }
+
+  // 2. Direct cloud bin fallback
+  try {
+    const fallbackUrl = `${FALLBACK_BIN}?t=${timestamp}`;
+    const res2 = await fetch(fallbackUrl, {
+      method: 'GET',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
+      }
+    });
+
+    if (res2.ok) {
+      const json2 = await res2.json();
+      return normalizeRecord(json2);
+    }
+  } catch (err2) {
+    console.warn('[CloudSync] Fallback network error:', err2);
+  }
+
+  return null;
+}
+
+function normalizeRecord(json) {
+  if (!json || typeof json !== 'object') return null;
+  if (json.data && typeof json.data === 'string') {
+    try {
+      return JSON.parse(json.data);
+    } catch (e) {}
+  }
+  if (json.record && typeof json.record === 'object') {
+    return json.record;
+  }
+  return json;
 }
 
 /**
@@ -107,9 +135,9 @@ function sanitizePayloadForCloud(raw) {
 }
 
 /**
- * Push the full state to Cloud (debounced to avoid unnecessary network flooding)
+ * Push the full state to Cloud (debounced with fast 150ms timeout)
  */
-export function pushCloudDataDebounced(getStateFn, delayMs = 300) {
+export function pushCloudDataDebounced(getStateFn, delayMs = 150) {
   if (pushTimeout) {
     clearTimeout(pushTimeout);
   }
@@ -122,18 +150,42 @@ export function pushCloudDataDebounced(getStateFn, delayMs = 300) {
       if (!rawPayload) return;
 
       const payload = sanitizePayloadForCloud(rawPayload);
+      const apiEndpoint = getApiEndpoint();
 
-      const res = await fetch(STORAGE_ENDPOINT, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
-      });
+      let success = false;
 
-      if (!res.ok) {
-        console.warn(`[CloudSync] Push error (${res.status}):`, await res.text());
-      } else {
+      // 1. Send to /api/sync
+      try {
+        const res = await fetch(apiEndpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          success = true;
+        }
+      } catch (err) {}
+
+      // 2. If /api/sync not available, push directly to fallback bin
+      if (!success) {
+        try {
+          const res2 = await fetch(FALLBACK_BIN, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+          if (res2.ok) {
+            success = true;
+          }
+        } catch (err2) {}
+      }
+
+      if (success) {
         notifyListeners({ type: 'push-success', timestamp: Date.now() });
       }
     } catch (err) {
@@ -165,7 +217,7 @@ export async function forceSyncNow(onDataLoaded) {
  * 1. Performs initial fetch from cloud
  * 2. Syncs into localStorage
  * 3. Sets up background refresh when window is focused or tab becomes visible
- * 4. Periodic background polling every 12 seconds for seamless multi-device live sync
+ * 4. Periodic background polling every 4 seconds for real-time live synchronization between phone and laptop
  */
 export async function initCloudSync(onDataLoaded) {
   // 1. Initial pull
@@ -175,7 +227,7 @@ export async function initCloudSync(onDataLoaded) {
     notifyListeners({ type: 'pull-success', data: cloudRecord });
   }
 
-  // 2. Refresh on window focus & tab visibility change
+  // 2. Immediate refresh handler
   const handleRefresh = async () => {
     const fresh = await fetchLatestCloudData();
     if (fresh && onDataLoaded) {
@@ -192,8 +244,8 @@ export async function initCloudSync(onDataLoaded) {
   });
   window.addEventListener('online', handleRefresh);
 
-  // 3. High-frequency polling every 12 seconds for true live sync between phone and laptop
-  const intervalId = setInterval(handleRefresh, 12000);
+  // 3. Ultra-fast polling every 4 seconds for true live sync without needing to reload or log in/out
+  const intervalId = setInterval(handleRefresh, 4000);
 
   return () => {
     window.removeEventListener('focus', handleRefresh);
