@@ -65,8 +65,7 @@ export default function JobsPage({
   jobs, 
   currentDoctor, 
   onAddJob, 
-  onOpenAuth,
-  onOpenAdminPanel
+  onOpenAuth
 }) {
   const [activeTab, setActiveTab] = useState('browse'); // 'browse', 'my-jobs'
   const [searchQuery, setSearchQuery] = useState('');
@@ -405,28 +404,6 @@ export default function JobsPage({
         </div>
 
         <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-          {currentDoctor?.role === 'admin' && (
-            <button
-              onClick={onOpenAdminPanel}
-              style={{
-                background: '#0d9488',
-                color: '#ffffff',
-                padding: '9px 18px',
-                borderRadius: '9999px',
-                fontWeight: 700,
-                fontSize: '0.86rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                cursor: 'pointer'
-              }}
-              id="btn-goto-admin-approvals"
-            >
-              <ShieldCheck size={16} />
-              <span>Admin Approvals Panel</span>
-            </button>
-          )}
-
           <button 
             className="btn-post-ad"
             onClick={() => {

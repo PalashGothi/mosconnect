@@ -1043,45 +1043,84 @@ export function addReplyToPost(postId, reply) {
   return updated;
 }
 
-// ================= DOCTOR SESSION =================
+// ================= DOCTOR SESSION (WITH FIXED TIMEOUT & SESSION STORAGE) =================
+// Fixed session duration of 2 hours (120 minutes)
+export const SESSION_DURATION_MS = 2 * 60 * 60 * 1000;
+
 export function getCurrentDoctor() {
   try {
-    // One-time cleanup of legacy auto-login default doctor
+    // 1. One-time cleanup of legacy auto-login default doctor
     const legacyCleaned = localStorage.getItem('mos_legacy_auto_doc_cleared');
     if (!legacyCleaned) {
       localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+      sessionStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
       localStorage.setItem('mos_legacy_auto_doc_cleared', 'true');
       return null;
     }
 
-    const saved = localStorage.getItem(STORAGE_KEYS.CURRENT_DOCTOR);
+    // 2. Check sessionStorage first (session ends when browser tab/window is closed)
+    let saved = sessionStorage.getItem(STORAGE_KEYS.CURRENT_DOCTOR);
+    let isFromSessionStorage = true;
+
+    if (!saved) {
+      saved = localStorage.getItem(STORAGE_KEYS.CURRENT_DOCTOR);
+      isFromSessionStorage = false;
+    }
+
     if (saved) {
       const parsed = JSON.parse(saved);
+      const doctor = parsed.doctor || parsed;
+      const expiresAt = parsed.expiresAt;
+
+      // 3. Enforce fixed session time limit
+      if (expiresAt && Date.now() > expiresAt) {
+        console.warn('[Session] Fixed session duration has expired. Logging out.');
+        setCurrentDoctor(null);
+        return null;
+      }
+
+      // Migrate from localStorage to sessionStorage if applicable
+      if (!isFromSessionStorage && doctor) {
+        setCurrentDoctor(doctor);
+      }
+
       // Ensure Dr. Atul Kadhane always has Admin rights
-      if (parsed && (
-        String(parsed.membershipNo) === '3545' || 
-        String(parsed.mobile) === '9890617789' ||
-        String(parsed.name || '').toLowerCase().includes('atul kadhane')
+      if (doctor && (
+        String(doctor.membershipNo) === '3545' || 
+        String(doctor.mobile) === '9890617789' ||
+        String(doctor.name || '').toLowerCase().includes('atul kadhane')
       )) {
-        if (parsed.role !== 'admin') {
-          parsed.role = 'admin';
-          parsed.membershipType = 'MOS Member & Platform Administrator';
-          localStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(parsed));
+        if (doctor.role !== 'admin') {
+          doctor.role = 'admin';
+          doctor.membershipType = 'MOS Member & Platform Administrator';
         }
       }
-      return parsed;
+      return doctor;
     }
   } catch (e) {
-    console.error('Error reading doctor from localStorage', e);
+    console.error('Error reading doctor session', e);
   }
   return null;
 }
 
 export function setCurrentDoctor(doctor) {
-  if (doctor) {
-    localStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(doctor));
-  } else {
-    localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+  try {
+    if (doctor) {
+      const sessionData = {
+        doctor,
+        loginTimestamp: Date.now(),
+        expiresAt: Date.now() + SESSION_DURATION_MS // 2 hours fixed session
+      };
+      sessionStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(sessionData));
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+    } else {
+      sessionStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+      sessionStorage.removeItem('mos_admin_unlocked');
+      sessionStorage.removeItem('mos_active_tab');
+      localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+    }
+  } catch (e) {
+    console.error('Error setting doctor session', e);
   }
 }
 

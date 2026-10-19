@@ -48,8 +48,24 @@ import {
   Lock
 } from 'lucide-react';
 
+const VALID_TABS = ['home', 'buy', 'wanted', 'sell', 'jobs', 'vendors', 'admin'];
+
+const getInitialTab = () => {
+  try {
+    const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+    if (VALID_TABS.includes(hash)) {
+      return hash;
+    }
+    const saved = sessionStorage.getItem('mos_active_tab');
+    if (saved && VALID_TABS.includes(saved)) {
+      return saved;
+    }
+  } catch (e) {}
+  return 'home';
+};
+
 export default function App() {
-  const [activeTab, setActiveTab] = useState('home'); // 'home', 'buy', 'wanted', 'sell', 'jobs', 'vendors', 'admin'
+  const [activeTab, setActiveTab] = useState(getInitialTab);
   const [currentDoctor, setCurrentDoctorState] = useState(null);
   const [listings, setListings] = useState([]);
   const [wantedPosts, setWantedPosts] = useState([]);
@@ -76,10 +92,15 @@ export default function App() {
     setSavedItems(getSavedItems());
   };
 
-  // Initialize data on mount
+  // Initialize data and sync URL on mount
   useEffect(() => {
     setCurrentDoctorState(getCurrentDoctor());
     refreshAllState();
+
+    try {
+      window.history.replaceState(null, '', '#' + activeTab);
+      sessionStorage.setItem('mos_active_tab', activeTab);
+    } catch (e) {}
 
     // Connect to real-time cloud sync for seamless cross-device live updates
     let cleanupFn = null;
@@ -108,6 +129,39 @@ export default function App() {
       window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  // Periodic session timeout check (enforces fixed session expiry)
+  useEffect(() => {
+    const checkDoctorSession = () => {
+      const activeDoc = getCurrentDoctor();
+      if (!activeDoc && currentDoctor) {
+        console.warn('[Session] Session expired or ended. Resetting auth state.');
+        setCurrentDoctorState(null);
+        setIsAdminUnlocked(false);
+      } else if (activeDoc && !currentDoctor) {
+        setCurrentDoctorState(activeDoc);
+      }
+    };
+
+    const interval = setInterval(checkDoctorSession, 15000);
+    window.addEventListener('focus', checkDoctorSession);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', checkDoctorSession);
+    };
+  }, [currentDoctor]);
+
+  // Synchronize browser URL hash with tab navigation
+  useEffect(() => {
+    const onHashChange = () => {
+      const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase().trim();
+      if (VALID_TABS.includes(hash) && hash !== activeTab) {
+        handleTabChange(hash);
+      }
+    };
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, [activeTab, isAdminUnlocked, currentDoctor]);
 
   // Listing Handlers
   const handleAddListing = (newListing) => {
@@ -224,7 +278,7 @@ export default function App() {
     });
   };
 
-  // Tab Navigation with Admin Panel 2nd Layer Protection
+  // Tab Navigation with Admin Panel 2nd Layer Protection & URL Sync
   const handleTabChange = (tab) => {
     if (tab === 'admin') {
       if (currentDoctor?.role !== 'admin') {
@@ -236,12 +290,20 @@ export default function App() {
       }
     }
     setActiveTab(tab);
+    try {
+      sessionStorage.setItem('mos_active_tab', tab);
+      if (window.location.hash.replace(/^#\/?/, '') !== tab) {
+        window.history.replaceState(null, '', '#' + tab);
+      }
+    } catch (e) {}
   };
 
   const handleAdminSecuritySuccess = () => {
     setIsAdminUnlocked(true);
     try {
       sessionStorage.setItem('mos_admin_unlocked', 'true');
+      sessionStorage.setItem('mos_active_tab', 'admin');
+      window.history.replaceState(null, '', '#admin');
     } catch (e) {}
     setIsAdminSecurityOpen(false);
     setActiveTab('admin');
@@ -255,6 +317,8 @@ export default function App() {
     setIsAdminUnlocked(false);
     try {
       sessionStorage.removeItem('mos_admin_unlocked');
+      sessionStorage.setItem('mos_active_tab', 'buy');
+      window.history.replaceState(null, '', '#buy');
     } catch (e) {}
     setActiveTab('buy');
   };
@@ -265,10 +329,11 @@ export default function App() {
     setIsAdminUnlocked(false);
     try {
       sessionStorage.removeItem('mos_admin_unlocked');
+      sessionStorage.removeItem('mos_active_tab');
+      sessionStorage.removeItem('mos_eyeequip_current_doctor');
+      window.history.replaceState(null, '', '#home');
     } catch (e) {}
-    if (activeTab === 'admin') {
-      setActiveTab('buy');
-    }
+    setActiveTab('home');
     forceSyncNow((cloudRecord) => {
       applyCloudRecord(cloudRecord);
       refreshAllState();
@@ -352,7 +417,6 @@ export default function App() {
             onAddJob={handleAddJob}
             onUpdateJob={handleAddJob}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenAdminPanel={() => handleTabChange('admin')}
           />
         )}
 
@@ -361,7 +425,6 @@ export default function App() {
             vendors={vendors}
             currentDoctor={currentDoctor}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenAdminPanel={() => handleTabChange('admin')}
           />
         )}
 

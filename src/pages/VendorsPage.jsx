@@ -27,7 +27,7 @@ import { maskPhone } from '../utils/masking';
 import { getVendorReviews, saveVendorReview } from '../utils/storage';
 import { subscribeCloudSync } from '../services/cloudSync';
 
-export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpenAdminPanel }) {
+export default function VendorsPage({ vendors, currentDoctor, onOpenAuth }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [selectedCity, setSelectedCity] = useState('All');
@@ -241,28 +241,6 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
               <OpticuraLogo variant="hero" height={34} />
-
-              {currentDoctor?.role === 'admin' && (
-                <button
-                  onClick={onOpenAdminPanel}
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '6px',
-                    background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
-                    color: '#ffffff',
-                    border: '1px solid #38bdf8',
-                    padding: '6px 14px',
-                    borderRadius: '9999px',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    cursor: 'pointer'
-                  }}
-                >
-                  <ShieldCheck size={14} />
-                  <span>+ Add / Manage Vendors</span>
-                </button>
-              )}
             </div>
           </div>
 
