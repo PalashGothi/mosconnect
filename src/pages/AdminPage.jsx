@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import OpticuraLogo from '../components/OpticuraLogo';
+import { formatDoctorName } from '../utils/storage';
 
 export default function AdminPage({ 
   currentDoctor, 
@@ -207,7 +208,7 @@ export default function AdminPage({
       sNo: String(members.length + 1),
       membershipNo: assignedId,
       membershipType: manualMember.membershipType || 'MOS Member',
-      name: manualMember.name.trim().startsWith('Dr.') ? manualMember.name.trim() : `Dr. ${manualMember.name.trim()}`,
+      name: formatDoctorName(manualMember.name),
       email: manualMember.email.trim().toLowerCase(),
       mobile: manualMember.mobile.trim().replace(/\D/g, ''),
       address: manualMember.address.trim(),
@@ -425,7 +426,7 @@ export default function AdminPage({
               sNo: String(members.length + idx + 1),
               membershipNo: memNo,
               membershipType: type,
-              name: name.startsWith('Dr.') ? name : `Dr. ${name}`,
+              name: formatDoctorName(name),
               email: email.toLowerCase(),
               mobile: mobile,
               address: address,
@@ -940,7 +941,7 @@ export default function AdminPage({
                       )}
                     </td>
                     <td style={{ padding: '12px 16px', fontWeight: 700, color: '#0f172a' }}>
-                      {m.name}
+                      {formatDoctorName(m.name)}
                     </td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ 
@@ -1019,7 +1020,7 @@ export default function AdminPage({
                         </span>
                       )}
                     </span>
-                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{m.name}</h4>
+                    <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{formatDoctorName(m.name)}</h4>
                   </div>
                   <span style={{ 
                     fontSize: '0.72rem', 

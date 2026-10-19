@@ -1884,10 +1884,12 @@
   ],
   "deletedMemberIds": [
     "USER-4692",
-    "USER-6585"
+    "USER-6585",
+    "USER-4579",
+    "USER-2200"
   ],
   "deletedJobIds": [],
   "deletedListingIds": [],
   "deletedVendorIds": [],
-  "lastUpdated": 1792381042884
+  "lastUpdated": 1792381982852
 }

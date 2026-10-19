@@ -254,9 +254,11 @@ export function applyCloudRecord(record) {
         if (deletedMemberSet.has(key)) return;
 
         const normalizedType = normalizeMembershipType(cloudM.membershipType);
+        const cleanName = formatDoctorName(cloudM.name);
         const existing = customMap.get(key);
         const cloudWithTimestamp = {
           ...cloudM,
+          name: cleanName,
           isCustom: true,
           createdAt: cloudM.createdAt || (existing && existing.createdAt) || new Date().toISOString(),
           membershipType: normalizedType
@@ -342,13 +344,41 @@ export function normalizeMembershipType(type) {
   return 'MOS Member';
 }
 
+// Clean & normalize Doctor names to prevent duplicate "Dr. Dr" prefixes
+export function formatDoctorName(name) {
+  if (!name || typeof name !== 'string') return '';
+  let str = name.trim();
+  if (!str) return '';
+
+  // Remove any repeated prefixes case-insensitively (e.g. "Dr.", "Dr", "DR", "dr.", "Doctor", "Dr. Dr", etc.)
+  str = str.replace(/^(?:(?:dr|doctor)\.?\s*)+/i, '').trim();
+
+  // Return clean single "Dr. " prefix
+  return str ? `Dr. ${str}` : name.trim();
+}
+
 export function getCustomMembers() {
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_MEMBERS);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed)) {
-        return parsed;
+        let changed = false;
+        const cleaned = parsed.map(m => {
+          if (!m) return m;
+          const cleanName = formatDoctorName(m.name);
+          if (cleanName && cleanName !== m.name) {
+            changed = true;
+            return { ...m, name: cleanName };
+          }
+          return m;
+        });
+        if (changed) {
+          try {
+            localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(cleaned));
+          } catch (err) {}
+        }
+        return cleaned;
       }
     }
   } catch (e) {}
@@ -361,6 +391,8 @@ export function saveCustomMember(member) {
     const id = String(member.membershipNo || '').trim().toLowerCase();
     const clean = {
       ...member,
+      name: formatDoctorName(member.name),
+      isCustom: true,
       createdAt: member.createdAt || new Date().toISOString()
     };
     const idx = list.findIndex(m => String(m.membershipNo || '').trim().toLowerCase() === id);
@@ -418,12 +450,14 @@ export function getMembers() {
     }
 
     const normType = normalizeMembershipType(m.membershipType);
-    if (m.membershipType !== normType) {
+    const cleanName = formatDoctorName(m.name);
+    if (m.membershipType !== normType || m.name !== cleanName) {
       needsSave = true;
     }
 
     resultMap.set(key, {
       ...m,
+      name: cleanName,
       membershipType: normType
     });
   });
@@ -432,14 +466,16 @@ export function getMembers() {
   customMap.forEach((cm, key) => {
     if (deletedSet.has(key)) return;
     const existing = resultMap.get(key);
+    const cleanName = formatDoctorName(cm.name);
     resultMap.set(key, {
       ...(existing || {}),
       ...cm,
+      name: cleanName,
       isCustom: true,
       createdAt: cm.createdAt || (existing && existing.createdAt),
       membershipType: normalizeMembershipType(cm.membershipType)
     });
-    if (!existing) {
+    if (!existing || (existing && existing.name !== cleanName)) {
       needsSave = true;
     }
   });
@@ -464,6 +500,7 @@ export function saveMember(newMember) {
 
   const cleanMember = {
     ...newMember,
+    name: formatDoctorName(newMember.name),
     isCustom: true,
     createdAt: newMember.createdAt || new Date().toISOString(),
     membershipType: normalizeMembershipType(newMember.membershipType)
@@ -753,7 +790,7 @@ export function registerNewDoctorUser({ name, contact, city = 'Maharashtra' }) {
   const inputDigits = cleanContact.replace(/\D/g, '');
   const members = getMembers();
 
-  const formattedName = name.trim().startsWith('Dr.') ? name.trim() : `Dr. ${name.trim()}`;
+  const formattedName = formatDoctorName(name);
   const newMember = {
     sNo: String(members.length + 1),
     membershipNo: `USER-${Math.floor(1000 + Math.random() * 9000)}`,
