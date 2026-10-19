@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   Search, 
   Wrench, 
@@ -25,6 +25,7 @@ import WhatsAppIcon from '../components/WhatsAppIcon';
 import OpticuraLogo from '../components/OpticuraLogo';
 import { maskPhone } from '../utils/masking';
 import { getVendorReviews, saveVendorReview } from '../utils/storage';
+import { subscribeCloudSync } from '../services/cloudSync';
 
 export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpenAdminPanel }) {
   const [searchQuery, setSearchQuery] = useState('');
@@ -42,6 +43,14 @@ export default function VendorsPage({ vendors, currentDoctor, onOpenAuth, onOpen
   const [reviewComment, setReviewComment] = useState('');
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState(false);
   const [reviewsVersion, setReviewsVersion] = useState(0);
+
+  // Subscribe to cloud sync events to auto-refresh reviews when synced from other devices
+  useEffect(() => {
+    const unsubscribe = subscribeCloudSync(() => {
+      setReviewsVersion(v => v + 1);
+    });
+    return unsubscribe;
+  }, []);
 
   const toggleFlip = (vendorId) => {
     setFlippedVendorIds(prev => {
