@@ -665,9 +665,8 @@ export function matchDoctorNames(registeredName, inputName) {
   return false;
 }
 
-// Verification function without OTP - Requires Doctor Name + Email/Mobile (MOS ID is optional)
+// Verification function without OTP - Requires MOS ID / User ID + Doctor Name + Email/Mobile (MOS ID is compulsory)
 export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputContact = '') {
-  // Gracefully handle if called with (contact, name) or (id, name, contact)
   let membershipNo = '';
   let name = '';
   let contact = '';
@@ -681,6 +680,9 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
     contact = inputContact || '';
   }
 
+  if (!membershipNo || !String(membershipNo).trim()) {
+    return { success: false, reason: 'MOS ID / User ID (for non mos members) is compulsory.' };
+  }
   if (!name || !String(name).trim()) {
     return { success: false, reason: 'Doctor Name is required.' };
   }
@@ -703,8 +705,8 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
   const isIdProvided = !!cleanId;
 
   // 1. Admin Override Stored Credentials:
-  // ID: 'admin' (or blank), Name: 'admin', Contact: 'admin12345' or 'admin@mos.org'
-  const isIdAdmin = !cleanId || cleanId === 'admin' || cleanId === 'admin-master';
+  // ID: 'admin', Name: 'admin', Contact: 'admin12345' or 'admin@mos.org'
+  const isIdAdmin = cleanId === 'admin' || cleanId === 'admin-master' || cleanId === '3545';
   const isNameAdmin = cleanName === 'admin' || cleanName.replace(/dr\.?/g, '').trim() === 'admin';
   const isContactAdmin = cleanContact === 'admin12345' || cleanContact === 'admin@mos.org' || cleanContact === 'admin';
 
@@ -721,7 +723,7 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
   // 2. Direct Support for Dr. Atul Kadhane (Opticura Leadership)
   const isAtulContact = inputDigits.includes('9890617789') || cleanContact.includes('atul.kadhane') || cleanContact === 'opticura' || cleanContact === 'atul';
   const isAtulName = matchDoctorNames('Dr. Atul Kadhane', name) || cleanName.includes('atul') || cleanName.includes('kadhane');
-  const isAtulId = cleanId === '3545' || !cleanId;
+  const isAtulId = cleanId === '3545' || cleanId === 'admin' || cleanId === 'user-3545';
 
   if ((isAtulContact || isAtulName) && isAtulId) {
     return {
@@ -895,7 +897,11 @@ export function saveJob(newJob) {
   } else {
     updated = [newJob, ...jobs];
   }
-  localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
+  try {
+    localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
+  } catch (err) {
+    console.error('Failed to save jobs to localStorage:', err);
+  }
   triggerCloudSync();
   return updated;
 }

@@ -107,7 +107,8 @@ function sanitizePayloadForCloud(raw) {
       clone.jobs = clone.jobs.map(job => {
         if (!job) return job;
         const j = { ...job };
-        if (j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.startsWith('data:') && j.flyerImage.length > 5000) {
+        // Preserve compressed flyers up to 600KB so they sync and display across all devices
+        if (j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.startsWith('data:') && j.flyerImage.length > 600000) {
           j.flyerImage = '';
         }
         return j;

@@ -31,6 +31,36 @@ import WhatsAppIcon from '../components/WhatsAppIcon';
 import OpticuraLogo from '../components/OpticuraLogo';
 import { maskPhone, maskEmail, maskMembershipNo } from '../utils/masking';
 
+// Client-side image compression for flyer uploads so they never exceed quota and sync flawlessly
+const compressFlyerImage = (file, maxWidth = 1000, maxHeight = 1400, quality = 0.82) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        let { width, height } = img;
+        if (width > maxWidth || height > maxHeight) {
+          const ratio = Math.min(maxWidth / width, maxHeight / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(event.target.result);
+      img.src = event.target.result;
+    };
+    reader.onerror = () => resolve(null);
+    reader.readAsDataURL(file);
+  });
+};
+
 export default function JobsPage({ 
   jobs, 
   currentDoctor, 
@@ -644,9 +674,9 @@ export default function JobsPage({
                         {job.specialization}
                       </span>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {job.flyerImage && !job.flyerImage.startsWith('data:') && (
+                        {job.flyerImage && (
                           <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 7px', borderRadius: '4px' }}>
-                            📷 Flyer
+                            📷 Flyer Attached
                           </span>
                         )}
                         <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 9px', borderRadius: '9999px', background: '#f1f5f9', color: '#334155' }}>
@@ -852,13 +882,29 @@ export default function JobsPage({
                     flexWrap: 'wrap'
                   }}
                 >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span className="brand-pill">{job.specialization}</span>
-                      <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>{job.title}</h4>
-                    </div>
-                    <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '3px' }}>
-                      {job.hospital} • {job.city} • Posted: {new Date(job.postedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    {job.flyerImage && (
+                      <img 
+                        src={job.flyerImage} 
+                        alt="Flyer" 
+                        style={{ width: '48px', height: '62px', objectFit: 'cover', borderRadius: '6px', border: '1px solid #cbd5e1', cursor: 'pointer', flexShrink: 0 }}
+                        onClick={() => setSelectedFlyerModal(job.flyerImage)}
+                        title="Click to inspect full flyer"
+                      />
+                    )}
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <span className="brand-pill">{job.specialization}</span>
+                        <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#0f172a' }}>{job.title}</h4>
+                        {job.flyerImage && (
+                          <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#0284c7', background: '#e0f2fe', padding: '2px 7px', borderRadius: '4px' }}>
+                            📷 Flyer Attached
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ fontSize: '0.82rem', color: '#64748b', marginTop: '3px' }}>
+                        {job.hospital} • {job.city} • Posted: {new Date(job.postedAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </div>
                     </div>
                   </div>
 
@@ -1125,14 +1171,21 @@ export default function JobsPage({
                         type="file"
                         accept="image/*"
                         style={{ display: 'none' }}
-                        onChange={(e) => {
+                        onChange={async (e) => {
                           const file = e.target.files?.[0];
                           if (file) {
-                            const reader = new FileReader();
-                            reader.onloadend = () => {
-                              setFormData({ ...formData, flyerImage: reader.result });
-                            };
-                            reader.readAsDataURL(file);
+                            try {
+                              const compressed = await compressFlyerImage(file);
+                              if (compressed) {
+                                setFormData({ ...formData, flyerImage: compressed });
+                              }
+                            } catch (err) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setFormData({ ...formData, flyerImage: reader.result });
+                              };
+                              reader.readAsDataURL(file);
+                            }
                           }
                         }}
                       />

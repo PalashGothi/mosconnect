@@ -28,6 +28,12 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!membershipNo || !membershipNo.trim()) {
+      setErrorMessage('MOS ID / User ID (for non mos members) is compulsory.');
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -113,19 +119,20 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 </div>
               )}
 
-              {/* FIELD 1: MOS MEMBERSHIP ID (OPTIONAL) */}
+              {/* FIELD 1: MOS ID / USER ID (FOR NON MOS MEMBERS) - COMPULSORY */}
               <div className="form-group">
-                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>MOS Membership ID</span>
-                  <span style={{ color: '#64748b', fontSize: '0.75rem', fontWeight: 600 }}>Optional</span>
+                <label className="form-label" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>MOS ID / User ID (for non mos members) *</span>
+                  <span style={{ color: '#dc2626', fontSize: '0.74rem', fontWeight: 700, background: '#fef2f2', padding: '1px 6px', borderRadius: '4px', border: '1px solid #fecaca' }}>Compulsory</span>
                 </label>
                 <div style={{ position: 'relative' }}>
-                  <ShieldCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                  <ShieldCheck size={18} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#0284c7' }} />
                   <input 
                     type="text"
                     className="form-input"
                     style={{ paddingLeft: '42px' }}
-                    placeholder="e.g. 3760, 3761, 03751A (Optional)"
+                    placeholder="e.g. 3760 or USER-9200"
+                    required
                     value={membershipNo}
                     onChange={e => setMembershipNo(e.target.value)}
                     id="input-login-mos-id"

@@ -7,6 +7,7 @@ import SellPage from './pages/SellPage';
 import VendorsPage from './pages/VendorsPage';
 import JobsPage from './pages/JobsPage';
 import AdminPage from './pages/AdminPage';
+import AdminSecurityModal from './components/AdminSecurityModal';
 import CommonChatBoard from './components/CommonChatBoard';
 import OpticuraLogo from './components/OpticuraLogo';
 import { 
@@ -43,7 +44,8 @@ import {
   Heart, 
   Activity,
   CheckCircle2,
-  Briefcase
+  Briefcase,
+  Lock
 } from 'lucide-react';
 
 export default function App() {
@@ -56,6 +58,14 @@ export default function App() {
   const [vendors, setVendors] = useState([]);
   const [savedItems, setSavedItems] = useState([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [isAdminUnlocked, setIsAdminUnlocked] = useState(() => {
+    try {
+      return sessionStorage.getItem('mos_admin_unlocked') === 'true';
+    } catch (e) {
+      return false;
+    }
+  });
+  const [isAdminSecurityOpen, setIsAdminSecurityOpen] = useState(false);
 
   const refreshAllState = () => {
     setListings(getListings());
@@ -214,9 +224,48 @@ export default function App() {
     });
   };
 
+  // Tab Navigation with Admin Panel 2nd Layer Protection
+  const handleTabChange = (tab) => {
+    if (tab === 'admin') {
+      if (currentDoctor?.role !== 'admin') {
+        return;
+      }
+      if (!isAdminUnlocked) {
+        setIsAdminSecurityOpen(true);
+        return;
+      }
+    }
+    setActiveTab(tab);
+  };
+
+  const handleAdminSecuritySuccess = () => {
+    setIsAdminUnlocked(true);
+    try {
+      sessionStorage.setItem('mos_admin_unlocked', 'true');
+    } catch (e) {}
+    setIsAdminSecurityOpen(false);
+    setActiveTab('admin');
+  };
+
+  const handleAdminSecurityClose = () => {
+    setIsAdminSecurityOpen(false);
+  };
+
+  const handleLockAdminPanel = () => {
+    setIsAdminUnlocked(false);
+    try {
+      sessionStorage.removeItem('mos_admin_unlocked');
+    } catch (e) {}
+    setActiveTab('buy');
+  };
+
   const handleLogout = () => {
     setCurrentDoctor(null);
     setCurrentDoctorState(null);
+    setIsAdminUnlocked(false);
+    try {
+      sessionStorage.removeItem('mos_admin_unlocked');
+    } catch (e) {}
     if (activeTab === 'admin') {
       setActiveTab('buy');
     }
@@ -234,11 +283,11 @@ export default function App() {
       {/* Sticky Navigation Bar */}
       <Navbar 
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         currentDoctor={currentDoctor}
         onOpenAuth={() => setIsAuthOpen(true)}
         onLogout={handleLogout}
-        onOpenPostAd={() => setActiveTab('sell')}
+        onOpenPostAd={() => handleTabChange('sell')}
         listingsCount={listings.length}
         wantedCount={wantedPosts.length}
         vendorsCount={vendors.length}
@@ -250,7 +299,7 @@ export default function App() {
       <main className="main-content">
         {activeTab === 'home' && (
           <HomePage 
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onNavigateTab={(tab) => handleTabChange(tab)}
             onOpenAuth={() => setIsAuthOpen(true)}
             currentDoctor={currentDoctor}
             listingsCount={listings.length}
@@ -266,9 +315,9 @@ export default function App() {
             savedItems={savedItems}
             onToggleSave={handleToggleSave}
             currentDoctor={currentDoctor}
-            onOpenWantedBoard={() => setActiveTab('wanted')}
-            onOpenPostAd={() => setActiveTab('sell')}
-            onNavigateTab={(tab) => setActiveTab(tab)}
+            onOpenWantedBoard={() => handleTabChange('wanted')}
+            onOpenPostAd={() => handleTabChange('sell')}
+            onNavigateTab={(tab) => handleTabChange(tab)}
             onOpenAuth={() => setIsAuthOpen(true)}
           />
         )}
@@ -292,7 +341,7 @@ export default function App() {
             onDeleteListing={handleDeleteListing}
             onUpdateStatus={handleUpdateStatus}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onViewOnBuyPage={() => setActiveTab('buy')}
+            onViewOnBuyPage={() => handleTabChange('buy')}
           />
         )}
 
@@ -303,7 +352,7 @@ export default function App() {
             onAddJob={handleAddJob}
             onUpdateJob={handleAddJob}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenAdminPanel={() => setActiveTab('admin')}
+            onOpenAdminPanel={() => handleTabChange('admin')}
           />
         )}
 
@@ -312,27 +361,61 @@ export default function App() {
             vendors={vendors}
             currentDoctor={currentDoctor}
             onOpenAuth={() => setIsAuthOpen(true)}
-            onOpenAdminPanel={() => setActiveTab('admin')}
+            onOpenAdminPanel={() => handleTabChange('admin')}
           />
         )}
 
         {activeTab === 'admin' && currentDoctor?.role === 'admin' && (
-          <AdminPage 
-            currentDoctor={currentDoctor}
-            jobs={jobs}
-            members={members}
-            vendors={vendors}
-            listings={listings}
-            onUpdateJobStatus={handleUpdateJobStatus}
-            onDeleteJob={handleDeleteJob}
-            onAddMember={handleAddMember}
-            onUpdateMember={handleUpdateMember}
-            onDeleteMember={handleDeleteMember}
-            onBulkAddMembers={handleBulkAddMembers}
-            onAddVendor={handleAddVendor}
-            onDeleteVendor={handleDeleteVendor}
-            onUpdateVendor={handleUpdateVendor}
-          />
+          isAdminUnlocked ? (
+            <AdminPage 
+              currentDoctor={currentDoctor}
+              jobs={jobs}
+              members={members}
+              vendors={vendors}
+              listings={listings}
+              onUpdateJobStatus={handleUpdateJobStatus}
+              onDeleteJob={handleDeleteJob}
+              onAddMember={handleAddMember}
+              onUpdateMember={handleUpdateMember}
+              onDeleteMember={handleDeleteMember}
+              onBulkAddMembers={handleBulkAddMembers}
+              onAddVendor={handleAddVendor}
+              onDeleteVendor={handleDeleteVendor}
+              onUpdateVendor={handleUpdateVendor}
+              onLockAdminPanel={handleLockAdminPanel}
+            />
+          ) : (
+            <div style={{ textAlign: 'center', padding: '90px 20px', minHeight: '65vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#fef2f2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '18px', boxShadow: '0 8px 24px rgba(239, 68, 68, 0.2)' }}>
+                <Lock size={36} />
+              </div>
+              <h2 style={{ fontSize: '1.6rem', fontWeight: 800, color: '#0f172a' }}>Admin Panel Locked</h2>
+              <p style={{ color: '#64748b', maxWidth: '440px', margin: '8px auto 24px auto', fontSize: '0.92rem', lineHeight: 1.5 }}>
+                Second-layer administrator verification is required to access the moderation console.
+              </p>
+              <button 
+                onClick={() => setIsAdminSecurityOpen(true)}
+                style={{
+                  background: 'linear-gradient(135deg, #0284c7 0%, #0f172a 100%)',
+                  color: '#ffffff',
+                  padding: '13px 28px',
+                  borderRadius: '10px',
+                  fontWeight: 800,
+                  fontSize: '0.94rem',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  boxShadow: '0 4px 14px rgba(2, 132, 199, 0.35)'
+                }}
+                id="btn-unlock-locked-admin"
+              >
+                <Lock size={16} />
+                <span>Enter Admin Credentials to Unlock</span>
+              </button>
+            </div>
+          )
         )}
       </main>
 
@@ -341,6 +424,13 @@ export default function App() {
         isOpen={isAuthOpen}
         onClose={() => setIsAuthOpen(false)}
         onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* Admin Panel 2nd-Layer Security Modal */}
+      <AdminSecurityModal 
+        isOpen={isAdminSecurityOpen}
+        onClose={handleAdminSecurityClose}
+        onSuccess={handleAdminSecuritySuccess}
       />
 
       {/* Professional Ophthalmology Platform Footer */}

@@ -22,7 +22,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Wrench,
-  Edit2
+  Edit2,
+  Lock
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import OpticuraLogo from '../components/OpticuraLogo';
@@ -42,7 +43,8 @@ export default function AdminPage({
   onBulkAddMembers,
   onAddVendor,
   onDeleteVendor,
-  onUpdateVendor
+  onUpdateVendor,
+  onLockAdminPanel
 }) {
   const [activeAdminTab, setActiveAdminTab] = useState('jobs'); // 'jobs', 'members', or 'vendors'
   const [jobStatusFilter, setJobStatusFilter] = useState('pending'); // 'pending', 'approved', 'rejected', 'all'
@@ -569,6 +571,30 @@ export default function AdminPage({
                 <span>SUPERADMINISTRATION CONSOLE</span>
               </div>
               <OpticuraLogo variant="card" height={28} />
+              {onLockAdminPanel && (
+                <button
+                  onClick={onLockAdminPanel}
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.18)',
+                    border: '1px solid rgba(239, 68, 68, 0.4)',
+                    color: '#fca5a5',
+                    padding: '4px 12px',
+                    borderRadius: '9999px',
+                    fontSize: '0.75rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.2s'
+                  }}
+                  id="btn-lock-admin-console"
+                  title="Lock Admin Panel"
+                >
+                  <Lock size={12} />
+                  <span>Lock Panel</span>
+                </button>
+              )}
             </div>
             <h2 style={{ fontSize: '1.85rem', fontWeight: 800, color: '#ffffff' }}>
               MOS Connect Control Center
@@ -924,7 +950,7 @@ export default function AdminPage({
                 type="text"
                 className="main-search-input"
                 style={{ paddingLeft: '42px', fontSize: '0.9rem' }}
-                placeholder="Search by MOS ID (e.g. 3760), Doctor Name, Mobile, or City..."
+                placeholder="Search by mOS ID/ User ID (e.g. 3760, USER-9200), Doctor Name, Mobile, or City..."
                 value={memberSearch}
                 onChange={e => {
                   setMemberSearch(e.target.value);
@@ -960,8 +986,8 @@ export default function AdminPage({
               aria-label="Sort members"
             >
               <option value="latest">⚡ Sort: Latest Added First</option>
-              <option value="id-desc">Sort: MOS ID (High to Low)</option>
-              <option value="id-asc">Sort: MOS ID (Low to High)</option>
+              <option value="id-desc">Sort: mOS ID/ User ID (High to Low)</option>
+              <option value="id-asc">Sort: mOS ID/ User ID (Low to High)</option>
               <option value="name-asc">Sort: Doctor Name (A → Z)</option>
               <option value="name-desc">Sort: Doctor Name (Z → A)</option>
             </select>
@@ -972,7 +998,7 @@ export default function AdminPage({
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.86rem' }}>
               <thead>
                 <tr style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
-                  <th style={{ padding: '12px 16px' }}>MOS ID</th>
+                  <th style={{ padding: '12px 16px' }}>mOS ID/ User ID</th>
                   <th style={{ padding: '12px 16px' }}>Doctor Name</th>
                   <th style={{ padding: '12px 16px' }}>Membership Type</th>
                   <th style={{ padding: '12px 16px' }}>Contact Phone</th>
@@ -1496,11 +1522,11 @@ export default function AdminPage({
             <form onSubmit={handleManualMemberSubmit} style={{ padding: '24px' }}>
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">MOS Membership ID (Optional)</label>
+                  <label className="form-label">mOS ID/ User ID (Optional)</label>
                   <input 
                     type="text"
                     className="form-input"
-                    placeholder="e.g. 3850 (Leave blank to auto-generate)"
+                    placeholder="e.g. 3850 (Leave blank to auto-generate USER-XXXX)"
                     value={manualMember.membershipNo}
                     onChange={e => setManualMember({ ...manualMember, membershipNo: e.target.value })}
                     id="input-add-member-id"
