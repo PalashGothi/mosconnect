@@ -237,7 +237,7 @@ export default function Navbar({
                       {currentDoctor.name}
                     </div>
                     <div style={{ fontSize: '0.78rem', color: '#0d9488', fontWeight: '600', marginTop: '2px' }}>
-                      {currentDoctor.membershipType || 'Life Membership'} (MOS #{currentDoctor.membershipNo})
+                      {currentDoctor.membershipType === 'Life Membership' ? 'MOS Member' : (currentDoctor.membershipType || 'MOS Member')} (MOS #{currentDoctor.membershipNo})
                     </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '4px' }}>
                       📍 {currentDoctor.city || 'Maharashtra'}

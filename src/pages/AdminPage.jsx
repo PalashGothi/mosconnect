@@ -36,6 +36,7 @@ export default function AdminPage({
   onUpdateJobStatus, 
   onDeleteJob,
   onAddMember,
+  onDeleteMember,
   onBulkAddMembers,
   onAddVendor,
   onDeleteVendor,
@@ -82,7 +83,7 @@ export default function AdminPage({
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [manualMember, setManualMember] = useState({
     membershipNo: '',
-    membershipType: 'Life Membership',
+    membershipType: 'MOS Member',
     name: '',
     email: '',
     mobile: '',
@@ -151,7 +152,7 @@ export default function AdminPage({
     const newMem = {
       sNo: String(members.length + 1),
       membershipNo: assignedId,
-      membershipType: manualMember.membershipType || 'Registered Doctor',
+      membershipType: manualMember.membershipType || 'MOS Member',
       name: manualMember.name.trim().startsWith('Dr.') ? manualMember.name.trim() : `Dr. ${manualMember.name.trim()}`,
       email: manualMember.email.trim().toLowerCase(),
       mobile: manualMember.mobile.trim().replace(/\D/g, ''),
@@ -165,7 +166,7 @@ export default function AdminPage({
     setShowAddMemberModal(false);
     setManualMember({
       membershipNo: '',
-      membershipType: 'Life Membership',
+      membershipType: 'MOS Member',
       name: '',
       email: '',
       mobile: '',
@@ -357,7 +358,8 @@ export default function AdminPage({
           if (memNo && name) {
             const email = findVal(['email', 'mail']);
             const mobile = findVal(['mobile', 'phone', 'contact']).replace(/\D/g, '');
-            const type = findVal(['membershiptype', 'type']) || 'Life Membership';
+            const typeRaw = findVal(['membershiptype', 'type']);
+            const type = (typeRaw && typeRaw.toLowerCase().includes('non')) ? 'NON MOS Member' : 'MOS Member';
             const city = findVal(['city']) || 'Maharashtra';
             const state = findVal(['state']) || 'Maharashtra';
             const address = findVal(['address', 'clinic']);
@@ -406,7 +408,7 @@ export default function AdminPage({
       {
         'S.No': '1',
         'Membership No': '3801',
-        'Membership Type': 'Life Membership',
+        'Membership Type': 'MOS Member',
         'Name': 'Dr. Rajesh Deshmukh',
         'Email': 'rajesh.deshmukh@gmail.com',
         'Mobile': '9820000001',
@@ -418,7 +420,7 @@ export default function AdminPage({
       {
         'S.No': '2',
         'Membership No': '3802',
-        'Membership Type': 'Life Membership',
+        'Membership Type': 'MOS Member',
         'Name': 'Dr. Meera Kulkarni',
         'Email': 'meera.kulkarni@gmail.com',
         'Mobile': '9820000002',
@@ -819,10 +821,11 @@ export default function AdminPage({
                 setMemberTypeFilter(e.target.value);
                 setCurrentPage(1);
               }}
+              id="select-admin-member-type-filter"
             >
               <option value="All">All Membership Types</option>
-              <option value="Life Membership">Life Membership</option>
-              <option value="Associate Member">Associate Member</option>
+              <option value="MOS Member">MOS Member</option>
+              <option value="NON MOS Member">NON MOS Member</option>
             </select>
           </div>
 
@@ -838,6 +841,7 @@ export default function AdminPage({
                   <th style={{ padding: '12px 16px' }}>Email</th>
                   <th style={{ padding: '12px 16px' }}>City</th>
                   <th style={{ padding: '12px 16px' }}>State</th>
+                  <th style={{ padding: '12px 16px', textAlign: 'center' }}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -850,8 +854,15 @@ export default function AdminPage({
                       {m.name}
                     </td>
                     <td style={{ padding: '12px 16px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: 600, background: '#ecfdf5', color: '#059669', padding: '3px 8px', borderRadius: '6px' }}>
-                        {m.membershipType || 'Life Membership'}
+                      <span style={{ 
+                        fontSize: '0.75rem', 
+                        fontWeight: 700, 
+                        background: m.membershipType === 'NON MOS Member' ? '#fef3c7' : '#ecfdf5', 
+                        color: m.membershipType === 'NON MOS Member' ? '#b45309' : '#059669', 
+                        padding: '3px 8px', 
+                        borderRadius: '6px' 
+                      }}>
+                        {m.membershipType === 'NON MOS Member' ? 'NON MOS Member' : 'MOS Member'}
                       </span>
                     </td>
                     <td style={{ padding: '12px 16px', color: '#334155' }}>
@@ -865,6 +876,30 @@ export default function AdminPage({
                     </td>
                     <td style={{ padding: '12px 16px', color: '#64748b' }}>
                       {m.state || 'Maharashtra'}
+                    </td>
+                    <td style={{ padding: '12px 16px', textAlign: 'center' }}>
+                      <button
+                        onClick={() => onDeleteMember && onDeleteMember(m.membershipNo, m.name)}
+                        style={{
+                          background: '#fef2f2',
+                          border: '1px solid #fecaca',
+                          color: '#dc2626',
+                          padding: '6px 12px',
+                          borderRadius: '8px',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          transition: 'all 0.2s'
+                        }}
+                        title="Delete Member from Registry"
+                        id={`btn-delete-member-${m.membershipNo}`}
+                      >
+                        <Trash2 size={14} />
+                        <span>Delete</span>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -881,14 +916,43 @@ export default function AdminPage({
                     <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0284c7' }}>#{m.membershipNo}</span>
                     <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{m.name}</h4>
                   </div>
-                  <span style={{ fontSize: '0.72rem', fontWeight: 600, background: '#ecfdf5', color: '#059669', padding: '3px 8px', borderRadius: '6px' }}>
-                    {m.membershipType || 'Life Membership'}
+                  <span style={{ 
+                    fontSize: '0.72rem', 
+                    fontWeight: 700, 
+                    background: m.membershipType === 'NON MOS Member' ? '#fef3c7' : '#ecfdf5', 
+                    color: m.membershipType === 'NON MOS Member' ? '#b45309' : '#059669', 
+                    padding: '3px 8px', 
+                    borderRadius: '6px' 
+                  }}>
+                    {m.membershipType === 'NON MOS Member' ? 'NON MOS Member' : 'MOS Member'}
                   </span>
                 </div>
                 <div style={{ fontSize: '0.82rem', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                   <div>📞 +91 {m.mobile || '—'}</div>
                   <div>✉️ {m.email || '—'}</div>
                   <div>📍 {m.city || '—'}, {m.state || 'Maharashtra'}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '12px', paddingTop: '8px', borderTop: '1px solid #f1f5f9' }}>
+                  <button
+                    onClick={() => onDeleteMember && onDeleteMember(m.membershipNo, m.name)}
+                    style={{
+                      background: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      color: '#dc2626',
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '0.75rem',
+                      fontWeight: 700
+                    }}
+                    id={`btn-mob-delete-member-${m.membershipNo}`}
+                  >
+                    <Trash2 size={13} />
+                    <span>Delete Member</span>
+                  </button>
                 </div>
               </div>
             ))}
@@ -1228,15 +1292,15 @@ export default function AdminPage({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Membership Type</label>
+                  <label className="form-label">Membership Type *</label>
                   <select 
                     className="form-select"
                     value={manualMember.membershipType}
                     onChange={e => setManualMember({ ...manualMember, membershipType: e.target.value })}
+                    id="select-add-member-type"
                   >
-                    <option value="Life Membership">Life Membership</option>
-                    <option value="Associate Member">Associate Member</option>
-                    <option value="Annual Member">Annual Member</option>
+                    <option value="MOS Member">MOS Member</option>
+                    <option value="NON MOS Member">NON MOS Member</option>
                   </select>
                 </div>
               </div>

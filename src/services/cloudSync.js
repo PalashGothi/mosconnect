@@ -1,11 +1,10 @@
 /**
- * Cloud Sync Service with JSONBin.io
- * Provides cross-device real-time sync for listings, wanted posts, jobs, vendors, and reviews.
+ * Real-Time Cloud Sync Service
+ * Provides instant cross-device synchronization between phone, laptop, and tablet
+ * for listings, wanted posts, jobs, members (custom & deletions), vendors, and reviews.
  */
 
-const BIN_ID = import.meta.env.VITE_JSONBIN_BIN_ID || '6ad3a1cbffd5d1605373e7a7';
-const API_KEY = import.meta.env.VITE_JSONBIN_API_KEY || '$2a$10$xstrCmJ3IrQNIUIhtnkvye.WkiWDevXbvNd0k1NVE1vgNtCZFKB/K';
-const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+const STORAGE_ENDPOINT = import.meta.env.VITE_CLOUD_STORAGE_URL || 'https://extendsclass.com/api/json-storage/bin/baefecf';
 
 let isSyncing = false;
 let pushTimeout = null;
@@ -27,35 +26,49 @@ function notifyListeners(data) {
 }
 
 /**
- * Fetch the latest shared data from JSONBin
+ * Fetch the latest shared data from Cloud
  */
 export async function fetchLatestCloudData() {
-  if (!BIN_ID || !API_KEY) return null;
+  if (!STORAGE_ENDPOINT) return null;
 
   try {
-    const res = await fetch(`${BASE_URL}/latest`, {
+    const bustUrl = `${STORAGE_ENDPOINT}?t=${Date.now()}`;
+    const res = await fetch(bustUrl, {
       method: 'GET',
       headers: {
-        'X-Master-Key': API_KEY,
-        'Cache-Control': 'no-cache'
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache'
       }
     });
 
     if (!res.ok) {
-      console.warn(`[JSONBin] Fetch error (${res.status}):`, await res.text());
+      console.warn(`[CloudSync] Fetch error (${res.status}):`, await res.text());
       return null;
     }
 
     const json = await res.json();
-    return json.record || null;
+    // Handle both direct object and wrapped response forms
+    if (json && typeof json === 'object') {
+      if (json.data && typeof json.data === 'string') {
+        try {
+          return JSON.parse(json.data);
+        } catch (e) {}
+      }
+      if (json.record && typeof json.record === 'object') {
+        return json.record;
+      }
+      return json;
+    }
+    return null;
   } catch (err) {
-    console.warn('[JSONBin] Network error during fetchLatestCloudData:', err);
+    console.warn('[CloudSync] Network error during fetchLatestCloudData:', err);
     return null;
   }
 }
 
 /**
- * Sanitize heavy base64 strings from cloud payload so JSONBin free plan (<100KB) does not reject with 403
+ * Sanitize heavy base64 images from cloud payload so uploads remain super-fast and lightweight (<50KB)
+ * Note: Local browser retains full image data in localStorage
  */
 function sanitizePayloadForCloud(raw) {
   if (!raw || typeof raw !== 'object') return raw;
@@ -94,9 +107,9 @@ function sanitizePayloadForCloud(raw) {
 }
 
 /**
- * Push the full state to JSONBin (debounced to avoid rate limits)
+ * Push the full state to Cloud (debounced to avoid unnecessary network flooding)
  */
-export function pushCloudDataDebounced(getStateFn, delayMs = 600) {
+export function pushCloudDataDebounced(getStateFn, delayMs = 300) {
   if (pushTimeout) {
     clearTimeout(pushTimeout);
   }
@@ -110,22 +123,21 @@ export function pushCloudDataDebounced(getStateFn, delayMs = 600) {
 
       const payload = sanitizePayloadForCloud(rawPayload);
 
-      const res = await fetch(BASE_URL, {
+      const res = await fetch(STORAGE_ENDPOINT, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          'X-Master-Key': API_KEY
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
 
       if (!res.ok) {
-        console.warn(`[JSONBin] Push error (${res.status}):`, await res.text());
+        console.warn(`[CloudSync] Push error (${res.status}):`, await res.text());
       } else {
         notifyListeners({ type: 'push-success', timestamp: Date.now() });
       }
     } catch (err) {
-      console.warn('[JSONBin] Network error during pushCloudData:', err);
+      console.warn('[CloudSync] Network error during pushCloudData:', err);
     } finally {
       isSyncing = false;
     }
@@ -133,23 +145,38 @@ export function pushCloudDataDebounced(getStateFn, delayMs = 600) {
 }
 
 /**
+ * Immediate, non-debounced sync to pull fresh data
+ */
+export async function forceSyncNow(onDataLoaded) {
+  try {
+    const fresh = await fetchLatestCloudData();
+    if (fresh && onDataLoaded) {
+      onDataLoaded(fresh);
+      notifyListeners({ type: 'pull-success', data: fresh });
+    }
+    return fresh;
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
  * Initialize cloud sync:
- * 1. Performs initial fetch from cloud bin
+ * 1. Performs initial fetch from cloud
  * 2. Syncs into localStorage
- * 3. Sets up background refresh when window is focused
+ * 3. Sets up background refresh when window is focused or tab becomes visible
+ * 4. Periodic background polling every 12 seconds for seamless multi-device live sync
  */
 export async function initCloudSync(onDataLoaded) {
+  // 1. Initial pull
   const cloudRecord = await fetchLatestCloudData();
-
-  if (cloudRecord) {
-    if (onDataLoaded) {
-      onDataLoaded(cloudRecord);
-    }
+  if (cloudRecord && onDataLoaded) {
+    onDataLoaded(cloudRecord);
     notifyListeners({ type: 'pull-success', data: cloudRecord });
   }
 
-  // Auto-refresh when user switches back to this tab/window
-  const handleFocus = async () => {
+  // 2. Refresh on window focus & tab visibility change
+  const handleRefresh = async () => {
     const fresh = await fetchLatestCloudData();
     if (fresh && onDataLoaded) {
       onDataLoaded(fresh);
@@ -157,19 +184,20 @@ export async function initCloudSync(onDataLoaded) {
     }
   };
 
-  window.addEventListener('focus', handleFocus);
-
-  // Periodic poll every 90 seconds
-  const intervalId = setInterval(async () => {
-    const fresh = await fetchLatestCloudData();
-    if (fresh && onDataLoaded) {
-      onDataLoaded(fresh);
-      notifyListeners({ type: 'pull-success', data: fresh });
+  window.addEventListener('focus', handleRefresh);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      handleRefresh();
     }
-  }, 90000);
+  });
+  window.addEventListener('online', handleRefresh);
+
+  // 3. High-frequency polling every 12 seconds for true live sync between phone and laptop
+  const intervalId = setInterval(handleRefresh, 12000);
 
   return () => {
-    window.removeEventListener('focus', handleFocus);
+    window.removeEventListener('focus', handleRefresh);
+    window.removeEventListener('online', handleRefresh);
     clearInterval(intervalId);
   };
 }

@@ -10,6 +10,7 @@ const STORAGE_KEYS = {
   WANTED_POSTS: 'mos_eyeequip_wanted_posts',
   JOBS: 'mos_eyeequip_jobs',
   MEMBERS: 'mos_eyeequip_members',
+  CUSTOM_MEMBERS: 'mos_eyeequip_custom_members',
   VENDORS: 'mos_eyeequip_vendors',
   CURRENT_DOCTOR: 'mos_eyeequip_current_doctor',
   SAVED_ITEMS: 'mos_eyeequip_saved_items',
@@ -20,7 +21,8 @@ const STORAGE_KEYS = {
 const TOMBSTONE_KEYS = {
   DELETED_JOBS: 'mos_deleted_job_ids',
   DELETED_LISTINGS: 'mos_deleted_listing_ids',
-  DELETED_VENDORS: 'mos_deleted_vendor_ids'
+  DELETED_VENDORS: 'mos_deleted_vendor_ids',
+  DELETED_MEMBERS: 'mos_deleted_member_ids'
 };
 
 function getDeletedIds(key) {
@@ -35,8 +37,9 @@ function getDeletedIds(key) {
 function recordDeletedId(key, id) {
   try {
     const ids = getDeletedIds(key);
-    if (!ids.includes(id)) {
-      ids.push(id);
+    const strId = String(id).trim();
+    if (!ids.includes(strId)) {
+      ids.push(strId);
       localStorage.setItem(key, JSON.stringify(ids));
     }
   } catch (e) {}
@@ -44,13 +47,14 @@ function recordDeletedId(key, id) {
 
 function unrecordDeletedId(key, id) {
   try {
-    const ids = getDeletedIds(key).filter(x => x !== id);
+    const strId = String(id).trim().toLowerCase();
+    const ids = getDeletedIds(key).filter(x => String(x).trim().toLowerCase() !== strId);
     localStorage.setItem(key, JSON.stringify(ids));
   } catch (e) {}
 }
 
 /**
- * Trigger background push to cloud (JSONBin.io)
+ * Trigger background push to cloud
  */
 export function triggerCloudSync() {
   pushCloudDataDebounced(() => ({
@@ -58,20 +62,41 @@ export function triggerCloudSync() {
     wantedPosts: getWantedPosts(),
     jobs: getJobs(),
     vendors: getVendors(),
-    vendorReviews: getAllVendorReviews()
+    vendorReviews: getAllVendorReviews(),
+    customMembers: getCustomMembers(),
+    deletedMemberIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_MEMBERS),
+    deletedJobIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_JOBS),
+    deletedListingIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_LISTINGS),
+    deletedVendorIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_VENDORS),
+    lastUpdated: Date.now()
   }));
 }
 
 /**
- * Apply cloud data downloaded from JSONBin.io to local cache using smart bidirectional merge
+ * Apply cloud data downloaded from cloud storage to local cache using smart bidirectional merge
  */
 export function applyCloudRecord(record) {
   if (!record || typeof record !== 'object') return false;
   let changed = false;
   try {
+    // 0. MERGE TOMBSTONES FIRST FROM CLOUD
+    if (Array.isArray(record.deletedJobIds)) {
+      record.deletedJobIds.forEach(id => recordDeletedId(TOMBSTONE_KEYS.DELETED_JOBS, id));
+    }
+    if (Array.isArray(record.deletedListingIds)) {
+      record.deletedListingIds.forEach(id => recordDeletedId(TOMBSTONE_KEYS.DELETED_LISTINGS, id));
+    }
+    if (Array.isArray(record.deletedVendorIds)) {
+      record.deletedVendorIds.forEach(id => recordDeletedId(TOMBSTONE_KEYS.DELETED_VENDORS, id));
+    }
+    if (Array.isArray(record.deletedMemberIds)) {
+      record.deletedMemberIds.forEach(id => recordDeletedId(TOMBSTONE_KEYS.DELETED_MEMBERS, id));
+    }
+
     const deletedJobIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_JOBS);
     const deletedListingIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_LISTINGS);
     const deletedVendorIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_VENDORS);
+    const deletedMemberIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_MEMBERS);
 
     // 1. SMART MERGE LISTINGS
     if (Array.isArray(record.listings)) {
@@ -209,6 +234,49 @@ export function applyCloudRecord(record) {
       const mergedReviews = { ...localReviews, ...cleanedCloud };
       localStorage.setItem(STORAGE_KEYS.VENDOR_REVIEWS, JSON.stringify(mergedReviews));
     }
+
+    // 6. SMART MERGE CUSTOM MEMBERS & DELETIONS
+    const deletedMemberSet = new Set(deletedMemberIds.map(x => String(x).toLowerCase().trim()));
+
+    if (Array.isArray(record.customMembers) && record.customMembers.length > 0) {
+      const localCustom = getCustomMembers();
+      const customMap = new Map();
+      localCustom.forEach(m => {
+        if (m && m.membershipNo) {
+          customMap.set(String(m.membershipNo).toLowerCase().trim(), m);
+        }
+      });
+
+      let customUpdated = false;
+      record.customMembers.forEach(cloudM => {
+        if (!cloudM || !cloudM.membershipNo) return;
+        const key = String(cloudM.membershipNo).toLowerCase().trim();
+        if (deletedMemberSet.has(key)) return;
+
+        const normalizedType = normalizeMembershipType(cloudM.membershipType);
+        const existing = customMap.get(key);
+        if (!existing || JSON.stringify(existing) !== JSON.stringify({ ...cloudM, membershipType: normalizedType })) {
+          customMap.set(key, { ...cloudM, membershipType: normalizedType });
+          customUpdated = true;
+          changed = true;
+        }
+      });
+
+      if (customUpdated) {
+        localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(Array.from(customMap.values())));
+      }
+    }
+
+    // Filter out any members deleted from cloud
+    const currentMembers = getMembers();
+    const filteredMembers = currentMembers.filter(m => {
+      const key = String(m.membershipNo || '').toLowerCase().trim();
+      return !deletedMemberSet.has(key);
+    });
+    if (filteredMembers.length !== currentMembers.length) {
+      localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(filteredMembers));
+      changed = true;
+    }
   } catch (e) {
     console.error('Error applying cloud record to localStorage', e);
   }
@@ -260,42 +328,181 @@ export const DEVELOPER_ADMIN_ACCOUNT = {
 };
 
 // ================= MEMBER MANAGEMENT =================
+export function normalizeMembershipType(type) {
+  const t = String(type || '').trim().toLowerCase();
+  if (t === 'non mos member' || t === 'non mos' || t === 'non-mos member') {
+    return 'NON MOS Member';
+  }
+  return 'MOS Member';
+}
+
+export function getCustomMembers() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEYS.CUSTOM_MEMBERS);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) {
+        return parsed;
+      }
+    }
+  } catch (e) {}
+  return [];
+}
+
+export function saveCustomMember(member) {
+  try {
+    const list = getCustomMembers();
+    const id = String(member.membershipNo || '').trim().toLowerCase();
+    const idx = list.findIndex(m => String(m.membershipNo || '').trim().toLowerCase() === id);
+    let updated;
+    if (idx >= 0) {
+      updated = [...list];
+      updated[idx] = { ...updated[idx], ...member };
+    } else {
+      updated = [member, ...list];
+    }
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(updated));
+    return updated;
+  } catch (e) {
+    return [];
+  }
+}
+
 export function getMembers() {
+  const deletedIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_MEMBERS);
+  const deletedSet = new Set(deletedIds.map(x => String(x).toLowerCase().trim()));
+  const customMembers = getCustomMembers();
+  const customMap = new Map();
+  customMembers.forEach(cm => {
+    if (cm && cm.membershipNo) {
+      customMap.set(String(cm.membershipNo).toLowerCase().trim(), cm);
+    }
+  });
+
+  let rawList = [];
   try {
     const saved = localStorage.getItem(STORAGE_KEYS.MEMBERS);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+        rawList = parsed;
       }
     }
   } catch (e) {
     console.error('Error reading members from localStorage', e);
   }
-  // Initialize with the 3,745 MOS database
-  try {
-    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(mosMembers));
-  } catch (err) {
-    console.warn('localStorage limit reached, reading from json bundle', err);
+
+  if (rawList.length === 0) {
+    rawList = mosMembers;
   }
-  return mosMembers;
+
+  let needsSave = false;
+  const resultMap = new Map();
+
+  rawList.forEach(m => {
+    if (!m || !m.membershipNo) return;
+    const key = String(m.membershipNo).toLowerCase().trim();
+    if (deletedSet.has(key)) {
+      needsSave = true;
+      return;
+    }
+
+    const normType = normalizeMembershipType(m.membershipType);
+    if (m.membershipType !== normType) {
+      needsSave = true;
+    }
+
+    resultMap.set(key, {
+      ...m,
+      membershipType: normType
+    });
+  });
+
+  // Overlay custom members
+  customMap.forEach((cm, key) => {
+    if (deletedSet.has(key)) return;
+    const existing = resultMap.get(key);
+    resultMap.set(key, {
+      ...(existing || {}),
+      ...cm,
+      membershipType: normalizeMembershipType(cm.membershipType)
+    });
+    if (!existing) {
+      needsSave = true;
+    }
+  });
+
+  const finalMembers = Array.from(resultMap.values());
+
+  if (needsSave || !localStorage.getItem(STORAGE_KEYS.MEMBERS)) {
+    try {
+      localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(finalMembers));
+    } catch (err) {
+      console.warn('localStorage limit reached, saving delta in custom members', err);
+    }
+  }
+
+  return finalMembers;
 }
 
 export function saveMember(newMember) {
+  if (!newMember || !newMember.membershipNo) return getMembers();
+  const rawId = String(newMember.membershipNo).trim();
+  unrecordDeletedId(TOMBSTONE_KEYS.DELETED_MEMBERS, rawId);
+
+  const cleanMember = {
+    ...newMember,
+    membershipType: normalizeMembershipType(newMember.membershipType)
+  };
+
+  saveCustomMember(cleanMember);
+
   const members = getMembers();
-  const index = members.findIndex(m => String(m.membershipNo || '').toLowerCase() === String(newMember.membershipNo || '').toLowerCase());
+  const index = members.findIndex(m => String(m.membershipNo || '').toLowerCase() === String(cleanMember.membershipNo || '').toLowerCase());
   let updated;
   if (index >= 0) {
     updated = [...members];
-    updated[index] = { ...updated[index], ...newMember };
+    updated[index] = { ...updated[index], ...cleanMember };
   } else {
-    updated = [newMember, ...members];
+    updated = [cleanMember, ...members];
   }
+
   try {
     localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(updated));
   } catch (e) {
     console.error('Failed to persist members to localStorage', e);
   }
+
+  triggerCloudSync();
+  return updated;
+}
+
+export function deleteMember(membershipNo) {
+  if (!membershipNo) return getMembers();
+  const rawId = String(membershipNo).trim();
+  const lowerId = rawId.toLowerCase();
+
+  // 1. Record tombstone
+  recordDeletedId(TOMBSTONE_KEYS.DELETED_MEMBERS, rawId);
+
+  // 2. Remove from custom members
+  try {
+    const custom = getCustomMembers();
+    const updatedCustom = custom.filter(m => String(m.membershipNo || '').trim().toLowerCase() !== lowerId);
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(updatedCustom));
+  } catch (e) {}
+
+  // 3. Remove from local full members
+  const members = getMembers();
+  const updated = members.filter(m => String(m.membershipNo || '').trim().toLowerCase() !== lowerId);
+
+  try {
+    localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(updated));
+  } catch (e) {
+    console.error('Failed to delete member from localStorage', e);
+  }
+
+  triggerCloudSync();
   return updated;
 }
 
@@ -306,18 +513,28 @@ export function addMembersBulk(newMembersList) {
 
   let addedCount = 0;
   let updatedCount = 0;
+  const newCustom = [];
 
   newMembersList.forEach(m => {
     if (!m.membershipNo || !m.name) return;
-    const key = String(m.membershipNo).toLowerCase().trim();
+    const clean = {
+      ...m,
+      membershipType: normalizeMembershipType(m.membershipType)
+    };
+    unrecordDeletedId(TOMBSTONE_KEYS.DELETED_MEMBERS, clean.membershipNo);
+    newCustom.push(clean);
+
+    const key = String(clean.membershipNo).toLowerCase().trim();
     if (existingMap.has(key)) {
-      existingMap.set(key, { ...existingMap.get(key), ...m });
+      existingMap.set(key, { ...existingMap.get(key), ...clean });
       updatedCount++;
     } else {
-      existingMap.set(key, m);
+      existingMap.set(key, clean);
       addedCount++;
     }
   });
+
+  newCustom.forEach(cm => saveCustomMember(cm));
 
   const merged = Array.from(existingMap.values());
   try {
@@ -325,6 +542,8 @@ export function addMembersBulk(newMembersList) {
   } catch (e) {
     console.error('Failed to save bulk members', e);
   }
+
+  triggerCloudSync();
   return { updatedList: merged, addedCount, updatedCount };
 }
 
@@ -495,7 +714,7 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
         ...matchedMember,
         isVerified: true,
         role: isDoctorAtul ? 'admin' : (matchedMember.role || 'doctor'),
-        membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : (matchedMember.membershipType || 'Life Membership'),
+        membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : normalizeMembershipType(matchedMember.membershipType),
         lastLogin: new Date().toISOString()
       }
     };
@@ -524,7 +743,7 @@ export function registerNewDoctorUser({ name, contact, city = 'Maharashtra' }) {
   const newMember = {
     sNo: String(members.length + 1),
     membershipNo: `USER-${Math.floor(1000 + Math.random() * 9000)}`,
-    membershipType: 'Registered Eye Care Professional',
+    membershipType: 'NON MOS Member',
     name: formattedName,
     email: cleanContact.includes('@') ? cleanContact : '',
     mobile: inputDigits || cleanContact,

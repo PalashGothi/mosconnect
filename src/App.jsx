@@ -22,6 +22,7 @@ import {
   deleteJob,
   getMembers,
   saveMember,
+  deleteMember,
   addMembersBulk,
   getVendors,
   saveVendor,
@@ -32,7 +33,7 @@ import {
   toggleSaveItem,
   applyCloudRecord
 } from './utils/storage';
-import { initCloudSync } from './services/cloudSync';
+import { initCloudSync, forceSyncNow } from './services/cloudSync';
 import { 
   Eye, 
   ShieldCheck, 
@@ -55,36 +56,45 @@ export default function App() {
   const [savedItems, setSavedItems] = useState([]);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
 
-  // Initialize data on mount
-  useEffect(() => {
-    setCurrentDoctorState(getCurrentDoctor());
+  const refreshAllState = () => {
     setListings(getListings());
     setWantedPosts(getWantedPosts());
     setJobs(getJobs());
     setMembers(getMembers());
     setVendors(getVendors());
     setSavedItems(getSavedItems());
+  };
 
-    // Connect to JSONBin cloud sync for real-time cross-device updates
+  // Initialize data on mount
+  useEffect(() => {
+    setCurrentDoctorState(getCurrentDoctor());
+    refreshAllState();
+
+    // Connect to real-time cloud sync for seamless cross-device live updates
     let cleanupFn = null;
     initCloudSync((cloudRecord) => {
-      const changed = applyCloudRecord(cloudRecord);
-      if (changed) {
-        setListings(getListings());
-        setWantedPosts(getWantedPosts());
-        setJobs(getJobs());
-        setVendors(getVendors());
-      }
+      applyCloudRecord(cloudRecord);
+      refreshAllState();
     }).then(cleanup => {
       cleanupFn = cleanup;
     }).catch(err => {
       console.warn('Cloud sync init error', err);
     });
 
+    // Cross-tab and window local storage sync
+    const handleStorageChange = (e) => {
+      if (e.key === 'mos_eyeequip_current_doctor') {
+        setCurrentDoctorState(getCurrentDoctor());
+      }
+      refreshAllState();
+    };
+    window.addEventListener('storage', handleStorageChange);
+
     return () => {
       if (typeof cleanupFn === 'function') {
         cleanupFn();
       }
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 
@@ -134,6 +144,14 @@ export default function App() {
     setMembers(updated);
   };
 
+  const handleDeleteMember = (membershipNo, name) => {
+    const docName = name || `MOS #${membershipNo}`;
+    if (window.confirm(`Are you sure you want to delete ${docName} from the registered members database? This action will sync across all devices.`)) {
+      const updated = deleteMember(membershipNo);
+      setMembers(updated);
+    }
+  };
+
   const handleBulkAddMembers = (membersList) => {
     const result = addMembersBulk(membersList);
     setMembers(result.updatedList);
@@ -179,6 +197,10 @@ export default function App() {
   const handleLoginSuccess = (doctor) => {
     setCurrentDoctor(doctor);
     setCurrentDoctorState(doctor);
+    forceSyncNow((cloudRecord) => {
+      applyCloudRecord(cloudRecord);
+      refreshAllState();
+    });
   };
 
   const handleLogout = () => {
@@ -187,6 +209,10 @@ export default function App() {
     if (activeTab === 'admin') {
       setActiveTab('buy');
     }
+    forceSyncNow((cloudRecord) => {
+      applyCloudRecord(cloudRecord);
+      refreshAllState();
+    });
   };
 
   const approvedJobsCount = jobs.filter(j => j.status === 'approved').length;
@@ -287,6 +313,7 @@ export default function App() {
             onUpdateJobStatus={handleUpdateJobStatus}
             onDeleteJob={handleDeleteJob}
             onAddMember={handleAddMember}
+            onDeleteMember={handleDeleteMember}
             onBulkAddMembers={handleBulkAddMembers}
             onAddVendor={handleAddVendor}
             onDeleteVendor={handleDeleteVendor}
