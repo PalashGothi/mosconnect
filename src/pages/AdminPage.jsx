@@ -46,9 +46,10 @@ export default function AdminPage({
   const [jobStatusFilter, setJobStatusFilter] = useState('pending'); // 'pending', 'approved', 'rejected', 'all'
   const [selectedAdminFlyer, setSelectedAdminFlyer] = useState(null);
   
-  // Member Search & Pagination State
+  // Member Search, Filter & Sort State
   const [memberSearch, setMemberSearch] = useState('');
   const [memberTypeFilter, setMemberTypeFilter] = useState('All');
+  const [memberSort, setMemberSort] = useState('latest'); // 'latest', 'id-desc', 'id-asc', 'name-asc', 'name-desc'
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 15;
 
@@ -111,9 +112,9 @@ export default function AdminPage({
     }).sort((a, b) => new Date(b.postedAt || 0) - new Date(a.postedAt || 0));
   }, [jobs, jobStatusFilter]);
 
-  // Filtered Members
+  // Filtered & Sorted Members
   const filteredMembers = useMemo(() => {
-    return members.filter(m => {
+    let list = members.filter(m => {
       if (memberTypeFilter !== 'All' && m.membershipType !== memberTypeFilter) return false;
       if (memberSearch.trim()) {
         const q = memberSearch.toLowerCase().trim();
@@ -127,7 +128,60 @@ export default function AdminPage({
       }
       return true;
     });
-  }, [members, memberSearch, memberTypeFilter]);
+
+    return list.sort((a, b) => {
+      if (memberSort === 'latest') {
+        // 1. Prioritize members with explicit createdAt timestamp (newest first)
+        if (a.createdAt && b.createdAt) {
+          const diff = new Date(b.createdAt) - new Date(a.createdAt);
+          if (diff !== 0) return diff;
+        }
+        if (a.createdAt && !b.createdAt) return -1;
+        if (!a.createdAt && b.createdAt) return 1;
+
+        // 2. Custom members (isCustom: true or starts with USER-)
+        const aIsCustom = a.isCustom || String(a.membershipNo || '').startsWith('USER-');
+        const bIsCustom = b.isCustom || String(b.membershipNo || '').startsWith('USER-');
+        if (aIsCustom && !bIsCustom) return -1;
+        if (!aIsCustom && bIsCustom) return 1;
+
+        // 3. Highest numeric membership number first (e.g. 3761, 3760, 3759...)
+        const numA = parseInt(String(a.membershipNo || '').replace(/\D/g, ''), 10);
+        const numB = parseInt(String(b.membershipNo || '').replace(/\D/g, ''), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numB - numA;
+
+        return String(b.membershipNo || '').localeCompare(String(a.membershipNo || ''));
+      }
+
+      if (memberSort === 'id-desc') {
+        const numA = parseInt(String(a.membershipNo || '').replace(/\D/g, ''), 10);
+        const numB = parseInt(String(b.membershipNo || '').replace(/\D/g, ''), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numB - numA;
+        return String(b.membershipNo || '').localeCompare(String(a.membershipNo || ''));
+      }
+
+      if (memberSort === 'id-asc') {
+        const numA = parseInt(String(a.membershipNo || '').replace(/\D/g, ''), 10);
+        const numB = parseInt(String(b.membershipNo || '').replace(/\D/g, ''), 10);
+        if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
+        return String(a.membershipNo || '').localeCompare(String(b.membershipNo || ''));
+      }
+
+      if (memberSort === 'name-asc') {
+        const cleanA = (a.name || '').replace(/^dr\.?\s*/i, '');
+        const cleanB = (b.name || '').replace(/^dr\.?\s*/i, '');
+        return cleanA.localeCompare(cleanB);
+      }
+
+      if (memberSort === 'name-desc') {
+        const cleanA = (a.name || '').replace(/^dr\.?\s*/i, '');
+        const cleanB = (b.name || '').replace(/^dr\.?\s*/i, '');
+        return cleanB.localeCompare(cleanA);
+      }
+
+      return 0;
+    });
+  }, [members, memberSearch, memberTypeFilter, memberSort]);
 
   const totalPages = Math.ceil(filteredMembers.length / pageSize) || 1;
   const paginatedMembers = useMemo(() => {
@@ -159,7 +213,9 @@ export default function AdminPage({
       address: manualMember.address.trim(),
       city: manualMember.city.trim() || 'Maharashtra',
       state: manualMember.state.trim() || 'Maharashtra',
-      ratifiedYear: manualMember.ratifiedYear || '2026'
+      ratifiedYear: manualMember.ratifiedYear || '2026',
+      isCustom: true,
+      createdAt: new Date().toISOString()
     };
 
     onAddMember(newMem);
@@ -827,6 +883,24 @@ export default function AdminPage({
               <option value="MOS Member">MOS Member</option>
               <option value="NON MOS Member">NON MOS Member</option>
             </select>
+
+            <select
+              className="filter-select"
+              value={memberSort}
+              onChange={e => {
+                setMemberSort(e.target.value);
+                setCurrentPage(1);
+              }}
+              style={{ fontWeight: 600, minWidth: '190px' }}
+              id="select-admin-member-sort"
+              aria-label="Sort members"
+            >
+              <option value="latest">⚡ Sort: Latest Added First</option>
+              <option value="id-desc">Sort: MOS ID (High to Low)</option>
+              <option value="id-asc">Sort: MOS ID (Low to High)</option>
+              <option value="name-asc">Sort: Doctor Name (A → Z)</option>
+              <option value="name-desc">Sort: Doctor Name (Z → A)</option>
+            </select>
           </div>
 
           {/* Members Table - Desktop */}
@@ -847,8 +921,23 @@ export default function AdminPage({
               <tbody>
                 {paginatedMembers.map((m, idx) => (
                   <tr key={`${m.membershipNo}-${idx}`} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }}>
-                    <td style={{ padding: '12px 16px', fontWeight: 800, color: '#0284c7' }}>
+                    <td style={{ padding: '12px 16px', fontWeight: 800, color: '#0284c7', whiteSpace: 'nowrap' }}>
                       #{m.membershipNo}
+                      {(m.createdAt || m.isCustom || String(m.membershipNo || '').startsWith('USER-')) && (
+                        <span style={{ 
+                          marginLeft: '6px', 
+                          fontSize: '0.65rem', 
+                          background: '#dbeafe', 
+                          color: '#1d4ed8', 
+                          padding: '2px 6px', 
+                          borderRadius: '4px', 
+                          fontWeight: 800,
+                          verticalAlign: 'middle',
+                          letterSpacing: '0.5px'
+                        }}>
+                          NEW
+                        </span>
+                      )}
                     </td>
                     <td style={{ padding: '12px 16px', fontWeight: 700, color: '#0f172a' }}>
                       {m.name}
@@ -913,7 +1002,23 @@ export default function AdminPage({
               <div key={`m-mob-${m.membershipNo}-${idx}`} className="admin-member-mobile-card">
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                   <div>
-                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0284c7' }}>#{m.membershipNo}</span>
+                    <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#0284c7' }}>
+                      #{m.membershipNo}
+                      {(m.createdAt || m.isCustom || String(m.membershipNo || '').startsWith('USER-')) && (
+                        <span style={{ 
+                          marginLeft: '6px', 
+                          fontSize: '0.62rem', 
+                          background: '#dbeafe', 
+                          color: '#1d4ed8', 
+                          padding: '2px 5px', 
+                          borderRadius: '4px', 
+                          fontWeight: 800,
+                          letterSpacing: '0.5px'
+                        }}>
+                          NEW
+                        </span>
+                      )}
+                    </span>
                     <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#0f172a', marginTop: '2px' }}>{m.name}</h4>
                   </div>
                   <span style={{ 

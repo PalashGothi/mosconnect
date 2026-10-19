@@ -255,8 +255,14 @@ export function applyCloudRecord(record) {
 
         const normalizedType = normalizeMembershipType(cloudM.membershipType);
         const existing = customMap.get(key);
-        if (!existing || JSON.stringify(existing) !== JSON.stringify({ ...cloudM, membershipType: normalizedType })) {
-          customMap.set(key, { ...cloudM, membershipType: normalizedType });
+        const cloudWithTimestamp = {
+          ...cloudM,
+          isCustom: true,
+          createdAt: cloudM.createdAt || (existing && existing.createdAt) || new Date().toISOString(),
+          membershipType: normalizedType
+        };
+        if (!existing || JSON.stringify(existing) !== JSON.stringify(cloudWithTimestamp)) {
+          customMap.set(key, cloudWithTimestamp);
           customUpdated = true;
           changed = true;
         }
@@ -353,13 +359,17 @@ export function saveCustomMember(member) {
   try {
     const list = getCustomMembers();
     const id = String(member.membershipNo || '').trim().toLowerCase();
+    const clean = {
+      ...member,
+      createdAt: member.createdAt || new Date().toISOString()
+    };
     const idx = list.findIndex(m => String(m.membershipNo || '').trim().toLowerCase() === id);
     let updated;
     if (idx >= 0) {
       updated = [...list];
-      updated[idx] = { ...updated[idx], ...member };
+      updated[idx] = { ...updated[idx], ...clean };
     } else {
-      updated = [member, ...list];
+      updated = [clean, ...list];
     }
     localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(updated));
     return updated;
@@ -425,6 +435,8 @@ export function getMembers() {
     resultMap.set(key, {
       ...(existing || {}),
       ...cm,
+      isCustom: true,
+      createdAt: cm.createdAt || (existing && existing.createdAt),
       membershipType: normalizeMembershipType(cm.membershipType)
     });
     if (!existing) {
@@ -452,6 +464,8 @@ export function saveMember(newMember) {
 
   const cleanMember = {
     ...newMember,
+    isCustom: true,
+    createdAt: newMember.createdAt || new Date().toISOString(),
     membershipType: normalizeMembershipType(newMember.membershipType)
   };
 

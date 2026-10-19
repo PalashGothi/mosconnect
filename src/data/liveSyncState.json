@@ -1,19 +1,1893 @@
 {
-  "listings": [],
-  "wantedPosts": [],
-  "jobs": [],
-  "vendors": [],
-  "vendorReviews": {},
+  "listings": [
+    {
+      "id": "list-dr-bhide-megatron-s3",
+      "title": "Megatron S3 Phaco plus vitrectomy system with all accessories",
+      "category": "Phaco Machines",
+      "brand": "Other Brand",
+      "model": "Geuder Megatron S3 Combined Anterior & Posterior System",
+      "year": 2020,
+      "price": 1250000,
+      "priceFormatted": "₹ 12,50,000",
+      "isNegotiable": true,
+      "condition": "Excellent Working Condition",
+      "warranty": "Tested & Verified with All Accessories",
+      "description": "Megatron S3 Phaco plus vitrectomy system with all accessories in Pune. Complete combined anterior and posterior system with all operational accessories, handpieces, and foot pedal. Excellent working condition, available for inspection in Pune.",
+      "sellerName": "Dr.Bhide Santosh S",
+      "sellerMembershipNo": "357",
+      "sellerCity": "Pune",
+      "sellerMobile": "9822300504",
+      "sellerEmail": "santosh.bhide7@gmail.com",
+      "clinicName": "Matrumandir Eye Hospital",
+      "image": "/images/listings/megatron_s3_1.jpeg",
+      "accessories": [
+        "Phaco Handpiece",
+        "Vitrectomy Cutter Handpiece",
+        "Foot Pedal",
+        "Infusion & Aspiration Tubing",
+        "Full Accessory Set",
+        "Power Cord"
+      ],
+      "status": "Available",
+      "createdAt": "2026-10-18T11:45:00.000Z",
+      "views": 18,
+      "inquiries": 3,
+      "images": [
+        "/images/listings/megatron_s3_1.jpeg",
+        "/images/listings/megatron_s3_2.jpeg",
+        "/images/listings/megatron_s3_3.jpeg",
+        "/images/listings/megatron_s3_4.jpeg"
+      ]
+    },
+    {
+      "id": "list-dr-bhide-topcon-camera",
+      "title": "Topcon Non-Mydriatic Retinal Camera with FFA Facility",
+      "category": "OCT & Fundus",
+      "brand": "Topcon",
+      "model": "TRC-NW8F Non-Mydriatic Retinal Camera with FFA",
+      "year": 2019,
+      "price": 1450000,
+      "priceFormatted": "₹ 14,50,000",
+      "isNegotiable": true,
+      "condition": "Excellent Working Condition",
+      "warranty": "Clean Optics & Complete Digital Camera Station",
+      "description": "Topcon TRC-NW8F Non-Mydriatic Retinal Camera with dedicated Fluorescein Angiography (FFA) facility and color fundus imaging. High resolution digital sensor station with external live viewing monitor and motorized table. In excellent working clinical condition, available for immediate inspection in Pune.",
+      "sellerName": "Dr.Bhide Santosh S",
+      "sellerMembershipNo": "357",
+      "sellerCity": "Pune",
+      "sellerMobile": "9822300504",
+      "sellerEmail": "santosh.bhide7@gmail.com",
+      "clinicName": "Matrumandir Eye Hospital",
+      "image": "/images/listings/topcon_trc_nw8f_1.jpg",
+      "accessories": [
+        "Nikon Digital SLR Camera Mount",
+        "High-Resolution Viewing Monitor",
+        "Motorized Chinrest Table",
+        "Power Supply Unit",
+        "Software Workstation"
+      ],
+      "status": "Available",
+      "createdAt": "2026-10-18T11:46:00.000Z",
+      "views": 24,
+      "inquiries": 5,
+      "images": [
+        "/images/listings/topcon_trc_nw8f_1.jpg",
+        "/images/listings/topcon_trc_nw8f_2.jpg"
+      ]
+    },
+    {
+      "id": "list-dr-amit-mahajan-centurion-gold",
+      "title": "Alcon Centurion Vision System (Gold) with Active Sentry & 2 Handpieces",
+      "category": "Phaco Machines",
+      "brand": "Alcon",
+      "model": "Centurion Gold with Active Sentry",
+      "year": 2021,
+      "price": 3200000,
+      "priceFormatted": "₹ 32,00,000",
+      "isNegotiable": false,
+      "condition": "Like New (Mint)",
+      "warranty": "Under Active Alcon CAMC",
+      "description": "Centurion Gold with Active Sentry with 2 handpieces under Alcon CAMC. Non negotiable ₹ 32 Lakh. Complete surgical console with wireless footswitch and Active Sentry fluidics. In pristine mint condition, available for inspection in Chalisgaon.",
+      "sellerName": "Dr.Amit Mahajan",
+      "sellerMembershipNo": "828",
+      "sellerCity": "Chalisgaon",
+      "sellerMobile": "8806655444",
+      "sellerEmail": "amit2gr8@gmail.com",
+      "clinicName": "Aashish Eye Clinic",
+      "image": "/images/listings/centurion_gold_1.jpeg",
+      "accessories": [
+        "Active Sentry Handpiece",
+        "2 Phaco Handpieces",
+        "Wireless Foot Pedal",
+        "Active Sentry Fluidics Pole & Mounts",
+        "Power Cable",
+        "Original Alcon CAMC Coverage"
+      ],
+      "status": "Available",
+      "createdAt": "2026-10-18T12:56:00.000Z",
+      "views": 42,
+      "inquiries": 9,
+      "images": [
+        "/images/listings/centurion_gold_1.jpeg",
+        "/images/listings/centurion_gold_2.jpeg",
+        "/images/listings/centurion_gold_3.jpeg",
+        "/images/listings/centurion_gold_4.jpeg",
+        "/images/listings/centurion_gold_5.jpeg",
+        "/images/listings/centurion_gold_6.jpeg",
+        "/images/listings/centurion_gold_7.jpeg",
+        "/images/listings/centurion_gold_8.jpeg",
+        "/images/listings/centurion_gold_9.jpeg",
+        "/images/listings/centurion_gold_10.jpeg",
+        "/images/listings/centurion_gold_11.jpeg",
+        "/images/listings/centurion_gold_12.jpeg",
+        "/images/listings/centurion_gold_arm_1.jpg",
+        "/images/listings/centurion_gold_arm_2.jpg"
+      ]
+    },
+    {
+      "id": "list-dr-shaunak-zeiss-hfa3",
+      "title": "Zeiss Humphrey Visual Field Perimeter HFA-3 (Model 830)",
+      "category": "OCT & Fundus",
+      "brand": "Zeiss",
+      "model": "Humphrey Perimeter HFA-3 (Model 830)",
+      "year": 2017,
+      "price": 1100000,
+      "priceFormatted": "₹ 11,00,000",
+      "isNegotiable": true,
+      "condition": "Excellent Working Condition",
+      "warranty": "Under Active Zeiss AMC",
+      "description": "Zeiss Humphrey Perimeter HFA-3 Model 830. Year of manufacture: 2017. Year of purchase: 2023. Under active Zeiss AMC. Current maintenance: Nil (Zero issues, working flawlessly). Expected price: about ₹ 11 Lakhs. Reason for sale: Upgrading to model 840. Location: Nagpur. Contact number and calling time: 7875554696, between 18:00 - 22:00 hrs.",
+      "sellerName": "Dr.MOKADAM SHAUNAK PRAFULL",
+      "sellerMembershipNo": "646",
+      "sellerCity": "Nagpur",
+      "sellerMobile": "7875554696",
+      "sellerEmail": "shaunakpm@gmail.com",
+      "clinicName": "Anjani Eye Hospital",
+      "image": "/images/listings/zeiss_hfa3_2.jpeg",
+      "accessories": [
+        "Patient Response Trigger",
+        "Keyboard & Tracking Mouse",
+        "Power Cable",
+        "Calibrated Optical Bowl & Headrest",
+        "Original Zeiss AMC Service Records"
+      ],
+      "status": "Available",
+      "createdAt": "2026-10-18T13:00:00.000Z",
+      "views": 31,
+      "inquiries": 6,
+      "images": [
+        "/images/listings/zeiss_hfa3_2.jpeg",
+        "/images/listings/zeiss_hfa3_1.jpeg",
+        "/images/listings/zeiss_hfa3_3.jpeg",
+        "/images/listings/zeiss_hfa3_4.jpeg",
+        "/images/listings/zeiss_hfa3_5.jpeg",
+        "/images/listings/zeiss_hfa3_6.jpeg"
+      ],
+      "reasonForSale": "Upgrading to model 840",
+      "callingHours": "18:00 - 22:00 hrs"
+    }
+  ],
+  "wantedPosts": [
+    {
+      "id": "req-chinmay-vaze-recording-system",
+      "doctorName": "Dr.Chinmay Vishwanath Vaze",
+      "membershipNo": "2800",
+      "doctorCity": "Bardez / Maharashtra Network",
+      "doctorMobile": "9765248936",
+      "doctorEmail": "cvvaze@gmail.com",
+      "equipmentName": "Refurb recording system compatible with Takagi OM-10 to record anterior segment surgeries",
+      "category": "Microscopes",
+      "targetBudget": "Open to Reasonable Offers",
+      "urgency": "Immediate (Within 2 weeks)",
+      "description": "Wanted - refurb recording system compatible with takagi om 10 to record anterior segment surgeries. Looking for beam splitter, high quality digital camera adapter, and recording system. Please help.",
+      "createdAt": "2026-10-18T12:05:00.000Z",
+      "replies": []
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-1792339130486",
+      "title": "Senior Phaco & Cornea Fellow",
+      "hospital": "Vaze Eye Institute",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "specialization": "Phaco / Cataract",
+      "jobType": "Fellowship",
+      "experience": "MS / DNB Ophthalmology",
+      "salary": "₹ 1,50,000 / month",
+      "description": "",
+      "requirements": [
+        "MS / DNB in Ophthalmology",
+        "MMC Registration"
+      ],
+      "flyerImage": null,
+      "contactEmail": "chinmay@vaze.com",
+      "contactPhone": "9765248936",
+      "contactWhatsApp": "",
+      "postedBy": {
+        "name": "Dr.Chinmay Vishwanath Vaze",
+        "membershipNo": "2800",
+        "email": "cvvaze@gmail.com",
+        "mobile": "9765248936"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T15:58:50.486Z",
+      "approvedAt": "2026-10-18T16:02:02.285Z",
+      "approvedBy": "Dr. Atul Kadhane"
+    },
+    {
+      "id": "job-1792337643176",
+      "title": "Pediatric Ophthalmologist Fellow",
+      "hospital": "Vaze Eye Clinic",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "specialization": "Pediatric / Strabismus",
+      "jobType": "Fellowship",
+      "experience": "MS / DNB",
+      "salary": "2,00,000 / month",
+      "description": "Great fellowship opportunity for young ophthalmologist.",
+      "requirements": [
+        "MS / DNB in Ophthalmology",
+        "MMC Registration"
+      ],
+      "flyerImage": null,
+      "contactEmail": "cvvaze@gmail.com",
+      "contactPhone": "9765248936",
+      "contactWhatsApp": "9765248936",
+      "postedBy": {
+        "name": "Dr.Chinmay Vishwanath Vaze",
+        "membershipNo": "2800",
+        "email": "cvvaze@gmail.com",
+        "mobile": "9765248936"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T15:34:03.176Z",
+      "approvedAt": "2026-10-18T15:37:35.086Z",
+      "approvedBy": "Administrator"
+    },
+    {
+      "id": "job-suraj-eye-vitreoretinal-surgeon",
+      "title": "Vitreoretinal Surgeon",
+      "hospital": "Suraj Eye Institute",
+      "city": "Nagpur",
+      "state": "Maharashtra",
+      "specialization": "Vitreoretina",
+      "jobType": "Full Time",
+      "experience": "MS / DNB in Ophthalmology, Fellowship in Vitreoretinal Surgery",
+      "salary": "Attractive & Competitive Remuneration based on experience",
+      "description": "Join a growing eye care team in Central India at Suraj Eye Institute (Nagpur | MIHAN). We are hiring a Vitreoretinal Surgeon with hands-on experience in retinal detachment, diabetic vitrectomy, and macular surgery. Advanced surgical and diagnostic setup, supportive team of ophthalmology specialists with opportunity to grow across two locations (Nagpur and MIHAN).",
+      "requirements": [
+        "MS / DNB in Ophthalmology",
+        "Fellowship in Vitreoretinal Surgery",
+        "Hands-on experience in retinal detachment",
+        "Diabetic vitrectomy and macular surgery",
+        "Valid medical council registration",
+        "Strong clinical skills & patient-first approach"
+      ],
+      "flyerImage": "/images/flyers/suraj_eye_institute_hiring.jpg",
+      "contactEmail": "hr@surajeye.org",
+      "contactPhone": "9884093001",
+      "contactWhatsApp": "9884093001",
+      "postedBy": {
+        "name": "Dr. Atul Kadhane",
+        "membershipNo": "3545",
+        "email": "atul.kadhane@opticura.in",
+        "mobile": "9890617789"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T12:00:00.000Z",
+      "approvedAt": "2026-10-18T12:00:00.000Z",
+      "approvedBy": "Dr. Atul Kadhane"
+    },
+    {
+      "id": "job-sri-adinath-netralay-ophthalmologist",
+      "title": "Full Time Consultant Ophthalmologist (SAN)",
+      "hospital": "Sri Adinath Netralay (SAN) - Global Veerayatan Foundation (Affiliated with LVPEI)",
+      "city": "Palitana",
+      "state": "Gujarat",
+      "specialization": "General Ophthalmology",
+      "jobType": "Full Time",
+      "experience": "MS / DNB / DO in Ophthalmology",
+      "salary": "Negotiable based on experience + Free Campus Accommodation",
+      "description": "URGENT Opportunity for Full time Ophthalmologist at Sri Adinath Netralay (SAN), Palitana, Gujarat. SAN is an Eye Hospital instituted under the auspices of the Global Veerayatan Foundation and affiliated with the renowned LV Prasad Eye Institute (LVPEI). Comprehensive surgical center, high clinical volume, and comfortable accommodation provided on campus.",
+      "requirements": [
+        "MS / DNB / DO in Ophthalmology",
+        "Anterior segment & cataract surgical competency",
+        "Medical council registration",
+        "Dedication to charitable and quality community eye care"
+      ],
+      "flyerImage": null,
+      "contactEmail": "dolly.mehta@veerayatan.org",
+      "contactPhone": "9372900754",
+      "contactWhatsApp": "9372900754",
+      "postedBy": {
+        "name": "Dr.Chinmay Vishwanath Vaze",
+        "membershipNo": "2800",
+        "email": "cvvaze@gmail.com",
+        "mobile": "9765248936"
+      },
+      "status": "approved",
+      "postedAt": "2026-10-18T12:05:00.000Z",
+      "approvedAt": "2026-10-18T12:05:00.000Z",
+      "approvedBy": "Dr. Atul Kadhane"
+    }
+  ],
+  "vendors": [
+    {
+      "id": "v-1791738711270",
+      "company": "Apex Ophthalmic Solutions",
+      "name": "Engr. Rajesh Sharma",
+      "phones": [
+        "+919822001122"
+      ],
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "All Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco",
+        "Lasers"
+      ],
+      "brands": [
+        "Zeiss",
+        "Topcon",
+        "Alcon"
+      ],
+      "experience": "10+ Years",
+      "verified": true,
+      "badge": "Verified Service Center",
+      "address": "Pune, Maharashtra",
+      "services": [
+        "Machine Repair",
+        "Spares",
+        "AMC Maintenance"
+      ],
+      "description": "Specialized biomedical service engineers and ophthalmic suppliers for Maharashtra eye care centers."
+    },
+    {
+      "id": "v-1791738236045",
+      "name": "Suresh More",
+      "company": "Pune Eye Laser Care & Optics",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "All Maharashtra",
+      "phones": [
+        "+919822998877"
+      ],
+      "email": "",
+      "address": "",
+      "categories": [
+        "Lasers",
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss",
+        "Lumenis"
+      ],
+      "services": [
+        "Machine Repair",
+        "Spares",
+        "AMC Maintenance"
+      ],
+      "description": "",
+      "experience": "10+ Years",
+      "verified": true,
+      "badge": "Verified Service Center"
+    },
+    {
+      "id": "v-01",
+      "name": "Gajendra Nirale",
+      "company": "Nirale Eyecare Services",
+      "city": "Palghar / Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Palghar, Thane, All Maharashtra",
+      "phones": [
+        "+918329761468",
+        "+919588466656"
+      ],
+      "email": "niraleservices@gmail.com",
+      "address": "Shop No. 02, Shri Mangal Murti CHS, Near Jadeja & Hemali Hall, Near Railway Station, Nallasopara (West), Dist. Palghar - 401 203",
+      "categories": [
+        "Microscopes",
+        "OCT & Fundus",
+        "Lasers",
+        "Slit Lamps",
+        "Autoref / Biometry"
+      ],
+      "brands": [
+        "Zeiss",
+        "Topcon",
+        "Appasamy",
+        "Takagi",
+        "All Brands"
+      ],
+      "services": [
+        "Machine Repair",
+        "Refurbished Equipment",
+        "Buyback Old Machines",
+        "Spares Supply"
+      ],
+      "description": "Comprehensive sales & service for all brand microscopes with camera, fundus camera, OCT, YAG & Green laser, Slit lamp, CCTV, Autoref with Keratometer, Lensmeter, Specular microscope. Buyback old machines & supply new autorefs and surgical instruments.",
+      "experience": "25+ Years",
+      "verified": true,
+      "badge": "Top Rated Service Center"
+    },
+    {
+      "id": "v-02",
+      "name": "Mr. Ketan",
+      "company": "Optiplus Services",
+      "city": "Anand",
+      "state": "Gujarat",
+      "coverage": "Gujarat & Maharashtra",
+      "phones": [
+        "+919228288197"
+      ],
+      "email": "",
+      "address": "Anand, Gujarat",
+      "categories": [
+        "Autoref / Biometry",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "Canon",
+        "Topcon",
+        "Nidek"
+      ],
+      "services": [
+        "Machine Repair",
+        "Optics Calibration",
+        "Electronic Board Repair"
+      ],
+      "description": "Specialist in Canon Autorefractometer repair and complex optical alignment. Doctor recommendation: Repaired Cannon Autoref which even distributor engineer and multiple Mumbai technicians could not repair.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "Doctor Recommended Specialist"
+    },
+    {
+      "id": "v-03",
+      "name": "Rahul Shinde",
+      "company": "Shinde and Sons Opticians & Bio-Medix",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, MMR, Maharashtra",
+      "phones": [
+        "+919820835457"
+      ],
+      "email": "",
+      "address": "Workshop in Girgaum area, South Mumbai",
+      "categories": [
+        "Autoref / Biometry",
+        "Screen & Electronics",
+        "Microscopes"
+      ],
+      "brands": [
+        "Topcon",
+        "Zeiss",
+        "Appasamy"
+      ],
+      "services": [
+        "Machine Repair",
+        "Screen & Display Repair",
+        "TOPCON ARK Repairs",
+        "Biomedical Engineering"
+      ],
+      "description": "Proper Biomedical Engineer & Optician with full workshop in Girgaum. Renowned for TOPCON ARK repairs, screen and display replacements, and precision mechanical servicing.",
+      "experience": "20+ Years",
+      "verified": true,
+      "badge": "Certified Biomedical Engineer"
+    },
+    {
+      "id": "v-04",
+      "name": "Gunaseelan",
+      "company": "Bharat Bio-Medix",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Maharashtra & All India",
+      "phones": [
+        "+919820411460"
+      ],
+      "email": "",
+      "address": "Dawood Baug, BSNL Wireless Road, J.B. Nagar, Andheri East, Mumbai – 400059",
+      "categories": [
+        "Microscopes",
+        "Lasers",
+        "Slit Lamps",
+        "Autoref / Biometry"
+      ],
+      "brands": [
+        "Zeiss",
+        "Luxor",
+        "Topcon",
+        "Takagi",
+        "Leica",
+        "Haag-Streit",
+        "Appasamy"
+      ],
+      "services": [
+        "Machine Repair",
+        "Installation & Troubleshooting",
+        "Preventive Maintenance",
+        "Spares"
+      ],
+      "description": "Over 35 years of senior experience in ophthalmic equipment. Ex-Appasamy Associates (1991–1996), founder of Bharat Bio-Medix (1996–present). Specialized in all models of Ophthalmic Operating Microscopes, YAG/Green Lasers, Perimeters, Slit Lamps, and Autorefractometers.",
+      "experience": "35+ Years",
+      "verified": true,
+      "badge": "Master Specialist (35+ Yrs)"
+    },
+    {
+      "id": "v-05",
+      "name": "Arun Shetty",
+      "company": "OphthalMate LLP",
+      "city": "Bangalore / Mumbai",
+      "state": "Karnataka / Maharashtra",
+      "coverage": "Bangalore, Mumbai, Pune, South & West India",
+      "phones": [
+        "+919731300972",
+        "+919980916729"
+      ],
+      "email": "contactus@ophthalmate.com",
+      "address": "A-313, 2nd Floor, KSSIDC Complex, Block -1, Electronic City Phase -1, Bangalore - 560100 (GSTIN: 29AAJFO8337K1ZK)",
+      "categories": [
+        "OCT & Fundus",
+        "Microscopes",
+        "Phaco Machines"
+      ],
+      "brands": [
+        "Zeiss Cirrus",
+        "Humphrey HFA",
+        "Zeiss"
+      ],
+      "services": [
+        "Warranty Repairs",
+        "Cirrus OCT Servicing",
+        "HFA 700 Calibration",
+        "Zeiss Spares"
+      ],
+      "description": "Ex-Zeiss engineer retired, offering full warranty repairs and maintenance for Zeiss Cirrus OCT (all models) and Humphrey Field Analyzer HFA 700 / 800 series. All stuff Zeiss covered with genuine spares.",
+      "experience": "25+ Years (Zeiss Retd)",
+      "verified": true,
+      "badge": "Ex-Zeiss Senior Engineer"
+    },
+    {
+      "id": "v-06",
+      "name": "Rane",
+      "company": "Rane Laminar Airflow Services",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "Pune, Western Maharashtra",
+      "phones": [
+        "+919822619344"
+      ],
+      "email": "jmcleanair@gmail.com",
+      "address": "78/4, Jai Mata Di Building, Sant Gajanan Maharaj Nagar, Dighi, Pune 411015",
+      "categories": [
+        "OT & Airflow",
+        "Autoclave / CSSD"
+      ],
+      "brands": [
+        "Laminar Flow Units",
+        "Clean Room Systems"
+      ],
+      "services": [
+        "Laminar Air Flow Servicing",
+        "HEPA Filter Replacement",
+        "OT Particle Count Testing"
+      ],
+      "description": "Specialized engineer for Ophthalmic Operation Theatre Laminar Air Flow units, clean room maintenance, air balancing, and filter certifications.",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "OT Clean Air Specialist"
+    },
+    {
+      "id": "v-07",
+      "name": "Kalamkar",
+      "company": "Kalamkar Equipment & Works",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "coverage": "Nashik, Khandesh, North Maharashtra",
+      "phones": [
+        "+919822858970"
+      ],
+      "email": "",
+      "address": "Ratnamala Ho. So. Bungalow No. 1, Peth Rd, Panchavati, Nashik 422004",
+      "categories": [
+        "Autoclave / CSSD",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "All Autoclave Brands",
+        "Mercury BP Instruments"
+      ],
+      "services": [
+        "Autoclave Repair",
+        "Gasket & Valve Service",
+        "Mercury BP Apparatus Calibration"
+      ],
+      "description": "Highly recommended in Nashik for surgical autoclave repair, pressure sterilizers, heating coils, safety valves, and mercury BP apparatus precision repair.",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Autoclave & CSSD Expert"
+    },
+    {
+      "id": "v-08",
+      "name": "Sahebrao Deore",
+      "company": "Deore Ophthalmic Instruments",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "coverage": "Nashik, undertakes outstation jobs across Maharashtra",
+      "phones": [
+        "+919860651897",
+        "02532399948"
+      ],
+      "email": "",
+      "address": "Nashik, Maharashtra",
+      "categories": [
+        "Chair Units",
+        "Autoref / Biometry",
+        "Slit Lamps"
+      ],
+      "brands": [
+        "All Brands (Except Phaco)"
+      ],
+      "services": [
+        "Instruments Resale & Maintenance",
+        "Autorefractometer Maintenance",
+        "Chair Unit Buyer & Seller"
+      ],
+      "description": "Buyer and reseller of ophthalmic chair units and slit lamps. Expert in maintenance of autorefractometers. Nashik based, undertakes outstation jobs across Maharashtra.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "Chair Unit & Autoref Specialist"
+    },
+    {
+      "id": "v-09",
+      "name": "Kedar Barde",
+      "company": "Barde Medical Equipments",
+      "city": "Pune / Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Pune, Western Maharashtra",
+      "phones": [
+        "+919890067867"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Autoclave / CSSD",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "Cardiac Monitors",
+        "Defibrillators",
+        "Autoclaves"
+      ],
+      "services": [
+        "Defibrillator Repair",
+        "Horizontal Autoclave Servicing",
+        "Cardiac Monitors & Pulse Oximeters"
+      ],
+      "description": "Medical equipment dealer and technical engineer. Deals with cardiac monitors, horizontal autoclaves, pulse oximeters, and emergency defibrillator repair.",
+      "experience": "14+ Years",
+      "verified": true,
+      "badge": "Critical Care & CSSD Dealer"
+    },
+    {
+      "id": "v-10",
+      "name": "Gautam Dhananjay",
+      "company": "Ex House of Ophthalmics",
+      "city": "Mumbai / Pune",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Pune, All Maharashtra",
+      "phones": [
+        "+919422434147",
+        "+919822666517",
+        "+917020343352"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Phaco Machines",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "Alcon",
+        "AMO",
+        "Bausch & Lomb",
+        "House of Ophthalmics"
+      ],
+      "services": [
+        "Phaco Machine Repair",
+        "Hydraulic & Vacuum Calibration",
+        "Board Level Diagnostics"
+      ],
+      "description": "Former House of Ophthalmics senior engineer. Can fix any issue associated with phaco machines, fluidics, ultrasonic boards, and handpieces.",
+      "experience": "22+ Years",
+      "verified": true,
+      "badge": "Phaco Machine Guru"
+    },
+    {
+      "id": "v-11",
+      "name": "Sanjiv Kundargi",
+      "company": "Kundargi Associates",
+      "city": "Pune / Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Pune, Mumbai, Rest of Maharashtra, Goa, Vidarbha",
+      "phones": [
+        "+919325775015"
+      ],
+      "email": "sanjeev.sk@rediffmail.com",
+      "address": "Pune & Mumbai, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "OCT & Fundus",
+        "Lasers"
+      ],
+      "brands": [
+        "Zeiss",
+        "Humphrey"
+      ],
+      "services": [
+        "Surgical Operating Microscopes",
+        "OCT Models (Cirrus 400/4000/500/5000/6000)",
+        "Nd YAG & Green Laser",
+        "Humphrey HFA2i/HFA3 (830/840/850/860)"
+      ],
+      "description": "15 years of service division experience directly with Zeiss Medical Technology. Providing maintenance of Zeiss operating microscopes, Cirrus OCTs, Nd:YAG / Green lasers, and Humphrey Field Analyzers with genuine original spares.",
+      "experience": "15+ Years (Zeiss Service Division)",
+      "verified": true,
+      "badge": "Certified Zeiss Specialist"
+    },
+    {
+      "id": "v-12",
+      "name": "Kaliraj",
+      "company": "Kaliraj Phaco Repair Services",
+      "city": "Mumbai / Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Thane, Western Maharashtra",
+      "phones": [
+        "+919930229912"
+      ],
+      "email": "",
+      "address": "Mumbai, Maharashtra",
+      "categories": [
+        "Phaco Machines"
+      ],
+      "brands": [
+        "Biomedix Quantum",
+        "Alcon",
+        "AMO"
+      ],
+      "services": [
+        "Phaco Machine Overhaul",
+        "PCB Troubleshooting",
+        "Pump & Fluidics Servicing"
+      ],
+      "description": "Phaco machine repair expert. Doctor recommendation: Repaired my 20-year-old Biomedix Quantum Phaco and it works like new.",
+      "experience": "19+ Years",
+      "verified": true,
+      "badge": "Doctor Recommended Phaco Repair"
+    },
+    {
+      "id": "v-13",
+      "name": "Mr. Kadiveran Nive",
+      "company": "Nive Ophthalmic Solutions",
+      "city": "All Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "All over Maharashtra",
+      "phones": [
+        "+918130983042"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco Machines",
+        "Slit Lamps",
+        "Autoref / Biometry"
+      ],
+      "brands": [
+        "Appasamy",
+        "Geuder",
+        "Topcon"
+      ],
+      "services": [
+        "Anterior Segment Equipment",
+        "Posterior Segment Equipment",
+        "Microscope Repair"
+      ],
+      "description": "Ex-Appasamy senior engineer. Deals with all anterior and posterior segment ophthalmic equipment across Maharashtra (except OCT).",
+      "experience": "20+ Years (Ex-Appasamy)",
+      "verified": true,
+      "badge": "Appasamy Veteran"
+    },
+    {
+      "id": "v-14",
+      "name": "Gajendra Singh",
+      "company": "Singh Ophthalmic Diagnostics",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Navi Mumbai, Thane",
+      "phones": [
+        "+918329761468"
+      ],
+      "email": "",
+      "address": "Mumbai, Maharashtra",
+      "categories": [
+        "OCT & Fundus",
+        "Slit Lamps",
+        "Microscopes"
+      ],
+      "brands": [
+        "Topcon",
+        "Zeiss"
+      ],
+      "services": [
+        "OCT Alignment",
+        "Fundus Camera Calibration",
+        "Slit Lamp Servicing",
+        "Microscopes"
+      ],
+      "description": "Former Topcon engineer. Master specialist in Topcon and Zeiss OCT systems, fundus cameras, slit lamps, and surgical microscopes.",
+      "experience": "18+ Years (Former Topcon)",
+      "verified": true,
+      "badge": "Former Topcon Specialist"
+    },
+    {
+      "id": "v-15",
+      "name": "Sarvesh Rao",
+      "company": "Rao Biomedical Systems",
+      "city": "Nagpur",
+      "state": "Maharashtra",
+      "coverage": "Nagpur, Vidarbha region",
+      "phones": [
+        "+919860266602"
+      ],
+      "email": "",
+      "address": "Nagpur, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "Zeiss",
+        "Olympus",
+        "Appasamy"
+      ],
+      "services": [
+        "Microscopes Repair",
+        "Electrosurgical Cautery",
+        "Suction Machines"
+      ],
+      "description": "Specialized engineer in Nagpur for surgical operating microscopes, bipolar/monopolar cautery units, surgical suction machines, and OT consoles.",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "Vidarbha Regional Engineer"
+    },
+    {
+      "id": "v-16",
+      "name": "Chandrakant Chutke (AMO Chandrakant)",
+      "company": "Chutke Phaco Solutions",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "Pune, Western Maharashtra",
+      "phones": [
+        "+919422620373"
+      ],
+      "email": "",
+      "address": "Pune, Maharashtra",
+      "categories": [
+        "Phaco Machines"
+      ],
+      "brands": [
+        "AMO / Johnson & Johnson",
+        "Sovereign",
+        "Compact WhiteStar"
+      ],
+      "services": [
+        "AMO Machine Repair",
+        "Phaco Handpiece Repair",
+        "Johnson & Johnson Handpiece Restoration"
+      ],
+      "description": "Renowned specialist in Pune for AMO and Johnson & Johnson Phaco machines and precision phaco handpiece refurbishing and piezoelectric crystal repair.",
+      "experience": "20+ Years",
+      "verified": true,
+      "badge": "AMO & JnJ Handpiece Master"
+    },
+    {
+      "id": "v-17",
+      "name": "Gyaneshwar Yaduwanshi",
+      "company": "Yaduvanshi Phaco Repairing",
+      "city": "Central Maharashtra / MP",
+      "state": "Maharashtra",
+      "coverage": "Maharashtra & Central India",
+      "phones": [
+        "+917987323299",
+        "+919407424027"
+      ],
+      "email": "",
+      "address": "Central India / Maharashtra",
+      "categories": [
+        "Phaco Machines"
+      ],
+      "brands": [
+        "Alcon Infiniti",
+        "Alcon Laureate",
+        "AMO"
+      ],
+      "services": [
+        "Phaco Probe Repair",
+        "Infiniti Probe Refurbishing",
+        "Laureate Machine Repair"
+      ],
+      "description": "Highly recommended for repairing all phaco probes and machines at reasonable rates. Doctors note: Repaired Alcon Infiniti probes as well as Laureate probes and machines flawlessly.",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Phaco Probe Repair Expert"
+    },
+    {
+      "id": "v-18",
+      "name": "S. Kathiravan",
+      "company": "Kathiravan Medical Technologies",
+      "city": "Nagpur",
+      "state": "Maharashtra",
+      "coverage": "Nagpur, Vidarbha, All Maharashtra",
+      "phones": [
+        "+918130983042"
+      ],
+      "email": "",
+      "address": "Nagpur, Maharashtra",
+      "categories": [
+        "Phaco Machines",
+        "Microscopes",
+        "Lasers",
+        "Autoref / Biometry",
+        "OCT & Fundus"
+      ],
+      "brands": [
+        "Appasamy",
+        "Geuder",
+        "Zeiss",
+        "Humphrey"
+      ],
+      "services": [
+        "Phaco Machine Repair",
+        "Retina Machine",
+        "Microscope Repair",
+        "Laser",
+        "A-Scan Biometry",
+        "Perimetry",
+        "Autoref",
+        "NCT",
+        "Phaco Probes"
+      ],
+      "description": "Ex-Appasamy engineer, currently with Geuder. Comprehensive expertise in Phaco machines, vitreoretinal systems, Zeiss microscopes, Humphrey perimeters, lasers, biometry, and NCT tonometers.",
+      "experience": "22+ Years (Ex-Appasamy / Geuder)",
+      "verified": true,
+      "badge": "Geuder / Appasamy Expert"
+    },
+    {
+      "id": "v-19",
+      "name": "Rahul (Zeis 2 Rahul)",
+      "company": "Rahul Precision Optical Services",
+      "city": "Pune / Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Maharashtra",
+      "phones": [
+        "+919422041001"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss"
+      ],
+      "services": [
+        "Zeiss Microscope Repair",
+        "Optics Alignment",
+        "Light Source & Foot Pedal Repair"
+      ],
+      "description": "Specialized engineer for Zeiss surgical operating microscopes, beam splitters, and optical pathway alignments.",
+      "experience": "14+ Years",
+      "verified": true,
+      "badge": "Zeiss Microscope Engineer"
+    },
+    {
+      "id": "v-20",
+      "name": "Manoj Titwane",
+      "company": "Titwane Eye Equipment Services",
+      "city": "Nashik",
+      "state": "Maharashtra",
+      "coverage": "Nashik, Dhule, Jalgaon, North Maharashtra",
+      "phones": [
+        "+919371518344"
+      ],
+      "email": "",
+      "address": "Nashik, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Cameras & Imaging"
+      ],
+      "brands": [
+        "Zeiss",
+        "Appasamy",
+        "Takagi"
+      ],
+      "services": [
+        "Operating Microscopes",
+        "Indirect Ophthalmoscope (IDO)",
+        "Camera Systems",
+        "Low Cost Service"
+      ],
+      "description": "Doctor recommendation: Efficient and beneficial service at economical cost. Expert in operating microscopes, indirect ophthalmoscopes, and medical camera attachments.",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Cost-Effective Solution Provider"
+    },
+    {
+      "id": "v-21",
+      "name": "Anburasan Senthil (Anbu)",
+      "company": "Anbu Ophthalmic Services",
+      "city": "Nagpur",
+      "state": "Maharashtra",
+      "coverage": "Nagpur, Wardha, Amravati, Vidarbha",
+      "phones": [
+        "+917806840414"
+      ],
+      "email": "",
+      "address": "Nagpur, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Chair Units",
+        "Slit Lamps"
+      ],
+      "brands": [
+        "Appasamy",
+        "Topcon",
+        "Takagi"
+      ],
+      "services": [
+        "Microscope Repair",
+        "Ophthalmic Chair Units",
+        "Slit Lamp Alignment"
+      ],
+      "description": "Skilled technician in Nagpur specialized in operating microscopes, motorized ophthalmic chair units, and slit-lamp optical assemblies.",
+      "experience": "12+ Years",
+      "verified": true,
+      "badge": "Nagpur Optical Technician"
+    },
+    {
+      "id": "v-22",
+      "name": "Prasad P Ghosalkar (Prasad Zeiss)",
+      "company": "Ovi MediServ",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Western Suburbs, Maharashtra",
+      "phones": [
+        "+919004732061"
+      ],
+      "email": "ovimediserv@hotmail.com",
+      "address": "503, Om Unnati, River Valley Colony, 198 - Mandpeshwar Road, Borivali (W) Mumbai, 400 103 (GSTIN: 27AFQPG8806H1Z3)",
+      "categories": [
+        "Microscopes",
+        "Phaco Machines",
+        "OCT & Fundus",
+        "Perimetry"
+      ],
+      "brands": [
+        "Zeiss"
+      ],
+      "services": [
+        "Buy, Sell & Service",
+        "Outside Servicing of Zeiss Instruments",
+        "Zeiss Microscope",
+        "Perimeter & OCT"
+      ],
+      "description": "Former Zeiss engineer operating Ovi MediServ. Authorized for buying, selling, servicing, and clinical application of Zeiss ophthalmic equipment: microscopes, perimeters, OCT, and phaco systems.",
+      "experience": "20+ Years (Zeiss)",
+      "verified": true,
+      "badge": "Zeiss Equipment & Application"
+    },
+    {
+      "id": "v-23",
+      "name": "Mr. Deva",
+      "company": "Deva Instrument Maintenance",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "Pune and surrounding districts",
+      "phones": [
+        "+919702007627"
+      ],
+      "email": "",
+      "address": "Pune, Maharashtra",
+      "categories": [
+        "Chair Units",
+        "Slit Lamps",
+        "Autoclave / CSSD"
+      ],
+      "brands": [
+        "All Clinic Instruments"
+      ],
+      "services": [
+        "Instrument Maintenance & Repair",
+        "Mechanical Overhaul",
+        "Clinic AMC"
+      ],
+      "description": "Reliable vendor and general instrument maintenance and repair specialist for Pune and surrounding clinic networks.",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Pune Instrument Care"
+    },
+    {
+      "id": "v-24",
+      "name": "Nikhil Rajendra Gund",
+      "company": "Gund Bio-Ophthalmic Firm",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "Pune & all over Maharashtra",
+      "phones": [
+        "+918669999666",
+        "+919762788428"
+      ],
+      "email": "",
+      "address": "Pune, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco Machines",
+        "Slit Lamps",
+        "Chair Units",
+        "Cameras & Imaging"
+      ],
+      "brands": [
+        "Zeiss",
+        "Topcon",
+        "Alcon",
+        "Appasamy"
+      ],
+      "services": [
+        "Microscopes Repair",
+        "Phaco Machines",
+        "Slit Lamp & Camera Systems",
+        "Chair Unit & Motorized Table",
+        "OT Table Repair"
+      ],
+      "description": "Over 15 years running dedicated independent firm covering all of Maharashtra. Specialized in microscopes, phaco machines, slit lamp camera integration, OT tables, and motorized tables.",
+      "experience": "15 Years (Proprietary Firm)",
+      "verified": true,
+      "badge": "Complete OT & Clinic Setup"
+    },
+    {
+      "id": "v-25",
+      "name": "Chandu Phulpagar",
+      "company": "Phulpagar Medical Electricals",
+      "city": "Parbhani",
+      "state": "Maharashtra",
+      "coverage": "Parbhani, Marathwada",
+      "phones": [
+        "+919422175066",
+        "+919175383000"
+      ],
+      "email": "",
+      "address": "Parbhani, Maharashtra",
+      "categories": [
+        "Screen & Electronics",
+        "Chair Units"
+      ],
+      "brands": [
+        "All Medical Equipments"
+      ],
+      "services": [
+        "Medical Equipment Electricals",
+        "Transformer & Supply Boards",
+        "Motorized Unit Wiring"
+      ],
+      "description": "Experienced medical equipment technician and electrician for eye clinics and hospitals across Parbhani and Marathwada.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "Marathwada Medical Electrician"
+    },
+    {
+      "id": "v-26",
+      "name": "Mediplus Bharat Equipment Service",
+      "company": "Mediplus Bharat",
+      "city": "Mumbai / Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Maharashtra",
+      "phones": [
+        "+919818866695"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco Machines"
+      ],
+      "brands": [
+        "All Brands"
+      ],
+      "services": [
+        "Equipment Service",
+        "Annual Maintenance",
+        "Emergency Breakdown Repair"
+      ],
+      "description": "Ophthalmic equipment service provider handling breakdown calls and periodic maintenance.",
+      "experience": "12+ Years",
+      "verified": true,
+      "badge": "Multi-Brand Service"
+    },
+    {
+      "id": "v-27",
+      "name": "Santosh Gosavi (Santosh Zeiss)",
+      "company": "Gosavi Zeiss Microscope Care",
+      "city": "Mumbai / Pune",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Pune, Nashik",
+      "phones": [
+        "+917777064061"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss"
+      ],
+      "services": [
+        "Zeiss Microscope Overhaul",
+        "Optics Cleaning",
+        "Collimation & Illumination"
+      ],
+      "description": "Doctor recommendation: Very good and cooperative engineer who helped resolve complex Zeiss operating microscope optical and mechanical issues.",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "Doctor Recommended Zeiss Engineer"
+    },
+    {
+      "id": "v-28",
+      "name": "Animesh",
+      "company": "Animesh Zeiss Microscope Service",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Thane, MMR",
+      "phones": [
+        "+919867362363"
+      ],
+      "email": "",
+      "address": "Mumbai, Maharashtra",
+      "categories": [
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss"
+      ],
+      "services": [
+        "Zeiss Microscope Servicing",
+        "OPMI Series Alignment",
+        "Mechanical Arm Tuning"
+      ],
+      "description": "Zeiss microscope technician dedicated to OPMI series surgical microscopes in Mumbai.",
+      "experience": "14+ Years",
+      "verified": true,
+      "badge": "Zeiss Microscope Service"
+    },
+    {
+      "id": "v-29",
+      "name": "Pradeep Panchal",
+      "company": "Life Sight Surgical Zeiss",
+      "city": "Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Maharashtra",
+      "phones": [
+        "+917798788880"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Surgical Tools"
+      ],
+      "brands": [
+        "Zeiss",
+        "Life Sight"
+      ],
+      "services": [
+        "Surgical Microscope Service",
+        "Zeiss Optics Spares",
+        "Micro-Surgical Accessories"
+      ],
+      "description": "Specialized in Zeiss surgical microscopes and eye surgery instrumentation.",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Surgical Zeiss Specialist"
+    },
+    {
+      "id": "v-30",
+      "name": "Dharmendra Bisen",
+      "company": "Bisen CSSD & Autoclave Solutions",
+      "city": "Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "All over Maharashtra",
+      "phones": [
+        "+919270069291",
+        "+919146686606"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Autoclave / CSSD"
+      ],
+      "brands": [
+        "ETO Sterilizers",
+        "High Pressure Autoclaves",
+        "CSSD Systems"
+      ],
+      "services": [
+        "Autoclave ETO Servicing",
+        "Sterilization Chamber Testing",
+        "CSSD Overhauling"
+      ],
+      "description": "Doctor recommendation: Very good with all CSSD things, extremely reliable and affordable. Saved lakhs of rupees in hospital equipment maintenance last year.",
+      "experience": "17+ Years",
+      "verified": true,
+      "badge": "Hospital CSSD & ETO Master"
+    },
+    {
+      "id": "v-31",
+      "name": "Ganesh Kasture",
+      "company": "Kasture Eye Tech Solutions",
+      "city": "Aurangabad (Chhatrapati Sambhajinagar)",
+      "state": "Maharashtra",
+      "coverage": "Aurangabad, Jalna, Marathwada",
+      "phones": [
+        "+919730549096"
+      ],
+      "email": "",
+      "address": "Aurangabad, Maharashtra",
+      "categories": [
+        "Microscopes",
+        "Phaco Machines",
+        "Autoref / Biometry",
+        "Chair Units"
+      ],
+      "brands": [
+        "All Brands"
+      ],
+      "services": [
+        "All-in-one Ophthalmic Repair",
+        "Clinic Installation",
+        "Emergency Servicing"
+      ],
+      "description": "Recognized as the all-in-one ophthalmic equipment expert in Aurangabad and Marathwada for complete clinic and OT hardware.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "All-in-One Service Specialist"
+    },
+    {
+      "id": "v-32",
+      "name": "Shrinivasan",
+      "company": "Shrinivasan YAG Laser Care",
+      "city": "Aurangabad (Chhatrapati Sambhajinagar)",
+      "state": "Maharashtra",
+      "coverage": "Aurangabad, Marathwada & Western Maharashtra",
+      "phones": [
+        "+91982317219",
+        "+919284277719"
+      ],
+      "email": "",
+      "address": "Aurangabad, Maharashtra",
+      "categories": [
+        "Lasers"
+      ],
+      "brands": [
+        "Zeiss",
+        "Coherent",
+        "Ellex",
+        "Appasamy"
+      ],
+      "services": [
+        "Nd:YAG Laser Servicing",
+        "Cavity Alignment",
+        "Energy Meter Calibration",
+        "Aiming Beam Adjustment"
+      ],
+      "description": "Specialist in Nd:YAG laser servicing, optics cleaning, cavity realignment, and pulse calibration.",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "YAG Laser Specialist"
+    },
+    {
+      "id": "v-33",
+      "name": "Swami Electronics",
+      "company": "Swami Ophthalmic Electronics",
+      "city": "Latur",
+      "state": "Maharashtra",
+      "coverage": "Latur, Osmanabad, Nanded",
+      "phones": [
+        "+919518943138"
+      ],
+      "email": "",
+      "address": "Latur, Maharashtra",
+      "categories": [
+        "Chair Units",
+        "Autoref / Biometry",
+        "Microscopes"
+      ],
+      "brands": [
+        "Appasamy",
+        "Takagi",
+        "Standard"
+      ],
+      "services": [
+        "Chair Unit Repair",
+        "A-Scan Biometry Calibration",
+        "Microscope Electronics"
+      ],
+      "description": "Latur-based service engineer for ophthalmic chair units, ultrasonic A-scan biometers, and microscope electronics.",
+      "experience": "14+ Years",
+      "verified": true,
+      "badge": "Latur Regional Hub"
+    },
+    {
+      "id": "v-34",
+      "name": "Dr. Sachin Gajanan Pagade",
+      "company": "Pagade Bio-Med Solutions",
+      "city": "Pune",
+      "state": "Maharashtra",
+      "coverage": "Pune, Western Maharashtra & State-wide",
+      "phones": [
+        "+919822872292"
+      ],
+      "email": "",
+      "address": "Pune, Maharashtra",
+      "categories": [
+        "Phaco Machines",
+        "Microscopes",
+        "OCT & Fundus",
+        "Autoref / Biometry",
+        "Slit Lamps",
+        "Chair Units"
+      ],
+      "brands": [
+        "Zeiss",
+        "Topcon",
+        "Alcon",
+        "Haag-Streit",
+        "Appasamy"
+      ],
+      "services": [
+        "Phaco Machines",
+        "Microscopes",
+        "OCT",
+        "Optical Biometry",
+        "Perimetry",
+        "Slit Lamp",
+        "Autorefractometer",
+        "Lensometer",
+        "Chair Unit",
+        "OT Table"
+      ],
+      "description": "Comprehensive ophthalmic biomedical specialist handling Phaco, microscopes, OCT, optical biometry, Humphrey perimetry, slit lamps, autorefractometers, lensometers, chair units, and motorized OT tables.",
+      "experience": "20+ Years",
+      "verified": true,
+      "badge": "Complete Ophthalmic Consultant"
+    },
+    {
+      "id": "v-35",
+      "name": "Sachin",
+      "company": "Zeiss Microscope Servicing Sachin",
+      "city": "Pune / Nashik",
+      "state": "Maharashtra",
+      "coverage": "Pune, Mumbai, Nashik",
+      "phones": [
+        "+917875457712"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Microscopes"
+      ],
+      "brands": [
+        "Zeiss"
+      ],
+      "services": [
+        "Zeiss Microscope Overhaul",
+        "Mechanical Arms Tuning",
+        "Lamp Housing Servicing"
+      ],
+      "description": "Specialized service technician for Zeiss operating microscopes and accessories.",
+      "experience": "12+ Years",
+      "verified": true,
+      "badge": "Zeiss Microscope Technician"
+    },
+    {
+      "id": "v-36",
+      "name": "Narayan Channa",
+      "company": "Heritage Surgicals",
+      "city": "Solapur",
+      "state": "Maharashtra",
+      "coverage": "Solapur district, Dharashiv (Osmanabad) district and Sangli district",
+      "phones": [
+        "+917875127875"
+      ],
+      "email": "",
+      "address": "c/o Heritage Surgicals, 39/45 Gandhi Nagar South Sadar Bazar, Solapur - 413003",
+      "categories": [
+        "Phaco Machines",
+        "Chair Units",
+        "Microscopes",
+        "Slit Lamps",
+        "Autoref / Biometry"
+      ],
+      "brands": [
+        "Chaxu",
+        "Topcon",
+        "Appasamy",
+        "Schiotz"
+      ],
+      "services": [
+        "Repair & Sale Chaxu Phaco",
+        "Chair Unit & Motorized Table",
+        "OT Table",
+        "Slit Lamp & Microscope",
+        "IDO Camera Set",
+        "Optics Cleaning Autoref",
+        "Ultrasonic Cleaner",
+        "Bipolar Cautery",
+        "Schiotz Tonometer & Retinoscope",
+        "Surgeon Chair",
+        "Phaco Handpiece Service",
+        "All Types Refurbished Equipment Purchase & Sale"
+      ],
+      "description": "Full-line refurbished ophthalmic equipment sales & comprehensive service covering Solapur, Dharashiv, and Sangli districts. Specialists in Chaxu phaco, chair units, slit lamps, IDO cameras, and phaco handpiece service.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "Refurbished Equipment & Service Hub"
+    },
+    {
+      "id": "v-37",
+      "name": "Dhananjay Chaxu",
+      "company": "Chaxu Electronics Care",
+      "city": "Pune / Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Maharashtra",
+      "phones": [
+        "+919822666517",
+        "+919422434147"
+      ],
+      "email": "",
+      "address": "Maharashtra",
+      "categories": [
+        "Screen & Electronics",
+        "Phaco Machines"
+      ],
+      "brands": [
+        "Chaxu",
+        "All Ophthalmic Brands"
+      ],
+      "services": [
+        "Medical Electronics Repair",
+        "Main Motherboard Repair",
+        "Switching Power Supplies"
+      ],
+      "description": "Master electronics repair specialist for ophthalmic circuitry, SMPS, microcontroller boards, and instrument controls.",
+      "experience": "19+ Years",
+      "verified": true,
+      "badge": "Medical Electronics Wizard"
+    },
+    {
+      "id": "v-38",
+      "name": "Mohan Jagdish",
+      "company": "Jagdish Ophthalmic Services",
+      "city": "Nanded",
+      "state": "Maharashtra",
+      "coverage": "Nanded, Hingoli, Marathwada",
+      "phones": [
+        "+919890439301"
+      ],
+      "email": "",
+      "address": "Nanded, Maharashtra",
+      "categories": [
+        "Chair Units"
+      ],
+      "brands": [
+        "All Chair Unit Brands"
+      ],
+      "services": [
+        "Ophthalmic Chair Unit Repair",
+        "Hydraulic Jack Service",
+        "Foot Switch Wiring"
+      ],
+      "description": "Reliable engineer for repairing ophthalmic refraction chair units, motorized elevation systems, and instrument arms in Nanded.",
+      "experience": "13+ Years",
+      "verified": true,
+      "badge": "Nanded Chair Unit Expert"
+    },
+    {
+      "id": "v-39",
+      "name": "Mumbai Autoclave Consortium (Vijaykant, Shiva, Ramnaresh, Kamble)",
+      "company": "2M Ophthotronics & Shiva Autoclaves",
+      "city": "Mumbai / Vasai-Virar",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Vasai-Virar, Thane, Navi Mumbai",
+      "phones": [
+        "+919594948435",
+        "+919820930589",
+        "+919970655107",
+        "+919028872486",
+        "+919869180914"
+      ],
+      "email": "",
+      "address": "Mumbai & Vasai-Virar, Maharashtra",
+      "categories": [
+        "Autoclave / CSSD"
+      ],
+      "brands": [
+        "2M Ophthotronics",
+        "Shiva",
+        "Surgical Products of India"
+      ],
+      "services": [
+        "Autoclave Purchase & Repair",
+        "Pressure Vessel Testing",
+        "Heating Elements",
+        "Steam Valves"
+      ],
+      "description": "Dedicated Mumbai network for flash autoclaves, vertical/horizontal steam sterilizers, and OT sterilization equipment (2M Ophthotronics Vijaykant: 9594948435, Shiva Autoclave: 9820930589, Kamble Vasai-Virar: 9028872486).",
+      "experience": "25+ Years combined",
+      "verified": true,
+      "badge": "Mumbai Sterilizer Network"
+    },
+    {
+      "id": "v-40",
+      "name": "Naresh Gurav & Yogendra Ganglani",
+      "company": "TOPCON ARK Specialists",
+      "city": "Mumbai / Baroda",
+      "state": "Maharashtra / Gujarat",
+      "coverage": "Mumbai, Maharashtra, Gujarat",
+      "phones": [
+        "+919320669349",
+        "+919429952322"
+      ],
+      "email": "",
+      "address": "Mumbai & Baroda",
+      "categories": [
+        "Autoref / Biometry",
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "TOPCON",
+        "Canon",
+        "Nidek"
+      ],
+      "services": [
+        "TOPCON ARK Repairs",
+        "Optical Keratometer Alignment",
+        "Screen & Display Repair"
+      ],
+      "description": "Naresh Gurav (official TOPCON engineer: 9320669349) and Yogendra Ganglani (Baroda display & ARK specialist: 9429952322) handling specialized TOPCON Auto Ref-Keratometer repairs and screen replacements.",
+      "experience": "20+ Years",
+      "verified": true,
+      "badge": "TOPCON Factory Trained"
+    },
+    {
+      "id": "v-41",
+      "name": "Ophthalmic EMR Software Alliance",
+      "company": "Crystal EMR & Splinetech Solutions",
+      "city": "Mumbai / Pune",
+      "state": "Maharashtra",
+      "coverage": "All Maharashtra & Pan-India",
+      "phones": [
+        "+919820477946",
+        "+919074745725",
+        "+919920036855",
+        "+919500075359",
+        "+919819217273"
+      ],
+      "email": "",
+      "address": "Mumbai & Pune, Maharashtra",
+      "categories": [
+        "EMR Software"
+      ],
+      "brands": [
+        "Crystal EMR",
+        "Splinetech",
+        "One Glance Software",
+        "Image Computers"
+      ],
+      "services": [
+        "Ophthalmic EMR Software",
+        "Patient Medical Records",
+        "DICOM Image Archiving",
+        "Cloud Sync"
+      ],
+      "description": "Curated ophthalmic clinic software developers and providers: Balaji Rao (Crystal EMR: 9820477946), Dr. Arpit EMR (9074745725), Prashant Deshpande (9920036855), Ayesha (One Glance Software / Splinetech: 9500075359), Ritesh Zaveri (Image Computers: 9819217273).",
+      "experience": "15+ Years",
+      "verified": true,
+      "badge": "Ophthalmic EMR Providers"
+    },
+    {
+      "id": "v-42",
+      "name": "Dr. Sachin Korde & Piyush Patel",
+      "company": "AMO Phaco Specialist Network",
+      "city": "Nashik / Gujarat",
+      "state": "Maharashtra / Gujarat",
+      "coverage": "Nashik, Maharashtra & Gujarat",
+      "phones": [
+        "+919822677522",
+        "+919822072745",
+        "+919825118320",
+        "+919825050263"
+      ],
+      "email": "",
+      "address": "Nashik, Maharashtra",
+      "categories": [
+        "Phaco Machines"
+      ],
+      "brands": [
+        "AMO Compact WhiteStar",
+        "Biomedix",
+        "Alcon"
+      ],
+      "services": [
+        "AMO Compact White Star Repair",
+        "Phaco Handpiece Re-coring",
+        "Biomedix Probes (Kuldeep Handoo: 9825050263)"
+      ],
+      "description": "Specialized network for AMO Compact White Star Phaco machines (contact Dr. Sachin Korde in Nashik: 9822677522), Piyush Patel for phaco consumables, and Kuldeep Handoo for Biomedix probe repairs.",
+      "experience": "18+ Years",
+      "verified": true,
+      "badge": "WhiteStar & Probe Experts"
+    },
+    {
+      "id": "v-43",
+      "name": "Rohit Verma & Rahul Deshpande",
+      "company": "Optofine ESC Cameras Sangli",
+      "city": "Sangli / Maharashtra",
+      "state": "Maharashtra",
+      "coverage": "Sangli, Kolhapur, All Maharashtra",
+      "phones": [
+        "+919818100144",
+        "+919422041001",
+        "+919422510011"
+      ],
+      "email": "",
+      "address": "Sangli, Maharashtra",
+      "categories": [
+        "Cameras & Imaging",
+        "Microscopes"
+      ],
+      "brands": [
+        "Optofine ESC",
+        "Sony Medical",
+        "Medisys 3D"
+      ],
+      "services": [
+        "Microscope Recording Cameras",
+        "HD / 4K Surgery Recording",
+        "Beam Splitter Camera Mounts"
+      ],
+      "description": "Optofine ESC Cameras Sangli (Rohit Verma: 9818100144, Rahul Deshpande: 9422041001) providing medical grade microscope surgery recording systems, camera adaptors, and live monitors.",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "Surgery Recording Cameras"
+    },
+    {
+      "id": "v-44",
+      "name": "Pravin Patil & Akshit Bhola",
+      "company": "Medisys 3D & ESC Camera Engineering",
+      "city": "Mumbai / Pan-India",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Maharashtra, Haryana",
+      "phones": [
+        "+919702868724",
+        "+919860198504",
+        "+919468435757",
+        "+919992929325"
+      ],
+      "email": "",
+      "address": "Mumbai / Pan-India",
+      "categories": [
+        "Cameras & Imaging",
+        "Slit Lamps"
+      ],
+      "brands": [
+        "ESC",
+        "Tripathi Cameras",
+        "Medisys 3D"
+      ],
+      "services": [
+        "ESC Camera Engineer",
+        "Slit Lamp Imaging Systems",
+        "Surgery Recording 3D Medisys Cameras",
+        "Tripathi Cameras"
+      ],
+      "description": "Pravin Patil (ESC Camera Engineer: 9702868724), Tripathi Cameras (9860198504), and Akshit Bhola (Slit lamp imaging systems and 3D surgery recording medisys camera: 9468435757).",
+      "experience": "14+ Years",
+      "verified": true,
+      "badge": "Digital Imaging & 3D Video"
+    },
+    {
+      "id": "v-45",
+      "name": "Sanjay Anand & Anand Technohand",
+      "company": "Technohand Screen & Electronics",
+      "city": "Vasai / Mumbai",
+      "state": "Maharashtra",
+      "coverage": "Mumbai, Vasai, All Maharashtra",
+      "phones": [
+        "+919821150348",
+        "+919373182464",
+        "+919370640019"
+      ],
+      "email": "",
+      "address": "Vasai, Palghar, Mumbai",
+      "categories": [
+        "Screen & Electronics"
+      ],
+      "brands": [
+        "Oertali",
+        "All Electronic Medical Displays"
+      ],
+      "services": [
+        "Screen & Display Repair / Replacement",
+        "Oertali Electronics Repair",
+        "Touchscreen Calibration"
+      ],
+      "description": "Specialists in screen repair and display replacement for ophthalmic machines (Sanjay Anand, Vasai: 9821150348) and Anand Technohand / Oertali electronics repair (9373182464).",
+      "experience": "16+ Years",
+      "verified": true,
+      "badge": "Display & Touchscreen Masters"
+    }
+  ],
+  "vendorReviews": {
+    "v-1791738711270": [
+      {
+        "id": "rev_1792343026606",
+        "doctorName": "Dr. Amit Patil",
+        "membershipNo": "Verified Surgeon",
+        "city": "Pune",
+        "rating": 5,
+        "comment": "Quick OT microscope repair and replaced illumination lamp within 3 hours. Great support.",
+        "date": "2026-10-18T17:03:46.606Z"
+      }
+    ]
+  },
   "customMembers": [
+    {
+      "sNo": "3748",
+      "membershipNo": "USER-9200",
+      "membershipType": "MOS Member",
+      "name": "Dr. Live Network Sync",
+      "email": "",
+      "mobile": "9811223344",
+      "address": "",
+      "city": "Nagpur",
+      "state": "Maharashtra",
+      "ratifiedYear": "2026",
+      "isCustom": true,
+      "createdAt": "2026-10-19T03:37:05.701Z"
+    },
+    {
+      "membershipNo": "3999",
+      "name": "Dr. Test Server Side",
+      "membershipType": "MOS Member",
+      "isCustom": true,
+      "createdAt": "2026-10-19T03:37:05.701Z"
+    },
     {
       "membershipNo": "USER-9999",
       "name": "Dr. Live Sync Test",
-      "membershipType": "MOS Member"
+      "membershipType": "MOS Member",
+      "isCustom": true,
+      "createdAt": "2026-10-19T03:37:05.701Z"
     }
   ],
-  "deletedMemberIds": [],
+  "deletedMemberIds": [
+    "USER-4692",
+    "USER-6585"
+  ],
   "deletedJobIds": [],
   "deletedListingIds": [],
   "deletedVendorIds": [],
-  "lastUpdated": 1792379853654
+  "lastUpdated": 1792381042884
 }
