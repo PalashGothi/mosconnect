@@ -38,6 +38,7 @@ export default function Navbar({
   pendingJobsCount = 0
 }) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isAdmin = Boolean(
     currentDoctor && (
       currentDoctor.role === 'admin' ||
