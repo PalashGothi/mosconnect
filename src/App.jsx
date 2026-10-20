@@ -66,13 +66,13 @@ const getInitialTab = () => {
 
 export default function App() {
   const [activeTab, setActiveTab] = useState(getInitialTab);
-  const [currentDoctor, setCurrentDoctorState] = useState(null);
-  const [listings, setListings] = useState([]);
-  const [wantedPosts, setWantedPosts] = useState([]);
-  const [jobs, setJobs] = useState([]);
-  const [members, setMembers] = useState([]);
-  const [vendors, setVendors] = useState([]);
-  const [savedItems, setSavedItems] = useState([]);
+  const [currentDoctor, setCurrentDoctorState] = useState(getCurrentDoctor);
+  const [listings, setListings] = useState(getListings);
+  const [wantedPosts, setWantedPosts] = useState(getWantedPosts);
+  const [jobs, setJobs] = useState(getJobs);
+  const [members, setMembers] = useState(getMembers);
+  const [vendors, setVendors] = useState(getVendors);
+  const [savedItems, setSavedItems] = useState(getSavedItems);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isAdminUnlocked, setIsAdminUnlocked] = useState(() => {
     try {
@@ -82,6 +82,15 @@ export default function App() {
     }
   });
   const [isAdminSecurityOpen, setIsAdminSecurityOpen] = useState(false);
+
+  const isDoctorAtulOrAdmin = Boolean(
+    currentDoctor && (
+      currentDoctor.role === 'admin' ||
+      String(currentDoctor.membershipNo) === '3545' || 
+      String(currentDoctor.mobile) === '9890617789' ||
+      String(currentDoctor.name || '').toLowerCase().includes('atul kadhane')
+    )
+  );
 
   const refreshAllState = () => {
     setListings(getListings());
@@ -113,10 +122,11 @@ export default function App() {
       console.warn('Cloud sync init error', err);
     });
 
-    // Reactive listener for push/pull cloud sync events
+    // Reactive listener for push/pull cloud sync events and cross-tab broadcasts
     const unsubCloudSync = subscribeCloudSync((event) => {
-      if (event?.type === 'push-success' || event?.type === 'pull-success') {
+      if (event?.type === 'push-success' || event?.type === 'pull-success' || event?.type === 'local-update') {
         refreshAllState();
+        setCurrentDoctorState(getCurrentDoctor());
       }
     });
 
@@ -291,7 +301,7 @@ export default function App() {
   // Tab Navigation with Admin Panel 2nd Layer Protection & URL Sync
   const handleTabChange = (tab) => {
     if (tab === 'admin') {
-      if (currentDoctor?.role !== 'admin') {
+      if (!isDoctorAtulOrAdmin) {
         return;
       }
       if (!isAdminUnlocked) {
@@ -356,7 +366,7 @@ export default function App() {
     if (j.status === 'approved') return true;
 
     // 2. Administrators see ALL jobs (both approved and pending/under moderation)
-    if (currentDoctor?.role === 'admin') return true;
+    if (isDoctorAtulOrAdmin) return true;
 
     // 3. Logged-in doctor sees their own submission on the Jobs page
     if (currentDoctor) {
@@ -464,7 +474,7 @@ export default function App() {
           />
         )}
 
-        {activeTab === 'admin' && currentDoctor?.role === 'admin' && (
+        {activeTab === 'admin' && isDoctorAtulOrAdmin && (
           isAdminUnlocked ? (
             <AdminPage 
               currentDoctor={currentDoctor}

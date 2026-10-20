@@ -321,6 +321,7 @@ export async function initCloudSync(onDataLoaded) {
   let channelHandler = null;
   if (syncChannel) {
     channelHandler = (event) => {
+      notifyListeners({ type: event?.data?.type || 'local-update' });
       if (event?.data?.type === 'push-success' || event?.data?.type === 'local-update') {
         handleRefresh();
       }

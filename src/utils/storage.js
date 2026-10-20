@@ -1209,13 +1209,14 @@ export function setCurrentDoctor(doctor) {
         expiresAt: Date.now() + SESSION_DURATION_MS // 2 hours fixed session
       };
       sessionStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(sessionData));
-      localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
+      localStorage.setItem(STORAGE_KEYS.CURRENT_DOCTOR, JSON.stringify(sessionData));
     } else {
       sessionStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
       sessionStorage.removeItem('mos_admin_unlocked');
       sessionStorage.removeItem('mos_active_tab');
       localStorage.removeItem(STORAGE_KEYS.CURRENT_DOCTOR);
     }
+    broadcastLocalUpdate();
   } catch (e) {
     console.error('Error setting doctor session', e);
   }
