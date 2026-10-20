@@ -311,8 +311,8 @@ export async function initCloudSync(onDataLoaded) {
   });
   window.addEventListener('online', handleRefresh);
 
-  // 3. Ultra-fast polling every 4 seconds for true live sync without needing to reload or log in/out
-  const intervalId = setInterval(handleRefresh, 4000);
+  // 3. Responsive polling every 10 seconds for live sync without rate-limiting
+  const intervalId = setInterval(handleRefresh, 10000);
 
   return () => {
     window.removeEventListener('focus', handleRefresh);

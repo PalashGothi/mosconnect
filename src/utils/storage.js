@@ -125,8 +125,9 @@ export function applyCloudRecord(record) {
           listingMap.set(cloudL.id, cloudL);
           changed = true;
         } else {
-          const localTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
-          const cloudTime = new Date(cloudL.updatedAt || cloudL.createdAt || 0).getTime();
+          // If local record was never edited (no updatedAt), localTime is 0 so cloud edits always win
+          const localTime = existing.updatedAt ? new Date(existing.updatedAt).getTime() : 0;
+          const cloudTime = cloudL.updatedAt ? new Date(cloudL.updatedAt).getTime() : (existing.updatedAt ? 0 : 1);
           const keepImage = existing.image || cloudL.image;
           const keepImages = (existing.images && existing.images.length > 0) ? existing.images : cloudL.images;
 
@@ -1018,7 +1019,6 @@ export function getListings() {
     if (current.length > 0) {
       if (hasNew || !saved) {
         localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(current));
-        triggerCloudSync();
       }
       return current;
     }

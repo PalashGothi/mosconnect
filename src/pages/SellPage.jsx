@@ -76,12 +76,13 @@ export default function SellPage({
     clinicName: ''
   });
 
-  // Filter listings posted by this doctor
+  // Filter listings posted by this doctor (or all platform listings if Admin)
   const myDoctorListings = listings.filter(l => 
     currentDoctor && (
       l.sellerMembershipNo === currentDoctor.membershipNo ||
       l.sellerMobile === currentDoctor.mobile ||
-      l.sellerName?.toLowerCase() === currentDoctor.name?.toLowerCase()
+      l.sellerName?.toLowerCase() === currentDoctor.name?.toLowerCase() ||
+      currentDoctor.role === 'admin'
     )
   );
 
@@ -418,7 +419,7 @@ export default function SellPage({
             id="tab-my-listings"
           >
             <ListChecks size={16} />
-            <span>My Equipment Listings ({myDoctorListings.length})</span>
+            <span>{currentDoctor?.role === 'admin' ? `Manage All Listings (${myDoctorListings.length})` : `My Equipment Listings (${myDoctorListings.length})`}</span>
           </button>
         </div>
       </div>

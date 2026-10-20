@@ -108,8 +108,9 @@ function syncApiPlugin() {
                 if (!ex) {
                   listingMap.set(key, l);
                 } else {
-                  const exTime = new Date(ex.updatedAt || ex.createdAt || 0).getTime();
-                  const inTime = new Date(l.updatedAt || l.createdAt || 0).getTime();
+                  // If incoming record has no updatedAt, it is an unedited default (inTime = 0)
+                  const exTime = ex.updatedAt ? new Date(ex.updatedAt).getTime() : 0;
+                  const inTime = l.updatedAt ? new Date(l.updatedAt).getTime() : (ex.updatedAt ? 0 : 1);
                   const keepImg = l.image || ex.image;
                   const keepImgs = (l.images && l.images.length > 0) ? l.images : ex.images;
                   if (inTime >= exTime) {

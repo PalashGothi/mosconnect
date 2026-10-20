@@ -418,6 +418,8 @@ export default function App() {
             onAddJob={handleAddJob}
             onUpdateJob={handleAddJob}
             onOpenAuth={() => setIsAuthOpen(true)}
+            onUpdateJobStatus={handleUpdateJobStatus}
+            onDeleteJob={handleDeleteJob}
           />
         )}
 
