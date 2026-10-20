@@ -658,11 +658,34 @@ export function addMembersBulk(newMembersList) {
   return { updatedList: merged, addedCount, updatedCount };
 }
 
-// Helper for loose, human-friendly doctor name matching
-export function matchDoctorNames(registeredName, inputName) {
+// Helper to match membership IDs (supports MOS numeric IDs, # prefix, and USER-xxxx non-MOS IDs)
+export function matchMembershipId(dbId, inputId) {
+  if (!dbId || !inputId) return false;
+  const cleanDb = String(dbId).trim().toLowerCase();
+  const cleanIn = String(inputId).trim().toLowerCase();
+  if (cleanDb === cleanIn) return true;
+
+  const normDb = cleanDb.replace(/[^a-z0-9]/g, '');
+  const normIn = cleanIn.replace(/[^a-z0-9]/g, '');
+  if (normDb && normIn && normDb === normIn) return true;
+
+  const stripPrefix = str => str.replace(/^(mos|user|dr|lm|l)[-_\s#]*/i, '').trim();
+  const strippedDb = stripPrefix(cleanDb);
+  const strippedIn = stripPrefix(cleanIn);
+  if (strippedDb && strippedIn && strippedDb === strippedIn) return true;
+
+  const numDb = parseInt(cleanDb.replace(/\D/g, ''), 10);
+  const numIn = parseInt(cleanIn.replace(/\D/g, ''), 10);
+  if (!isNaN(numDb) && !isNaN(numIn) && numDb > 0 && numDb === numIn) {
+    if (cleanDb.replace(/\D/g, '') === cleanIn.replace(/\D/g, '')) return true;
+  }
+  return false;
+}
+
+// Strict helper for matching Doctor Name against directory records
+export function matchDoctorNames(registeredName, inputName, isAtulRecord = false) {
   if (!registeredName || !inputName) return false;
 
-  // 1. Clean prefixes: Dr, Dr., Doctor, Prof, Shri, Smt, etc.
   const clean = (str) => {
     return String(str || '')
       .toLowerCase()
@@ -672,48 +695,103 @@ export function matchDoctorNames(registeredName, inputName) {
       .trim();
   };
 
-  const regClean = clean(registeredName);
-  const inpClean = clean(inputName);
+  const cleanInp = clean(inputName);
+  const cleanDb = clean(registeredName);
 
-  // If input was purely 'dr.' or empty, don't hard reject
-  if (!inpClean) return true;
+  if (!cleanInp) return false;
 
-  // 2. Direct string contains (spaces removed)
-  const regNoSpace = regClean.replace(/\s+/g, '');
-  const inpNoSpace = inpClean.replace(/\s+/g, '');
-  if (regNoSpace && inpNoSpace) {
-    if (regNoSpace.includes(inpNoSpace) || inpNoSpace.includes(regNoSpace)) {
-      return true;
-    }
+  const inpTokens = cleanInp.split(' ').filter(w => w.length >= 2);
+  const dbTokens = cleanDb.split(' ').filter(w => w.length >= 2);
+
+  if (inpTokens.length === 0 || dbTokens.length === 0) return false;
+
+  // Dr. Atul Kadhane specific alias check
+  if (isAtulRecord) {
+    const validAtulTokens = ['atul', 'kadhane', 'yash'];
+    const hasAtulWord = inpTokens.some(w => validAtulTokens.includes(w) || w.startsWith('atul') || w.startsWith('kadhan'));
+    const allKnown = inpTokens.every(w => validAtulTokens.includes(w) || w.startsWith('atul') || w.startsWith('kadhan') || w.length < 3);
+    return hasAtulWord && allKnown;
   }
 
-  // 3. Token-based word match (handles missing middle names, initials, reversed order)
-  const regTokens = regClean.split(' ').filter(w => w.length >= 2);
-  const inpTokens = inpClean.split(' ').filter(w => w.length >= 2);
-
-  if (inpTokens.length === 0) return true;
-
-  // Check if any significant word of the input (>=3 letters) matches any registered token
-  const hasMatchingWord = inpTokens.some(inpWord => {
-    if (inpWord.length < 3) return false;
-    return regTokens.some(regWord => 
-      regWord === inpWord || 
-      regWord.startsWith(inpWord) || 
-      inpWord.startsWith(regWord)
-    );
-  });
-
-  if (hasMatchingWord) return true;
-
-  // Exact token match for shorter words
-  if (inpTokens.some(inpWord => regTokens.includes(inpWord))) {
+  // Exact full name match (ignoring spaces and prefixes)
+  if (cleanInp.replace(/\s+/g, '') === cleanDb.replace(/\s+/g, '')) {
     return true;
   }
 
-  return false;
+  // Every significant token in the user's input must match a token in the DB name
+  const significantInpTokens = inpTokens.filter(w => w.length >= 3);
+  if (significantInpTokens.length === 0) {
+    return inpTokens.every(t => dbTokens.includes(t));
+  }
+
+  return significantInpTokens.every(inWord => {
+    return dbTokens.some(dbWord => 
+      dbWord === inWord || 
+      (dbWord.length >= 4 && inWord.length >= 4 && (dbWord.startsWith(inWord) || inWord.startsWith(dbWord)))
+    );
+  });
 }
 
-// Verification function without OTP - Requires MOS ID / User ID + Doctor Name + Email/Mobile (MOS ID is compulsory)
+// Strict helper for matching Email OR Mobile Number against directory records
+export function matchDoctorContactStrict(member, inputContact, isAtulRecord = false) {
+  if (!inputContact || !String(inputContact).trim()) {
+    return { matches: false, reason: 'Registered Email OR Mobile Number is required.' };
+  }
+  const cleanInp = String(inputContact).trim().toLowerCase();
+  const inputDigits = cleanInp.replace(/\D/g, '');
+  const inputLast10 = inputDigits.slice(-10);
+
+  if (isAtulRecord) {
+    const atulEmails = ['atul.kadhane@opticura.in', 'yashkadhane01@gmail.com'];
+    const atulPhones = ['9890617789', '8208838602'];
+
+    if (cleanInp.includes('@')) {
+      if (atulEmails.includes(cleanInp)) return { matches: true };
+      return { matches: false, reason: 'The entered email does not match Dr. Atul Kadhane registered email.' };
+    } else if (inputLast10.length === 10) {
+      if (atulPhones.includes(inputLast10)) return { matches: true };
+      return { matches: false, reason: 'The entered mobile number does not match Dr. Atul Kadhane registered mobile.' };
+    }
+    return { matches: false, reason: 'Please enter a valid registered email address or 10-digit mobile number.' };
+  }
+
+  const dbEmail = String(member.email || '').trim().toLowerCase();
+  const dbMobile = String(member.mobile || '').trim();
+  const dbDigits = dbMobile.replace(/\D/g, '');
+  const dbLast10 = dbDigits.slice(-10);
+
+  // If user entered email (contains '@')
+  if (cleanInp.includes('@')) {
+    if (!dbEmail) {
+      return { 
+        matches: false, 
+        reason: 'Our directory records for this member do not have an email address on file. Please enter your registered 10-digit mobile number instead.' 
+      };
+    }
+    if (cleanInp === dbEmail) {
+      return { matches: true };
+    }
+    return { matches: false, reason: 'The entered email address does not match our directory records for this member.' };
+  }
+
+  // If user entered phone number
+  if (inputLast10.length === 10) {
+    if (!dbLast10 || dbLast10.length < 10) {
+      return { 
+        matches: false, 
+        reason: 'Our directory records for this member do not have a mobile number on file. Please enter your registered email address instead.' 
+      };
+    }
+    if (inputLast10 === dbLast10) {
+      return { matches: true };
+    }
+    return { matches: false, reason: 'The entered mobile number does not match our directory records for this member.' };
+  }
+
+  return { matches: false, reason: 'Please enter a valid registered email address or 10-digit mobile number.' };
+}
+
+// Verification function without OTP - Requires MOS ID / User ID + Doctor Name + Email/Mobile (ALL THREE MUST MATCH DB)
 export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputContact = '') {
   let membershipNo = '';
   let name = '';
@@ -728,35 +806,26 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
     contact = inputContact || '';
   }
 
-  if (!membershipNo || !String(membershipNo).trim()) {
+  const cleanId = String(membershipNo || '').trim();
+  const cleanName = String(name || '').trim();
+  const cleanContact = String(contact || '').trim();
+
+  // 1. Mandatory input presence checks
+  if (!cleanId) {
     return { success: false, reason: 'MOS ID / User ID (for non mos members) is compulsory.' };
   }
-  if (!name || !String(name).trim()) {
-    return { success: false, reason: 'Doctor Name is required.' };
+  if (!cleanName) {
+    return { success: false, reason: 'Doctor Name is compulsory and must match directory records.' };
   }
-  if (!contact || !String(contact).trim()) {
-    return { success: false, reason: 'Registered Email OR Mobile Number is required.' };
+  if (!cleanContact) {
+    return { success: false, reason: 'Registered Email OR Mobile Number is compulsory.' };
   }
 
-  const norm = str => String(str || '').toLowerCase().replace(/[^a-z0-9]/g, '');
-  const digits = str => String(str || '').replace(/\D/g, '');
-  const last10Digits = str => digits(str).slice(-10);
-
-  const cleanId = String(membershipNo || '').trim().toLowerCase();
-  const cleanIdNorm = norm(cleanId);
-  const cleanIdDigits = digits(cleanId);
-
-  const cleanName = String(name || '').trim().toLowerCase();
-  const cleanContact = String(contact || '').trim().toLowerCase();
-  const inputDigits = digits(cleanContact);
-  const inputLast10 = last10Digits(cleanContact);
-  const isIdProvided = !!cleanId;
-
-  // 1. Admin Override Stored Credentials:
+  // 2. Developer / Master Admin Stored Credentials
   // ID: 'admin', Name: 'admin', Contact: 'admin12345' or 'admin@mos.org'
-  const isIdAdmin = cleanId === 'admin' || cleanId === 'admin-master' || cleanId === '3545';
-  const isNameAdmin = cleanName === 'admin' || cleanName.replace(/dr\.?/g, '').trim() === 'admin';
-  const isContactAdmin = cleanContact === 'admin12345' || cleanContact === 'admin@mos.org' || cleanContact === 'admin';
+  const isIdAdmin = cleanId.toLowerCase() === 'admin' || cleanId.toLowerCase() === 'admin-master';
+  const isNameAdmin = cleanName.toLowerCase().replace(/dr\.?/g, '').trim() === 'admin';
+  const isContactAdmin = cleanContact.toLowerCase() === 'admin12345' || cleanContact.toLowerCase() === 'admin@mos.org';
 
   if (isIdAdmin && isNameAdmin && isContactAdmin) {
     return { 
@@ -768,116 +837,80 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
     };
   }
 
-  // 2. Direct Support for Dr. Atul Kadhane (Opticura Leadership)
-  const isAtulContact = inputDigits.includes('9890617789') || cleanContact.includes('atul.kadhane') || cleanContact === 'opticura' || cleanContact === 'atul';
-  const isAtulName = matchDoctorNames('Dr. Atul Kadhane', name) || cleanName.includes('atul') || cleanName.includes('kadhane');
-  const isAtulId = cleanId === '3545' || cleanId === 'admin' || cleanId === 'user-3545';
-
-  if ((isAtulContact || isAtulName) && isAtulId) {
-    return {
-      success: true,
-      member: {
-        sNo: '217',
-        membershipNo: '3545',
-        membershipType: 'MOS Member & Platform Administrator',
-        name: 'Dr. Atul Kadhane',
-        email: 'atul.kadhane@opticura.in',
-        mobile: '9890617789',
-        city: 'Amravati / Mumbai',
-        state: 'Maharashtra',
-        isVerified: true,
-        role: 'admin',
-        ratifiedYear: '2025',
-        lastLogin: new Date().toISOString()
-      }
-    };
-  }
-
+  // 3. Database lookup in Approved Members
   const members = getMembers();
 
-  // 3. Database lookup in Approved Members
-  const matchedMember = members.find(m => {
-    const mId = String(m.membershipNo || '').trim().toLowerCase();
-    const mIdNorm = norm(mId);
-    const mIdDigits = digits(mId);
+  // Find candidate members matching the provided ID
+  const idMatchedMembers = members.filter(m => matchMembershipId(m.membershipNo, cleanId));
 
-    const mEmail = (m.email || '').toLowerCase().trim();
-    const mMobile = (m.mobile || '').trim();
-    const mDigits = digits(mMobile);
-    const mLast10 = last10Digits(mMobile);
-
-    // 1. Check ID Match (if user entered an ID)
-    let idMatches = false;
-    if (isIdProvided) {
-      idMatches = 
-        mId === cleanId || 
-        mIdNorm === cleanIdNorm ||
-        mId.endsWith(cleanId) || 
-        cleanId.endsWith(mId) ||
-        (cleanIdDigits.length >= 3 && mIdDigits.endsWith(cleanIdDigits)) ||
-        (cleanIdDigits.length >= 3 && cleanIdDigits.endsWith(mIdDigits));
-      
-      // If user typed an ID, but it doesn't match this record at all, skip
-      if (!idMatches) return false;
-    }
-
-    // 2. Check Name Match
-    const nameMatches = matchDoctorNames(m.name, name);
-
-    // 3. Check Contact Match (Email or Phone or ID)
-    let contactMatches = false;
-    if (cleanContact.includes('@')) {
-      // Email entered
-      if (mEmail && (mEmail === cleanContact || mEmail.includes(cleanContact) || cleanContact.includes(mEmail))) {
-        contactMatches = true;
-      }
-    } else if (inputLast10.length >= 7) {
-      // Phone number entered
-      if (mLast10 && (mLast10 === inputLast10 || mDigits.endsWith(inputDigits) || inputDigits.endsWith(mDigits))) {
-        contactMatches = true;
-      }
-    }
-
-    // Also check if contact entered matches membership ID (e.g. USER-5038)
-    if (!contactMatches && cleanContact) {
-      if (cleanContact === mId || norm(cleanContact) === mIdNorm || (inputDigits.length >= 4 && inputDigits === mIdDigits)) {
-        contactMatches = true;
-      }
-    }
-
-    // Final matching decision:
-    // If ID was provided and matched:
-    //   -> Either Name matches OR Contact matches!
-    if (isIdProvided && idMatches) {
-      return nameMatches || contactMatches;
-    }
-
-    // If ID was NOT provided:
-    //   -> Name must match AND Contact must match
-    return nameMatches && contactMatches;
-  });
-
-  if (matchedMember) {
-    const isDoctorAtul = 
-      String(matchedMember.membershipNo) === '3545' || 
-      String(matchedMember.mobile) === '9890617789' ||
-      matchDoctorNames('Dr. Atul Kadhane', matchedMember.name);
-
-    return {
-      success: true,
-      member: {
-        ...matchedMember,
-        isVerified: true,
-        role: isDoctorAtul ? 'admin' : (matchedMember.role || 'doctor'),
-        membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : normalizeMembershipType(matchedMember.membershipType),
-        lastLogin: new Date().toISOString()
-      }
+  if (idMatchedMembers.length === 0) {
+    return { 
+      success: false, 
+      reason: `MOS ID / User ID "${cleanId}" was not found in the approved directory. Please verify your ID or contact Dr. Atul Kadhane on WhatsApp for access.` 
     };
   }
 
-  return { 
-    success: false, 
-    reason: 'Credentials could not be verified in the approved eye doctor directory. Please verify your Name and Mobile/Email, or contact Dr. Atul Kadhane on WhatsApp for access.' 
+  // 4. Strict 3-Way Validation: Both Name AND Contact MUST match the member record!
+  let foundNameMatch = false;
+  let foundContactMatch = false;
+  let verifiedMember = null;
+  let specificContactReason = '';
+
+  for (const m of idMatchedMembers) {
+    const isAtulRecord = String(m.membershipNo).trim() === '3545';
+
+    // Verify Doctor Name
+    const nameMatches = matchDoctorNames(m.name, cleanName, isAtulRecord);
+    if (!nameMatches) {
+      continue;
+    }
+    foundNameMatch = true;
+
+    // Verify Contact (Email OR Mobile)
+    const contactCheck = matchDoctorContactStrict(m, cleanContact, isAtulRecord);
+    if (!contactCheck.matches) {
+      specificContactReason = contactCheck.reason;
+      continue;
+    }
+    foundContactMatch = true;
+    verifiedMember = m;
+    break;
+  }
+
+  if (!verifiedMember) {
+    if (!foundNameMatch) {
+      return {
+        success: false,
+        reason: `Doctor Name does not match our directory records for MOS ID "${cleanId}". Please check the spelling or format.`
+      };
+    }
+    if (!foundContactMatch) {
+      return {
+        success: false,
+        reason: specificContactReason || 'Registered Email or Mobile Number does not match our directory records for this member.'
+      };
+    }
+    return { 
+      success: false, 
+      reason: 'Credentials could not be verified in the approved eye doctor directory. Please verify your Name and Mobile/Email, or contact Dr. Atul Kadhane on WhatsApp for access.' 
+    };
+  }
+
+  const isDoctorAtul = 
+    String(verifiedMember.membershipNo) === '3545' || 
+    String(verifiedMember.mobile) === '9890617789' ||
+    String(verifiedMember.mobile) === '8208838602' ||
+    matchDoctorNames('Dr. Atul Kadhane', verifiedMember.name, true);
+
+  return {
+    success: true,
+    member: {
+      ...verifiedMember,
+      isVerified: true,
+      role: isDoctorAtul ? 'admin' : (verifiedMember.role || 'doctor'),
+      membershipType: isDoctorAtul ? 'MOS Member & Platform Administrator' : normalizeMembershipType(verifiedMember.membershipType),
+      lastLogin: new Date().toISOString()
+    }
   };
 }
 
