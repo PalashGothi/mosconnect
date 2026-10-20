@@ -16,7 +16,8 @@ import {
   Tag, 
   Wrench, 
   ArrowRight,
-  Share2
+  Share2,
+  Edit2
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { maskMembershipNo, maskDoctorName, maskPrice } from '../utils/masking';
@@ -26,7 +27,8 @@ export default function EquipmentDetailsModal({
   onClose, 
   listing, 
   currentDoctor, 
-  onOpenAuth 
+  onOpenAuth,
+  onEditListing 
 }) {
   const [activeImgIndex, setActiveImgIndex] = useState(0);
   const [copiedShare, setCopiedShare] = useState(false);
@@ -590,28 +592,67 @@ export default function EquipmentDetailsModal({
 
               {/* Action Buttons */}
               {currentDoctor ? (
-                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                  <a 
-                    href={waUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="btn-pluckcard-wa"
-                    style={{ flex: 1, justifyContent: 'center', padding: '10px 16px', fontSize: '0.9rem', borderRadius: '8px' }}
-                    id={`btn-modal-wa-${listing.id}`}
-                  >
-                    <WhatsAppIcon size={18} />
-                    <span>Chat on WhatsApp</span>
-                  </a>
+                <div>
+                  {Boolean(
+                    currentDoctor && (
+                      (listing.sellerMembershipNo && String(listing.sellerMembershipNo).toLowerCase().trim() === String(currentDoctor.membershipNo || '').toLowerCase().trim()) ||
+                      (listing.sellerMobile && String(listing.sellerMobile).replace(/\D/g, '') === String(currentDoctor.mobile || '').replace(/\D/g, '')) ||
+                      currentDoctor.role === 'admin'
+                    )
+                  ) && onEditListing && (
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onEditListing(listing);
+                      }}
+                      style={{
+                        width: '100%',
+                        marginBottom: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '8px',
+                        background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                        color: '#ffffff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 16px',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(2, 132, 199, 0.3)'
+                      }}
+                      id={`btn-modal-edit-owner-${listing.id}`}
+                    >
+                      <Edit2 size={16} />
+                      <span>Edit Your Listing (Change Price / Details)</span>
+                    </button>
+                  )}
 
-                  <a 
-                    href={callUrl} 
-                    className="btn-pluckcard-call"
-                    style={{ flex: 1, justifyContent: 'center', padding: '10px 16px', fontSize: '0.9rem', borderRadius: '8px' }}
-                    id={`btn-modal-call-${listing.id}`}
-                  >
-                    <Phone size={16} />
-                    <span>Call: +91 {listing.sellerMobile}</span>
-                  </a>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                    <a 
+                      href={waUrl} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="btn-pluckcard-wa"
+                      style={{ flex: 1, justifyContent: 'center', padding: '10px 16px', fontSize: '0.9rem', borderRadius: '8px' }}
+                      id={`btn-modal-wa-${listing.id}`}
+                    >
+                      <WhatsAppIcon size={18} />
+                      <span>Chat on WhatsApp</span>
+                    </a>
+
+                    <a 
+                      href={callUrl} 
+                      className="btn-pluckcard-call"
+                      style={{ flex: 1, justifyContent: 'center', padding: '10px 16px', fontSize: '0.9rem', borderRadius: '8px' }}
+                      id={`btn-modal-call-${listing.id}`}
+                    >
+                      <Phone size={16} />
+                      <span>Call: +91 {listing.sellerMobile}</span>
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <div>

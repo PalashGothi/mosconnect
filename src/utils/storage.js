@@ -3,7 +3,7 @@ import initialWantedPosts from '../data/initialWantedPosts.json';
 import initialJobs from '../data/initialJobs.json';
 import mosMembers from '../data/mosMembers.json';
 import vendorsData from '../data/vendors.json';
-import { pushCloudDataDebounced } from '../services/cloudSync.js';
+import { pushCloudDataDebounced, pushCloudDataImmediately } from '../services/cloudSync.js';
 
 const STORAGE_KEYS = {
   LISTINGS: 'mos_eyeequip_listings',
@@ -53,11 +53,8 @@ function unrecordDeletedId(key, id) {
   } catch (e) {}
 }
 
-/**
- * Trigger background push to cloud
- */
-export function triggerCloudSync() {
-  pushCloudDataDebounced(() => ({
+export function getSyncState() {
+  return {
     listings: getListings(),
     wantedPosts: getWantedPosts(),
     jobs: getJobs(),
@@ -69,11 +66,24 @@ export function triggerCloudSync() {
     deletedListingIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_LISTINGS),
     deletedVendorIds: getDeletedIds(TOMBSTONE_KEYS.DELETED_VENDORS),
     lastUpdated: Date.now()
-  }));
+  };
 }
 
 /**
- * Apply cloud data downloaded from cloud storage to local cache using smart bidirectional merge
+ * Trigger background push to cloud
+ */
+export function triggerCloudSync(immediate = false) {
+  if (immediate) {
+    pushCloudDataImmediately(getSyncState);
+  } else {
+    pushCloudDataDebounced(getSyncState);
+  }
+}
+
+/**
+ * Apply cloud data downloaded from cloud storage to local cache using smart bidirectional timestamp-based merge.
+ * This guarantees that edited listing prices, job ads, and member updates sync accurately across devices
+ * without being overwritten by stale records.
  */
 export function applyCloudRecord(record) {
   if (!record || typeof record !== 'object') return false;
@@ -98,7 +108,7 @@ export function applyCloudRecord(record) {
     const deletedVendorIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_VENDORS);
     const deletedMemberIds = getDeletedIds(TOMBSTONE_KEYS.DELETED_MEMBERS);
 
-    // 1. SMART MERGE LISTINGS
+    // 1. SMART MERGE LISTINGS (Last-Write-Wins with image preservation)
     if (Array.isArray(record.listings)) {
       const localListings = getListings();
       const listingMap = new Map();
@@ -115,15 +125,29 @@ export function applyCloudRecord(record) {
           listingMap.set(cloudL.id, cloudL);
           changed = true;
         } else {
-          // Preserve local rich images if cloud copy was sanitized
+          const localTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudL.updatedAt || cloudL.createdAt || 0).getTime();
           const keepImage = existing.image || cloudL.image;
           const keepImages = (existing.images && existing.images.length > 0) ? existing.images : cloudL.images;
-          listingMap.set(cloudL.id, {
-            ...cloudL,
-            ...existing,
-            image: keepImage,
-            images: keepImages
-          });
+
+          if (cloudTime > localTime) {
+            // Cloud has newer edit (e.g. price edited on another device)
+            listingMap.set(cloudL.id, {
+              ...existing,
+              ...cloudL,
+              image: keepImage,
+              images: keepImages
+            });
+            changed = true;
+          } else {
+            // Local is newer or equal; preserve local updates and keep rich images
+            listingMap.set(cloudL.id, {
+              ...cloudL,
+              ...existing,
+              image: keepImage,
+              images: keepImages
+            });
+          }
         }
       });
       localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(Array.from(listingMap.values())));
@@ -154,9 +178,11 @@ export function applyCloudRecord(record) {
           if (allReplies.length !== exReplies.length) {
             changed = true;
           }
+          const localTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudP.updatedAt || cloudP.createdAt || 0).getTime();
+          const base = cloudTime > localTime ? { ...existing, ...cloudP } : { ...cloudP, ...existing };
           postMap.set(cloudP.id, {
-            ...cloudP,
-            ...existing,
+            ...base,
             replies: allReplies
           });
         }
@@ -164,7 +190,7 @@ export function applyCloudRecord(record) {
       localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(Array.from(postMap.values())));
     }
 
-    // 3. SMART MERGE JOBS
+    // 3. SMART MERGE JOBS (Last-Write-Wins with approval preservation)
     if (Array.isArray(record.jobs)) {
       const localJobs = getJobs();
       const jobMap = new Map();
@@ -181,22 +207,34 @@ export function applyCloudRecord(record) {
           jobMap.set(cloudJ.id, cloudJ);
           changed = true;
         } else {
-          // CRITICAL: If job is approved locally or in cloud, keep approved! Never revert to pending
-          const keepStatus = (existing.status === 'approved' || cloudJ.status === 'approved') ? 'approved' : cloudJ.status;
+          const localTime = new Date(existing.updatedAt || existing.postedAt || existing.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudJ.updatedAt || cloudJ.postedAt || cloudJ.createdAt || 0).getTime();
+          // Critical: If job is approved anywhere, keep it approved! Never revert an approved job to pending
+          const keepStatus = (existing.status === 'approved' || cloudJ.status === 'approved') ? 'approved' : (cloudTime >= localTime ? cloudJ.status : existing.status);
           const keepApprovedAt = existing.approvedAt || cloudJ.approvedAt;
           const keepApprovedBy = existing.approvedBy || cloudJ.approvedBy;
           const keepFlyer = existing.flyerImage || cloudJ.flyerImage;
-          if (existing.status !== keepStatus) {
+
+          if (cloudTime > localTime) {
+            jobMap.set(cloudJ.id, {
+              ...existing,
+              ...cloudJ,
+              status: keepStatus,
+              approvedAt: keepApprovedAt,
+              approvedBy: keepApprovedBy,
+              flyerImage: keepFlyer
+            });
             changed = true;
+          } else {
+            jobMap.set(cloudJ.id, {
+              ...cloudJ,
+              ...existing,
+              status: keepStatus,
+              approvedAt: keepApprovedAt,
+              approvedBy: keepApprovedBy,
+              flyerImage: keepFlyer
+            });
           }
-          jobMap.set(cloudJ.id, {
-            ...cloudJ,
-            ...existing,
-            status: keepStatus,
-            approvedAt: keepApprovedAt,
-            approvedBy: keepApprovedBy,
-            flyerImage: keepFlyer
-          });
         }
       });
       localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(Array.from(jobMap.values())));
@@ -213,9 +251,17 @@ export function applyCloudRecord(record) {
       });
       record.vendors.forEach(cloudV => {
         if (!cloudV || !cloudV.id || deletedVendorIds.includes(cloudV.id)) return;
-        if (!vendorMap.has(cloudV.id)) {
+        const existing = vendorMap.get(cloudV.id);
+        if (!existing) {
           vendorMap.set(cloudV.id, cloudV);
           changed = true;
+        } else {
+          const localTime = new Date(existing.updatedAt || existing.createdAt || 0).getTime();
+          const cloudTime = new Date(cloudV.updatedAt || cloudV.createdAt || 0).getTime();
+          if (cloudTime > localTime) {
+            vendorMap.set(cloudV.id, { ...existing, ...cloudV });
+            changed = true;
+          }
         }
       });
       localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(Array.from(vendorMap.values())));
@@ -502,6 +548,7 @@ export function saveMember(newMember) {
     ...newMember,
     name: formatDoctorName(newMember.name),
     isCustom: true,
+    updatedAt: new Date().toISOString(),
     createdAt: newMember.createdAt || new Date().toISOString(),
     membershipType: normalizeMembershipType(newMember.membershipType)
   };
@@ -524,7 +571,7 @@ export function saveMember(newMember) {
     console.error('Failed to persist members to localStorage', e);
   }
 
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -565,7 +612,7 @@ export function deleteMember(membershipNo) {
     console.error('Failed to delete member from localStorage', e);
   }
 
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -890,19 +937,23 @@ export function saveJob(newJob) {
   unrecordDeletedId(TOMBSTONE_KEYS.DELETED_JOBS, newJob.id);
   const jobs = getJobs();
   const index = jobs.findIndex(j => j.id === newJob.id);
+  const stamped = {
+    ...newJob,
+    updatedAt: new Date().toISOString()
+  };
   let updated;
   if (index >= 0) {
     updated = [...jobs];
-    updated[index] = newJob;
+    updated[index] = stamped;
   } else {
-    updated = [newJob, ...jobs];
+    updated = [stamped, ...jobs];
   }
   try {
     localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
   } catch (err) {
     console.error('Failed to save jobs to localStorage:', err);
   }
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -913,6 +964,7 @@ export function updateJobStatus(jobId, status, adminName = 'MOS Admin') {
       return {
         ...job,
         status,
+        updatedAt: new Date().toISOString(),
         approvedAt: status === 'approved' ? new Date().toISOString() : job.approvedAt,
         approvedBy: status === 'approved' ? adminName : job.approvedBy
       };
@@ -920,7 +972,7 @@ export function updateJobStatus(jobId, status, adminName = 'MOS Admin') {
     return job;
   });
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -929,7 +981,7 @@ export function deleteJob(jobId) {
   const jobs = getJobs();
   const updated = jobs.filter(j => j.id !== jobId);
   localStorage.setItem(STORAGE_KEYS.JOBS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -981,15 +1033,19 @@ export function saveListing(newListing) {
   unrecordDeletedId(TOMBSTONE_KEYS.DELETED_LISTINGS, newListing.id);
   const listings = getListings();
   const index = listings.findIndex(l => l.id === newListing.id);
+  const stamped = {
+    ...newListing,
+    updatedAt: new Date().toISOString()
+  };
   let updated;
   if (index >= 0) {
     updated = [...listings];
-    updated[index] = newListing;
+    updated[index] = stamped;
   } else {
-    updated = [newListing, ...listings];
+    updated = [stamped, ...listings];
   }
   localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -998,7 +1054,7 @@ export function deleteListing(id) {
   const listings = getListings();
   const updated = listings.filter(l => l.id !== id);
   localStorage.setItem(STORAGE_KEYS.LISTINGS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -1021,9 +1077,13 @@ export function getWantedPosts() {
 
 export function saveWantedPost(newPost) {
   const posts = getWantedPosts();
-  const updated = [newPost, ...posts];
+  const stamped = {
+    ...newPost,
+    updatedAt: new Date().toISOString()
+  };
+  const updated = [stamped, ...posts];
   localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -1033,13 +1093,14 @@ export function addReplyToPost(postId, reply) {
     if (post.id === postId) {
       return {
         ...post,
+        updatedAt: new Date().toISOString(),
         replies: [...(post.replies || []), reply]
       };
     }
     return post;
   });
   localStorage.setItem(STORAGE_KEYS.WANTED_POSTS, JSON.stringify(updated));
-  triggerCloudSync();
+  triggerCloudSync(true);
   return updated;
 }
 
@@ -1182,18 +1243,22 @@ export function saveVendor(newVendor) {
     unrecordDeletedId(TOMBSTONE_KEYS.DELETED_VENDORS, newVendor.id);
   }
   const vendors = getVendors();
+  const stamped = {
+    ...newVendor,
+    updatedAt: new Date().toISOString()
+  };
   let updated;
   if (newVendor.id) {
     const index = vendors.findIndex(v => v.id === newVendor.id);
     if (index >= 0) {
       updated = [...vendors];
-      updated[index] = { ...updated[index], ...newVendor };
+      updated[index] = { ...updated[index], ...stamped };
     } else {
-      updated = [newVendor, ...vendors];
+      updated = [stamped, ...vendors];
     }
   } else {
     const createdVendor = {
-      ...newVendor,
+      ...stamped,
       id: `v-${Date.now()}`,
       createdAt: new Date().toISOString()
     };
@@ -1201,7 +1266,7 @@ export function saveVendor(newVendor) {
   }
   try {
     localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
-    triggerCloudSync();
+    triggerCloudSync(true);
   } catch (e) {
     console.error('Failed to save vendor to localStorage', e);
   }
@@ -1214,7 +1279,7 @@ export function deleteVendor(id) {
   const updated = vendors.filter(v => v.id !== id);
   try {
     localStorage.setItem(STORAGE_KEYS.VENDORS, JSON.stringify(updated));
-    triggerCloudSync();
+    triggerCloudSync(true);
   } catch (e) {
     console.error('Failed to delete vendor from localStorage', e);
   }

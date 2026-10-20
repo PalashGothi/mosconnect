@@ -384,6 +384,7 @@ export default function App() {
             onOpenPostAd={() => handleTabChange('sell')}
             onNavigateTab={(tab) => handleTabChange(tab)}
             onOpenAuth={() => setIsAuthOpen(true)}
+            onUpdateListing={handleUpdateListing}
           />
         )}
 

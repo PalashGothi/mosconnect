@@ -32,7 +32,7 @@ import OpticuraLogo from '../components/OpticuraLogo';
 import { maskPhone, maskEmail, maskMembershipNo } from '../utils/masking';
 
 // Client-side image compression for flyer uploads so they never exceed quota and sync flawlessly
-const compressFlyerImage = (file, maxWidth = 1000, maxHeight = 1400, quality = 0.82) => {
+const compressFlyerImage = (file, maxWidth = 650, maxHeight = 900, quality = 0.65) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -278,6 +278,7 @@ export default function JobsPage({
       },
       status: currentDoctor.role === 'admin' ? 'approved' : 'pending',
       postedAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
       approvedAt: currentDoctor.role === 'admin' ? new Date().toISOString() : null,
       approvedBy: currentDoctor.role === 'admin' ? currentDoctor.name : null
     };

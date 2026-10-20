@@ -12,7 +12,8 @@ import {
   Sparkles,
   Building2,
   X,
-  Lock
+  Lock,
+  Edit2
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { maskMembershipNo, maskDoctorName, maskTeaser } from '../utils/masking';
@@ -23,7 +24,8 @@ export default function Pluckcard({
   onToggleSave, 
   onOpenDetails, 
   currentDoctor,
-  onOpenAuth
+  onOpenAuth,
+  onEditListing
 }) {
   const [copiedShare, setCopiedShare] = useState(false);
 
@@ -200,6 +202,45 @@ export default function Pluckcard({
               {listing.isNegotiable ? 'Negotiable' : 'Fixed Price'}
             </span>
           </div>
+
+          {/* Owner Edit Quick Action */}
+          {Boolean(
+            currentDoctor && (
+              (listing.sellerMembershipNo && String(listing.sellerMembershipNo).toLowerCase().trim() === String(currentDoctor.membershipNo || '').toLowerCase().trim()) ||
+              (listing.sellerMobile && String(listing.sellerMobile).replace(/\D/g, '') === String(currentDoctor.mobile || '').replace(/\D/g, '')) ||
+              currentDoctor.role === 'admin'
+            )
+          ) && onEditListing && (
+            <button 
+              type="button"
+              className="btn-pluckcard-edit-owner"
+              onClick={(e) => {
+                e.stopPropagation();
+                onEditListing(listing);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                background: 'linear-gradient(135deg, #0284c7 0%, #0369a1 100%)',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                padding: '7px 12px',
+                fontSize: '0.8rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                width: '100%',
+                marginBottom: '8px',
+                boxShadow: '0 2px 6px rgba(2, 132, 199, 0.25)'
+              }}
+              id={`btn-edit-owner-${listing.id}`}
+            >
+              <Edit2 size={13} />
+              <span>Edit Price & Ad (Your Listing)</span>
+            </button>
+          )}
 
           {/* Action buttons */}
           <div className="pluckcard-action-bar">
