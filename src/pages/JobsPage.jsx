@@ -32,7 +32,7 @@ import OpticuraLogo from '../components/OpticuraLogo';
 import { maskPhone, maskEmail, maskMembershipNo } from '../utils/masking';
 
 // Client-side image compression for flyer uploads so they never exceed quota and sync flawlessly
-const compressFlyerImage = (file, maxWidth = 650, maxHeight = 900, quality = 0.65) => {
+const compressFlyerImage = (file, maxWidth = 550, maxHeight = 800, quality = 0.6) => {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -51,7 +51,15 @@ const compressFlyerImage = (file, maxWidth = 650, maxHeight = 900, quality = 0.6
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+
+        let q = quality;
+        let dataUrl = canvas.toDataURL('image/jpeg', q);
+        // Adaptive quality reduction to guarantee dataUrl stays under 55,000 characters (~38KB)
+        while (dataUrl.length > 55000 && q > 0.25) {
+          q -= 0.08;
+          dataUrl = canvas.toDataURL('image/jpeg', q);
+        }
+        resolve(dataUrl);
       };
       img.onerror = () => resolve(event.target.result);
       img.src = event.target.result;

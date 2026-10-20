@@ -193,11 +193,11 @@ export default async function handler(req, res) {
         lastUpdated: Date.now()
       };
 
-      // 80KB Quota Safeguard: Ensure total JSON size never exceeds ExtendsClass 100KB limit
+      // 92KB Quota Safeguard: Ensure total JSON size never exceeds ExtendsClass 100KB limit
       let payloadJson = JSON.stringify(mergedPayload);
-      if (payloadJson.length > 80000) {
+      if (payloadJson.length > 92000) {
         mergedPayload.jobs = (mergedPayload.jobs || []).map(j => {
-          if (j && j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length > 30000) {
+          if (j && j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length > 65000) {
             return { ...j, flyerImage: '' };
           }
           return j;

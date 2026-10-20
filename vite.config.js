@@ -223,12 +223,12 @@ function syncApiPlugin() {
                 fs.writeFileSync(STATE_FILE, JSON.stringify(cacheState, null, 2), 'utf8');
               } catch (err) {}
 
-              // Asynchronously push to upstream cloud storage bin with 80KB quota safeguard
+              // Asynchronously push to upstream cloud storage bin with 92KB quota safeguard
               let upstreamPayload = { ...cacheState };
               let payloadJson = JSON.stringify(upstreamPayload);
-              if (payloadJson.length > 80000) {
+              if (payloadJson.length > 92000) {
                 upstreamPayload.jobs = (upstreamPayload.jobs || []).map(j => {
-                  if (j && j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length > 30000) {
+                  if (j && j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length > 65000) {
                     return { ...j, flyerImage: '' };
                   }
                   return j;
