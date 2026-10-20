@@ -19,6 +19,16 @@ let hasPendingPush = false;
 let pendingStateGetter = null;
 const listeners = new Set();
 
+const syncChannel = (typeof window !== 'undefined' && 'BroadcastChannel' in window)
+  ? new BroadcastChannel('mos_connect_sync_channel')
+  : null;
+
+export function broadcastLocalUpdate() {
+  try {
+    syncChannel?.postMessage({ type: 'local-update', timestamp: Date.now() });
+  } catch (e) {}
+}
+
 export function subscribeCloudSync(listener) {
   listeners.add(listener);
   return () => listeners.delete(listener);
@@ -214,6 +224,9 @@ async function executePush(getStateFn) {
 
     if (success) {
       notifyListeners({ type: 'push-success', timestamp: Date.now() });
+      try {
+        syncChannel?.postMessage({ type: 'push-success', timestamp: Date.now() });
+      } catch (e) {}
     }
   } catch (err) {
     console.warn('[CloudSync] Network error during pushCloudData:', err);
@@ -284,7 +297,8 @@ export async function forceSyncNow(onDataLoaded) {
  * 1. Performs initial fetch from cloud
  * 2. Syncs into localStorage
  * 3. Sets up background refresh when window is focused or tab becomes visible
- * 4. Periodic background polling every 4 seconds for real-time live synchronization between phone and laptop
+ * 4. Periodic background polling every 3.5 seconds for real-time live synchronization between phone and laptop
+ * 5. Instant BroadcastChannel communication across open tabs and windows
  */
 export async function initCloudSync(onDataLoaded) {
   // 1. Initial pull
@@ -303,6 +317,17 @@ export async function initCloudSync(onDataLoaded) {
     }
   };
 
+  // Cross-tab immediate synchronization via BroadcastChannel
+  let channelHandler = null;
+  if (syncChannel) {
+    channelHandler = (event) => {
+      if (event?.data?.type === 'push-success' || event?.data?.type === 'local-update') {
+        handleRefresh();
+      }
+    };
+    syncChannel.addEventListener('message', channelHandler);
+  }
+
   window.addEventListener('focus', handleRefresh);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
@@ -311,10 +336,13 @@ export async function initCloudSync(onDataLoaded) {
   });
   window.addEventListener('online', handleRefresh);
 
-  // 3. Responsive polling every 10 seconds for live sync without rate-limiting
-  const intervalId = setInterval(handleRefresh, 10000);
+  // 3. Fast responsive polling every 3.5 seconds for instant multi-device sync
+  const intervalId = setInterval(handleRefresh, 3500);
 
   return () => {
+    if (syncChannel && channelHandler) {
+      syncChannel.removeEventListener('message', channelHandler);
+    }
     window.removeEventListener('focus', handleRefresh);
     window.removeEventListener('online', handleRefresh);
     clearInterval(intervalId);

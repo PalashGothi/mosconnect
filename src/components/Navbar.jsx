@@ -286,6 +286,9 @@ export default function Navbar({
                         gap: '8px'
                       }}
                       onClick={() => {
+                        try {
+                          sessionStorage.setItem('mos_sell_subtab', 'my-listings');
+                        } catch (e) {}
                         setActiveTab('sell');
                         setShowProfileMenu(false);
                       }}

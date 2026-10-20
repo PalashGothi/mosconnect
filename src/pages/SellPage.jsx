@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   PlusCircle, 
   ListChecks, 
@@ -34,8 +34,28 @@ export default function SellPage({
   onOpenAuth,
   onViewOnBuyPage
 }) {
-  const [activeSubTab, setActiveSubTab] = useState('post'); // 'post' or 'my-listings'
+  const [activeSubTab, setActiveSubTab] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('mos_sell_subtab');
+      if (saved) {
+        sessionStorage.removeItem('mos_sell_subtab');
+        return saved;
+      }
+    } catch (e) {}
+    return 'post';
+  });
   const [successToast, setSuccessToast] = useState('');
+
+  // Watch for subtab requests
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('mos_sell_subtab');
+      if (saved) {
+        sessionStorage.removeItem('mos_sell_subtab');
+        setActiveSubTab(saved);
+      }
+    } catch (e) {}
+  }, [listings, currentDoctor]);
 
   // Edit Listing State
   const [editingListing, setEditingListing] = useState(null);

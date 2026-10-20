@@ -152,6 +152,9 @@ export default function BuyPage({
     if (onUpdateListing) {
       onUpdateListing(updatedListing);
     }
+    if (selectedListing?.id === updatedListing.id) {
+      setSelectedListing(updatedListing);
+    }
     setShowEditModal(false);
     setEditingListing(null);
     setSuccessToast(`Price & Ad updated! "${updatedListing.title}" (${updatedListing.priceFormatted}) has been saved and synced to cloud.`);

@@ -3,7 +3,7 @@ import initialWantedPosts from '../data/initialWantedPosts.json';
 import initialJobs from '../data/initialJobs.json';
 import mosMembers from '../data/mosMembers.json';
 import vendorsData from '../data/vendors.json';
-import { pushCloudDataDebounced, pushCloudDataImmediately } from '../services/cloudSync.js';
+import { pushCloudDataDebounced, pushCloudDataImmediately, broadcastLocalUpdate } from '../services/cloudSync.js';
 
 const STORAGE_KEYS = {
   LISTINGS: 'mos_eyeequip_listings',
@@ -73,6 +73,9 @@ export function getSyncState() {
  * Trigger background push to cloud
  */
 export function triggerCloudSync(immediate = false) {
+  try {
+    broadcastLocalUpdate();
+  } catch (e) {}
   if (immediate) {
     pushCloudDataImmediately(getSyncState);
   } else {
@@ -131,8 +134,8 @@ export function applyCloudRecord(record) {
           const keepImage = existing.image || cloudL.image;
           const keepImages = (existing.images && existing.images.length > 0) ? existing.images : cloudL.images;
 
-          if (cloudTime > localTime) {
-            // Cloud has newer edit (e.g. price edited on another device)
+          if (cloudTime >= localTime) {
+            // Cloud has newer or current edit (e.g. price/details edited on another device or admin console)
             listingMap.set(cloudL.id, {
               ...existing,
               ...cloudL,
@@ -141,7 +144,7 @@ export function applyCloudRecord(record) {
             });
             changed = true;
           } else {
-            // Local is newer or equal; preserve local updates and keep rich images
+            // Local is newer; preserve local updates and keep rich images
             listingMap.set(cloudL.id, {
               ...cloudL,
               ...existing,

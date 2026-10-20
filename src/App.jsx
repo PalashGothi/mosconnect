@@ -35,7 +35,7 @@ import {
   toggleSaveItem,
   applyCloudRecord
 } from './utils/storage';
-import { initCloudSync, forceSyncNow } from './services/cloudSync';
+import { initCloudSync, forceSyncNow, subscribeCloudSync } from './services/cloudSync';
 import { 
   Eye, 
   ShieldCheck, 
@@ -113,6 +113,13 @@ export default function App() {
       console.warn('Cloud sync init error', err);
     });
 
+    // Reactive listener for push/pull cloud sync events
+    const unsubCloudSync = subscribeCloudSync((event) => {
+      if (event?.type === 'push-success' || event?.type === 'pull-success') {
+        refreshAllState();
+      }
+    });
+
     // Cross-tab and window local storage sync
     const handleStorageChange = (e) => {
       if (e.key === 'mos_eyeequip_current_doctor') {
@@ -125,6 +132,9 @@ export default function App() {
     return () => {
       if (typeof cleanupFn === 'function') {
         cleanupFn();
+      }
+      if (typeof unsubCloudSync === 'function') {
+        unsubCloudSync();
       }
       window.removeEventListener('storage', handleStorageChange);
     };
@@ -340,7 +350,30 @@ export default function App() {
     });
   };
 
-  const approvedJobsCount = jobs.filter(j => j.status === 'approved').length;
+  // Visible jobs count dynamically matching what is visible to this doctor/admin on JobsPage
+  const visibleJobsCount = jobs.filter(j => {
+    // 1. Approved jobs are visible to everyone
+    if (j.status === 'approved') return true;
+
+    // 2. Administrators see ALL jobs (both approved and pending/under moderation)
+    if (currentDoctor?.role === 'admin') return true;
+
+    // 3. Logged-in doctor sees their own submission on the Jobs page
+    if (currentDoctor) {
+      const p = j.postedBy || {};
+      const docMobile = currentDoctor.mobile ? currentDoctor.mobile.replace(/\D/g, '') : '';
+      const pMobile = p.mobile ? p.mobile.replace(/\D/g, '') : '';
+      const docEmail = currentDoctor.email ? currentDoctor.email.toLowerCase().trim() : '';
+      const pEmail = p.email ? p.email.toLowerCase().trim() : '';
+      const docName = currentDoctor.name ? currentDoctor.name.toLowerCase().trim() : '';
+      const pName = p.name ? p.name.toLowerCase().trim() : '';
+      if (currentDoctor.membershipNo && p.membershipNo === currentDoctor.membershipNo) return true;
+      if (docMobile && pMobile && (pMobile === docMobile || pMobile.endsWith(docMobile) || docMobile.endsWith(pMobile))) return true;
+      if (docEmail && pEmail && pEmail === docEmail) return true;
+      if (docName && pName && (pName.includes(docName) || docName.includes(pName))) return true;
+    }
+    return false;
+  }).length;
   const pendingJobsCount = jobs.filter(j => j.status === 'pending').length;
 
   return (
@@ -356,7 +389,7 @@ export default function App() {
         listingsCount={listings.length}
         wantedCount={wantedPosts.length}
         vendorsCount={vendors.length}
-        jobsCount={approvedJobsCount}
+        jobsCount={visibleJobsCount}
         pendingJobsCount={pendingJobsCount}
       />
 
@@ -369,7 +402,7 @@ export default function App() {
             currentDoctor={currentDoctor}
             listingsCount={listings.length}
             vendorsCount={vendors.length}
-            jobsCount={approvedJobsCount}
+            jobsCount={visibleJobsCount}
             wantedCount={wantedPosts.length}
           />
         )}
