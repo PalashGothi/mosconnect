@@ -22,7 +22,7 @@ import {
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import OpticuraLogo from './OpticuraLogo';
-import { OPTICURA_CONTACT } from '../data/opticuraProducts';
+import { OPTICURA_CONTACT, NON_MEMBER_WHATSAPP_GROUP } from '../data/opticuraProducts';
 
 export default function Navbar({ 
   activeTab, 
@@ -64,13 +64,14 @@ export default function Navbar({
           <span>Premier Ophthalmic Platform for Eye Care Professionals</span>
           <span style={{ opacity: 0.5 }}>•</span>
           <a
-            href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am interested in accessing the MOS Connect platform supported by Opticura.')}`}
+            href={NON_MEMBER_WHATSAPP_GROUP.url}
             target="_blank"
             rel="noopener noreferrer"
+            title="Non-member? Join WhatsApp Group to share your Name, Number & Practice Area for User ID"
             style={{ color: '#4ade80', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
           >
             <WhatsAppIcon size={13} />
-            <span>Non-member? Contact Dr. Atul Kadhane (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
+            <span>Non-member? Join WhatsApp Group for Access</span>
           </a>
         </div>
         <div className="active-members-count" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

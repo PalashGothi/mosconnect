@@ -20,7 +20,8 @@ import OpticuraLogo from '../components/OpticuraLogo';
 import WhatsAppIcon from '../components/WhatsAppIcon';
 import { 
   OPTICURA_PRODUCTS, 
-  OPTICURA_CONTACT 
+  OPTICURA_CONTACT,
+  NON_MEMBER_WHATSAPP_GROUP
 } from '../data/opticuraProducts';
 
 export default function HomePage({ 
@@ -46,17 +47,17 @@ export default function HomePage({
                 Not an MOS member but want to use the application?
               </h3>
               <p className="flank-desc">
-                Connect directly for clinic onboarding, equipment inspection, or institutional access.
+                Join our onboarding group and send your <strong>Name, Number & Practice Area</strong> to receive your User ID.
               </p>
               <a
-                href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am not an MOS member but want to use the MOS Connect application.')}`}
+                href={NON_MEMBER_WHATSAPP_GROUP.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-flank-wa"
                 id="btn-flank-wa-left"
               >
                 <WhatsAppIcon size={16} />
-                <span>Contact on WhatsApp</span>
+                <span>Join Access Group on WhatsApp</span>
               </a>
             </div>
 
@@ -324,19 +325,20 @@ export default function HomePage({
                 Not an MOS Member Interested in this Platform?
               </h4>
               <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '3px 0 0 0' }}>
-                For non-member access, vendor directory listings, or Opticura institutional pharmaceutical supply, connect directly with Dr. Atul Kadhane.
+                Join our WhatsApp onboarding group and post your <strong>Name</strong>, <strong>Mobile Number</strong>, and <strong>Practice Area / City</strong> so Dr. Atul Kadhane can create your User ID to access MOS Connect.
               </p>
             </div>
           </div>
 
           <a 
-            href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am interested in accessing or listing on the MOS Connect platform supported by Opticura.')}`}
+            href={NON_MEMBER_WHATSAPP_GROUP.url}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-contact-dr-atul-large"
+            id="btn-nonmember-group-large"
           >
             <WhatsAppIcon size={18} />
-            <span>WhatsApp Dr. Atul Kadhane: {OPTICURA_CONTACT.whatsappNumber}</span>
+            <span>Join WhatsApp Group for User ID</span>
           </a>
         </div>
       </section>

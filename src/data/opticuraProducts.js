@@ -1,8 +1,16 @@
+export const NON_MEMBER_WHATSAPP_GROUP = {
+  url: 'https://chat.whatsapp.com/E4tFpEjfkPJ4iKYxQmGPSS?s=cl&p=i&mlu=4&ilr=4&iam=0',
+  shortUrl: 'https://chat.whatsapp.com/E4tFpEjfkPJ4iKYxQmGPSS',
+  requiredFormat: 'Name, Mobile Number, and Practice Area / City',
+  instructionText: 'Please send a message with your Name, Mobile Number, and Practice Area / City so that Dr. Atul Kadhane can create your User ID to access MOS Connect.'
+};
+
 export const OPTICURA_CONTACT = {
   drName: 'Dr. Atul Kadhane',
   whatsappNumber: '9890617789',
   phoneFormatted: '+91 98906 17789',
-  waUrl: 'https://wa.me/919890617789'
+  waUrl: 'https://wa.me/919890617789',
+  nonMemberGroupUrl: NON_MEMBER_WHATSAPP_GROUP.url
 };
 
 export const OPTICURA_PRODUCTS = [

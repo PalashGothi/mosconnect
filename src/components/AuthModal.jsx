@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import OpticuraLogo from './OpticuraLogo';
-import { OPTICURA_CONTACT } from '../data/opticuraProducts';
+import { OPTICURA_CONTACT, NON_MEMBER_WHATSAPP_GROUP } from '../data/opticuraProducts';
 import { verifyDoctorLogin, applyCloudRecord } from '../utils/storage';
 import { fetchLatestCloudData } from '../services/cloudSync';
 
@@ -211,7 +211,7 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 <ArrowRight size={18} />
               </button>
 
-              {/* Not an MOS Member? Contact Dr. Atul Kadhane */}
+              {/* Not an MOS Member? Join WhatsApp Group for Access */}
               <div 
                 style={{ 
                   marginTop: '20px', 
@@ -223,13 +223,13 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                 }}
               >
                 <div style={{ fontSize: '0.86rem', fontWeight: 800, color: '#166534', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                  <span>Not an MOS Member?</span>
+                  <span>Not an MOS Member? Request Access</span>
                 </div>
-                <p style={{ fontSize: '0.8rem', color: '#374151', margin: '4px 0 10px 0', lineHeight: 1.4 }}>
-                  Interested in accessing this platform, selling equipment, or joining the network? Contact <strong>{OPTICURA_CONTACT.drName}</strong> directly on WhatsApp.
+                <p style={{ fontSize: '0.8rem', color: '#374151', margin: '4px 0 10px 0', lineHeight: 1.45 }}>
+                  Non-MOS ophthalmologists and eye care specialists can join our WhatsApp onboarding group to get an access ID created:
                 </p>
                 <a
-                  href={`https://wa.me/91${OPTICURA_CONTACT.whatsappNumber}?text=${encodeURIComponent('Hello Dr. Atul Kadhane, I am not currently an MOS member, but I am interested in accessing / joining the MOS Connect platform supported by Opticura.')}`}
+                  href={NON_MEMBER_WHATSAPP_GROUP.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
@@ -241,17 +241,32 @@ export default function AuthModal({ isOpen, onClose, onLoginSuccess }) {
                     color: '#ffffff',
                     fontWeight: 700,
                     fontSize: '0.84rem',
-                    padding: '9px 16px',
+                    padding: '10px 16px',
                     borderRadius: '8px',
                     textDecoration: 'none',
                     boxShadow: '0 2px 8px rgba(37, 211, 102, 0.3)',
-                    width: '100%'
+                    width: '100%',
+                    boxSizing: 'border-box'
                   }}
-                  id="btn-auth-contact-dr-atul"
+                  id="btn-auth-join-whatsapp-group"
                 >
                   <WhatsAppIcon size={16} />
-                  <span>Chat with {OPTICURA_CONTACT.drName} (+91 {OPTICURA_CONTACT.whatsappNumber})</span>
+                  <span>Join WhatsApp Group for User ID</span>
                 </a>
+                <div style={{
+                  marginTop: '10px',
+                  background: '#ffffff',
+                  border: '1px dashed #22c55e',
+                  borderRadius: '8px',
+                  padding: '9px 12px',
+                  fontSize: '0.74rem',
+                  color: '#15803d',
+                  textAlign: 'left',
+                  lineHeight: 1.45
+                }}>
+                  📌 <strong>Format to send in the group:</strong><br />
+                  "Please send message with your <strong>Name</strong>, <strong>Mobile Number</strong>, and <strong>Practice Area / City</strong> so that your User ID will be created to access MOS Connect."
+                </div>
               </div>
             </form>
           )}

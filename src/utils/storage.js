@@ -895,7 +895,7 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
     }
     return { 
       success: false, 
-      reason: 'Credentials could not be verified in the approved eye doctor directory. Please verify your Name and Mobile/Email, or contact Dr. Atul Kadhane on WhatsApp for access.' 
+      reason: 'Credentials could not be verified in the approved eye doctor directory. Please verify your Name and Mobile/Email, or join our WhatsApp access group below to get a User ID created.' 
     };
   }
 

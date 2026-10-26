@@ -10,6 +10,7 @@ import AdminPage from './pages/AdminPage';
 import AdminSecurityModal from './components/AdminSecurityModal';
 import CommonChatBoard from './components/CommonChatBoard';
 import OpticuraLogo from './components/OpticuraLogo';
+import { NON_MEMBER_WHATSAPP_GROUP } from './data/opticuraProducts';
 import { 
   getListings, 
   saveListing, 
@@ -595,10 +596,10 @@ export default function App() {
           <div>
             <h4 style={{ color: '#ffffff', fontSize: '0.95rem', marginBottom: '14px', fontWeight: 700 }}>Non-MOS Inquiries</h4>
             <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '10px' }}>
-              If you are not an MOS member and interested in joining or utilizing this platform, please reach out directly:
+              If you are not an MOS member, join our WhatsApp onboarding group and post your <strong>Name</strong>, <strong>Mobile Number</strong>, and <strong>Practice Area / City</strong> to receive your User ID:
             </p>
             <a 
-              href="https://wa.me/919890617789?text=Hello%20Dr.%20Atul%20Kadhane,%20I%20am%20interested%20in%20the%20MOS%20Connect%20platform%20(Supported%20by%20Opticura)."
+              href={NON_MEMBER_WHATSAPP_GROUP.url}
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -608,14 +609,15 @@ export default function App() {
                 background: 'rgba(34, 197, 94, 0.15)',
                 border: '1px solid #22c55e',
                 color: '#4ade80',
-                padding: '6px 12px',
+                padding: '7px 14px',
                 borderRadius: '8px',
                 fontSize: '0.82rem',
                 fontWeight: 700,
                 textDecoration: 'none'
               }}
+              id="btn-footer-non-member-wa"
             >
-              <span>💬 Contact Dr. Atul Kadhane: 9890617789</span>
+              <span>👥 Join WhatsApp Access Group</span>
             </a>
           </div>
         </div>
