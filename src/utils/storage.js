@@ -388,7 +388,7 @@ export const DEVELOPER_ADMIN_ACCOUNT = {
 // ================= MEMBER MANAGEMENT =================
 export function normalizeMembershipType(type) {
   const t = String(type || '').trim().toLowerCase();
-  if (t === 'non mos member' || t === 'non mos' || t === 'non-mos member') {
+  if (t === 'non mos member' || t === 'non mos' || t === 'non-mos member' || t.includes('non') || t.includes('guest') || t.includes('external')) {
     return 'NON MOS Member';
   }
   return 'MOS Member';

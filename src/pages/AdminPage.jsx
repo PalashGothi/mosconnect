@@ -267,12 +267,26 @@ export default function AdminPage({
       return;
     }
 
-    const assignedId = manualMember.membershipNo.trim() || `USER-${Math.floor(1000 + Math.random() * 9000)}`;
+    let assignedId = manualMember.membershipNo.trim();
+    if (!assignedId) {
+      let maxNum = 5000;
+      members.forEach(m => {
+        const raw = String(m.membershipNo || '').trim();
+        const match = raw.match(/^USER-(\d+)$/i);
+        if (match) {
+          const num = parseInt(match[1], 10);
+          if (!isNaN(num) && num > maxNum) maxNum = num;
+        }
+      });
+      assignedId = `USER-${maxNum + 1}`;
+    }
+
+    const assignedType = manualMember.membershipType || (assignedId.toUpperCase().startsWith('USER-') ? 'NON MOS Member' : 'MOS Member');
 
     const newMem = {
       sNo: String(members.length + 1),
       membershipNo: assignedId,
-      membershipType: manualMember.membershipType || 'MOS Member',
+      membershipType: assignedType,
       name: formatDoctorName(manualMember.name),
       email: manualMember.email.trim().toLowerCase(),
       mobile: manualMember.mobile.trim().replace(/\D/g, ''),
@@ -439,7 +453,7 @@ export default function AdminPage({
     setTimeout(() => setUploadStats(null), 4000);
   };
 
-  // Handle Excel Upload
+  // Handle Excel Upload (supports both standard MOS sheets and Non-MOS member sheets without membership numbers)
   const handleExcelUpload = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -464,56 +478,184 @@ export default function AdminPage({
           return;
         }
 
-        // Map column headers flexible to MOS format
+        // Set of existing membership IDs in lowercase for collision avoidance
+        const existingIdSet = new Set(members.map(m => String(m.membershipNo || '').toLowerCase().trim()));
+
+        // Find the highest existing numeric ID in USER-XXXX format (minimum base 5000)
+        let maxUserNum = 5000;
+        members.forEach(m => {
+          const raw = String(m.membershipNo || '').trim();
+          const match = raw.match(/^USER-(\d+)$/i);
+          if (match) {
+            const num = parseInt(match[1], 10);
+            if (!isNaN(num) && num > maxUserNum) {
+              maxUserNum = num;
+            }
+          }
+        });
+        let nextUserNum = maxUserNum + 1;
+
+        // Clean phone helper
+        const cleanPhone = (val) => {
+          if (!val) return '';
+          let str = String(val).trim();
+          if (str.includes('e+') || str.includes('E+')) {
+            const num = Number(str);
+            if (!isNaN(num)) str = num.toFixed(0);
+          }
+          const digits = str.replace(/\D/g, '');
+          if (digits.length === 12 && digits.startsWith('91')) return digits.slice(2);
+          if (digits.length === 11 && digits.startsWith('0')) return digits.slice(1);
+          return digits;
+        };
+
+        // Map column headers flexible to both MOS format and Non-MOS WhatsApp lists
         const parsedMembers = [];
-        rawRows.forEach((row, idx) => {
-          // Normalize keys
+        rawRows.forEach((row) => {
           const keys = Object.keys(row);
+          if (keys.length === 0) return;
+
+          // Flexible header finder with exact match priority
           const findVal = (terms) => {
-            const k = keys.find(key => terms.some(t => key.toLowerCase().replace(/[^a-z]/g, '').includes(t)));
-            return k ? String(row[k]).trim() : '';
+            // 1. Exact match after stripping non-alphanumeric
+            for (const term of terms) {
+              const kExact = keys.find(key => key.toLowerCase().replace(/[^a-z0-9]/g, '') === term);
+              if (kExact && String(row[kExact]).trim()) return String(row[kExact]).trim();
+            }
+            // 2. Substring match
+            for (const term of terms) {
+              const kSub = keys.find(key => key.toLowerCase().replace(/[^a-z0-9]/g, '').includes(term));
+              if (kSub && String(row[kSub]).trim()) return String(row[kSub]).trim();
+            }
+            return '';
           };
 
-          const memNo = findVal(['membershipno', 'memberno', 'memno', 'membership']);
-          const name = findVal(['name', 'doctorname', 'drname']);
-          
-          if (memNo && name) {
-            const email = findVal(['email', 'mail']);
-            const mobile = findVal(['mobile', 'phone', 'contact']).replace(/\D/g, '');
-            const typeRaw = findVal(['membershiptype', 'type']);
-            const type = (typeRaw && typeRaw.toLowerCase().includes('non')) ? 'NON MOS Member' : 'MOS Member';
-            const city = findVal(['city']) || 'Maharashtra';
-            const state = findVal(['state']) || 'Maharashtra';
-            const address = findVal(['address', 'clinic']);
-            const ratified = findVal(['ratifiedyear', 'ratified', 'year']);
+          const rawName = findVal([
+            'doctorname', 'drname', 'fullname', 'membername', 'nameofdoctor', 
+            'doctor', 'name', 'dr', 'candidate', 'applicant', 'member'
+          ]);
 
-            parsedMembers.push({
-              sNo: String(members.length + idx + 1),
-              membershipNo: memNo,
-              membershipType: type,
-              name: formatDoctorName(name),
-              email: email.toLowerCase(),
-              mobile: mobile,
-              address: address,
-              city: city,
-              state: state,
-              ratifiedYear: ratified
+          // Doctor name is the primary required field
+          if (!rawName || !rawName.trim()) return;
+
+          // Membership No / User ID (Optional for Non-MOS)
+          const explicitMemNo = findVal([
+            'membershipno', 'memberno', 'memno', 'membershipnumber', 'membershipid', 'userid', 'mosid', 'user'
+          ]) || (() => {
+            const idKey = keys.find(key => {
+              const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+              return cleanKey === 'id' || cleanKey === 'membership' || cleanKey === 'mosno';
             });
+            return idKey ? String(row[idKey]).trim() : '';
+          })();
+
+          // Mobile / Phone / WhatsApp
+          const rawMobile = findVal([
+            'mobileno', 'phoneno', 'contactno', 'whatsappno', 'mobile', 'phone', 'whatsapp', 'contact', 'cell'
+          ]) || (() => {
+            const numKey = keys.find(key => {
+              const cleanKey = key.toLowerCase().replace(/[^a-z0-9]/g, '');
+              const isExcluded = cleanKey.includes('member') || cleanKey.includes('membership') || cleanKey.includes('sno') || cleanKey.includes('srno') || cleanKey.includes('id');
+              return !isExcluded && (cleanKey === 'number' || cleanKey.includes('number'));
+            });
+            return numKey ? String(row[numKey]).trim() : '';
+          })();
+
+          const mobile = cleanPhone(rawMobile);
+
+          // Practice Area / City / Location
+          const practiceAreaRaw = findVal([
+            'practiceofarea', 'practicearea', 'areaofpractice', 'area', 'location', 
+            'practicelocation', 'city', 'town', 'district', 'place', 'clinic', 'hospital', 'address'
+          ]);
+          const explicitCity = findVal(['city', 'town', 'district']);
+          const explicitAddress = findVal(['address', 'clinic', 'hospital']);
+
+          const city = explicitCity || practiceAreaRaw || 'Maharashtra';
+          const address = explicitAddress || (practiceAreaRaw && practiceAreaRaw !== city ? practiceAreaRaw : '');
+
+          const email = findVal(['email', 'emailid', 'mail', 'emailaddress']);
+          const typeRaw = findVal(['membershiptype', 'membershiptyp', 'type', 'category', 'status']);
+          const ratified = findVal(['ratifiedyear', 'ratified', 'year']);
+
+          // Determine membership number and auto-generate if missing
+          let assignedMemNo = explicitMemNo.trim();
+          let isGeneratedId = false;
+
+          if (!assignedMemNo) {
+            // Check if member already exists by exact 10-digit mobile number
+            const mobile10 = mobile.slice(-10);
+            let existingMemberByMobile = null;
+            if (mobile10 && mobile10.length === 10) {
+              existingMemberByMobile = members.find(m => {
+                const mDigits = String(m.mobile || '').replace(/\D/g, '');
+                return mDigits.slice(-10) === mobile10;
+              });
+            }
+
+            if (existingMemberByMobile) {
+              assignedMemNo = existingMemberByMobile.membershipNo;
+            } else {
+              while (existingIdSet.has(`user-${nextUserNum}`)) {
+                nextUserNum++;
+              }
+              assignedMemNo = `USER-${nextUserNum}`;
+              existingIdSet.add(assignedMemNo.toLowerCase());
+              nextUserNum++;
+              isGeneratedId = true;
+            }
+          } else {
+            existingIdSet.add(assignedMemNo.toLowerCase());
           }
+
+          // Determine Membership Type
+          let membershipType = 'MOS Member';
+          if (typeRaw) {
+            membershipType = (typeRaw.toLowerCase().includes('non') || typeRaw.toLowerCase().includes('guest')) ? 'NON MOS Member' : 'MOS Member';
+          } else if (isGeneratedId || assignedMemNo.toUpperCase().startsWith('USER-')) {
+            membershipType = 'NON MOS Member';
+          }
+
+          parsedMembers.push({
+            sNo: String(members.length + parsedMembers.length + 1),
+            membershipNo: assignedMemNo,
+            membershipType: membershipType,
+            name: formatDoctorName(rawName),
+            email: email ? email.toLowerCase() : '',
+            mobile: mobile,
+            address: address,
+            city: city,
+            state: findVal(['state']) || 'Maharashtra',
+            ratifiedYear: ratified || '2026',
+            isCustom: true,
+            createdAt: new Date().toISOString(),
+            isAutoGeneratedId: isGeneratedId
+          });
         });
 
         if (parsedMembers.length === 0) {
-          setUploadError('Could not find required columns ("Membership No", "Name") in the Excel sheet. Please download the sample template.');
+          setUploadError('Could not find any doctor records with names in the Excel sheet. Please make sure the sheet has a "Name" column.');
           setIsUploading(false);
           return;
         }
 
         const result = onBulkAddMembers(parsedMembers);
+        const generatedList = parsedMembers.filter(m => m.isAutoGeneratedId);
+        const generatedCount = generatedList.length;
+
+        const summaryText = generatedCount > 0
+          ? `Successfully processed ${parsedMembers.length} records! Added ${result.addedCount} new members (${generatedCount} Non-MOS User IDs created: ${generatedList[0].membershipNo} to ${generatedList[generatedCount - 1].membershipNo}).`
+          : `Successfully processed ${parsedMembers.length} records! Added ${result.addedCount} new members, updated ${result.updatedCount} existing.`;
+
         setUploadStats({
-          message: `Successfully processed ${parsedMembers.length} records! Added ${result.addedCount} new members, updated ${result.updatedCount} existing.`
+          message: summaryText,
+          generatedList: generatedList.length > 0 ? generatedList : null
         });
         setIsUploading(false);
-        setTimeout(() => setUploadStats(null), 6000);
+        // If no credentials were created, auto-hide banner after 8s; otherwise keep it visible so admin can download credentials
+        if (generatedCount === 0) {
+          setTimeout(() => setUploadStats(null), 8000);
+        }
       } catch (err) {
         console.error('Error parsing excel file', err);
         setUploadError(`Failed to parse Excel file: ${err.message}`);
@@ -522,6 +664,56 @@ export default function AdminPage({
     };
     reader.readAsArrayBuffer(file);
     e.target.value = '';
+  };
+
+  // Download Generated Credentials for Non-MOS Members
+  const handleDownloadGeneratedCredentials = (listToDownload) => {
+    const list = listToDownload || [];
+    if (list.length === 0) return;
+
+    const data = list.map((m, idx) => ({
+      'S.No': String(idx + 1),
+      'Doctor Name': m.name,
+      'Assigned User ID': m.membershipNo,
+      'Mobile Number': m.mobile || '',
+      'Practice Area': m.city || m.address || '',
+      'Email': m.email || '',
+      'Membership Type': m.membershipType || 'NON MOS Member',
+      'Login URL': 'https://mosconnect.vercel.app',
+      'WhatsApp Welcome Message': `Dear ${m.name}, your MOS Connect access has been approved! Your User ID is ${m.membershipNo}. You can login at https://mosconnect.vercel.app with your User ID, Doctor Name, and Mobile number (${m.mobile || ''}).`
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Non_MOS_User_IDs');
+    XLSX.writeFile(workbook, `Non_MOS_Created_User_IDs_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  };
+
+  // Download Non-MOS Member Excel Template
+  const handleDownloadNonMosTemplate = () => {
+    const templateData = [
+      {
+        'S.No': '1',
+        'Name': 'Dr. Amit Shah',
+        'Number': '9820123456',
+        'Practice of Area': 'Shivaji Nagar, Pune',
+        'Email (Optional)': 'amit.shah@gmail.com',
+        'User ID (Leave blank to auto-create)': ''
+      },
+      {
+        'S.No': '2',
+        'Name': 'Dr. Sneha Joshi',
+        'Number': '9820654321',
+        'Practice of Area': 'Dadar, Mumbai',
+        'Email (Optional)': 'sneha.joshi@gmail.com',
+        'User ID (Leave blank to auto-create)': ''
+      }
+    ];
+
+    const worksheet = XLSX.utils.json_to_sheet(templateData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Non_MOS_Template');
+    XLSX.writeFile(workbook, 'Non_MOS_Member_Template.xlsx');
   };
 
   // Download Sample MOS Excel Template
@@ -557,6 +749,30 @@ export default function AdminPage({
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'MOS_Members_Template');
     XLSX.writeFile(workbook, 'MOS_Member_Approved_Template.xlsx');
+  };
+
+  // Export Member Directory (.xlsx)
+  const handleExportMembers = () => {
+    const targetMembers = filteredMembers.length > 0 ? filteredMembers : members;
+    const exportData = targetMembers.map((m, idx) => ({
+      'S.No': String(idx + 1),
+      'User ID / Membership No': m.membershipNo,
+      'Membership Type': m.membershipType || 'MOS Member',
+      'Doctor Name': m.name,
+      'Mobile Number': m.mobile || '',
+      'Email': m.email || '',
+      'Practice Area / City': m.city || '',
+      'Address': m.address || '',
+      'State': m.state || 'Maharashtra',
+      'Ratified Year': m.ratifiedYear || '2026',
+      'Status': (m.isCustom || String(m.membershipNo || '').startsWith('USER-')) ? 'Custom / Non-MOS Added' : 'Approved Directory'
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Members');
+    const suffix = memberTypeFilter === 'All' ? 'All' : memberTypeFilter.replace(/\s+/g, '_');
+    XLSX.writeFile(workbook, `MOS_Connect_Members_${suffix}_${new Date().toISOString().slice(0, 10)}.xlsx`);
   };
 
   return (
@@ -670,10 +886,51 @@ export default function AdminPage({
       )}
 
       {uploadStats && (
-        <div className="otp-sim-toast" style={{ borderLeftColor: '#10b981', marginBottom: '20px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <CheckCircle2 size={20} color="#10b981" />
+        <div className="otp-sim-toast" style={{ borderLeftColor: '#10b981', marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+            <CheckCircle2 size={20} color="#10b981" style={{ flexShrink: 0 }} />
             <span style={{ fontSize: '0.9rem', fontWeight: 600 }}>{uploadStats.message}</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {uploadStats.generatedList && uploadStats.generatedList.length > 0 && (
+              <button
+                onClick={() => handleDownloadGeneratedCredentials(uploadStats.generatedList)}
+                style={{
+                  background: '#15803d',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '7px 14px',
+                  borderRadius: '6px',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                }}
+                id="btn-download-generated-credentials"
+                title="Download Excel spreadsheet of newly generated Non-MOS User IDs"
+              >
+                <Download size={14} />
+                <span>Download Non-MOS User IDs (.xlsx)</span>
+              </button>
+            )}
+            <button
+              onClick={() => setUploadStats(null)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#64748b',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+              title="Dismiss"
+            >
+              <X size={16} />
+            </button>
           </div>
         </div>
       )}
@@ -880,16 +1137,38 @@ export default function AdminPage({
               </p>
             </div>
 
-            <div className="admin-member-actions-row">
+            <div className="admin-member-actions-row" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+              <button
+                onClick={handleDownloadNonMosTemplate}
+                style={{
+                  background: '#f0fdf4',
+                  color: '#15803d',
+                  padding: '9px 14px',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  border: '1px solid #86efac'
+                }}
+                id="btn-download-non-mos-template"
+                title="Download template for Non-MOS members (Name, Number, Practice of Area - User ID auto-created)"
+              >
+                <Download size={14} />
+                <span>Non-MOS Template (.xlsx)</span>
+              </button>
+
               <button
                 onClick={handleDownloadTemplate}
                 style={{
-                  background: '#f1f5f9',
+                  background: '#f8fafc',
                   color: '#334155',
-                  padding: '9px 16px',
+                  padding: '9px 13px',
                   borderRadius: '8px',
-                  fontWeight: 700,
-                  fontSize: '0.84rem',
+                  fontWeight: 600,
+                  fontSize: '0.82rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
@@ -897,9 +1176,10 @@ export default function AdminPage({
                   border: '1px solid #cbd5e1'
                 }}
                 id="btn-download-excel-template"
+                title="Download approved template for MOS Members (with Membership No)"
               >
-                <Download size={15} />
-                <span>Download Sample Template</span>
+                <Download size={14} />
+                <span>MOS Template (.xlsx)</span>
               </button>
 
               <label
@@ -914,9 +1194,11 @@ export default function AdminPage({
                   alignItems: 'center',
                   gap: '6px',
                   cursor: 'pointer',
-                  border: 'none'
+                  border: 'none',
+                  boxShadow: '0 1px 3px rgba(13,148,136,0.3)'
                 }}
                 id="label-upload-excel"
+                title="Upload Excel list of MOS or Non-MOS members (User IDs auto-created if missing)"
               >
                 <UploadCloud size={16} />
                 <span>{isUploading ? 'Importing...' : 'Upload Members Excel (.xlsx)'}</span>
@@ -931,12 +1213,34 @@ export default function AdminPage({
               </label>
 
               <button
+                onClick={handleExportMembers}
+                style={{
+                  background: '#f8fafc',
+                  color: '#0284c7',
+                  padding: '9px 13px',
+                  borderRadius: '8px',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  border: '1px solid #bae6fd'
+                }}
+                id="btn-export-members-excel"
+                title="Export current member directory to Excel (.xlsx)"
+              >
+                <FileSpreadsheet size={14} />
+                <span>Export (.xlsx)</span>
+              </button>
+
+              <button
                 onClick={handleOpenAddMember}
                 className="btn-post-ad"
-                style={{ padding: '9px 16px', fontSize: '0.84rem' }}
+                style={{ padding: '9px 15px', fontSize: '0.82rem' }}
                 id="btn-add-member-manually"
               >
-                <PlusCircle size={16} />
+                <PlusCircle size={15} />
                 <span>+ Add Member Manually</span>
               </button>
             </div>
