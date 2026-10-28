@@ -23,7 +23,10 @@ import {
   ChevronRight,
   Wrench,
   Edit2,
-  Lock
+  Lock,
+  Copy,
+  ExternalLink,
+  Globe
 } from 'lucide-react';
 import * as XLSX from 'xlsx';
 import OpticuraLogo from '../components/OpticuraLogo';
@@ -87,15 +90,17 @@ export default function AdminPage({
   // Manual Member Modal State
   const [showAddMemberModal, setShowAddMemberModal] = useState(false);
   const [editingMember, setEditingMember] = useState(null);
+  const [addedMemberSuccessModal, setAddedMemberSuccessModal] = useState(null);
   const [manualMember, setManualMember] = useState({
     membershipNo: '',
-    membershipType: 'MOS Member',
+    membershipType: 'NON MOS Member',
     name: '',
     email: '',
     mobile: '',
+    website: '',
     address: '',
-    city: 'Mumbai',
-    state: 'Maharashtra',
+    city: '',
+    state: '',
     ratifiedYear: '2026'
   });
 
@@ -198,13 +203,14 @@ export default function AdminPage({
     setEditingMember(null);
     setManualMember({
       membershipNo: '',
-      membershipType: 'MOS Member',
+      membershipType: 'NON MOS Member',
       name: '',
       email: '',
       mobile: '',
+      website: '',
       address: '',
-      city: 'Mumbai',
-      state: 'Maharashtra',
+      city: '',
+      state: '',
       ratifiedYear: '2026'
     });
     setShowAddMemberModal(true);
@@ -214,13 +220,14 @@ export default function AdminPage({
     setEditingMember(m);
     setManualMember({
       membershipNo: m.membershipNo || '',
-      membershipType: m.membershipType || 'MOS Member',
+      membershipType: m.membershipType || 'NON MOS Member',
       name: m.name || '',
       email: m.email || '',
       mobile: m.mobile || '',
+      website: m.website || '',
       address: m.address || '',
-      city: m.city || 'Mumbai',
-      state: m.state || 'Maharashtra',
+      city: m.city || '',
+      state: m.state || '',
       ratifiedYear: m.ratifiedYear || '2026'
     });
     setShowAddMemberModal(true);
@@ -238,18 +245,28 @@ export default function AdminPage({
       return;
     }
 
+    let emailVal = manualMember.email.trim();
+    let websiteVal = (manualMember.website || '').trim();
+
+    // Smart fix: If user pasted a website/URL into the email field by accident (e.g. www.innovisiondrishti.com)
+    if (emailVal && !emailVal.includes('@') && (emailVal.startsWith('www.') || emailVal.startsWith('http') || emailVal.includes('.com') || emailVal.includes('.in') || emailVal.includes('.org') || emailVal.includes('.net'))) {
+      if (!websiteVal) websiteVal = emailVal;
+      emailVal = '';
+    }
+
     if (editingMember) {
       const assignedId = manualMember.membershipNo.trim() || editingMember.membershipNo;
       const updatedMem = {
         ...editingMember,
         membershipNo: assignedId,
-        membershipType: manualMember.membershipType || 'MOS Member',
+        membershipType: manualMember.membershipType || editingMember.membershipType || 'NON MOS Member',
         name: formatDoctorName(manualMember.name),
-        email: manualMember.email.trim().toLowerCase(),
+        email: emailVal.toLowerCase(),
         mobile: manualMember.mobile.trim().replace(/\D/g, ''),
+        website: websiteVal,
         address: manualMember.address.trim(),
-        city: manualMember.city.trim() || 'Maharashtra',
-        state: manualMember.state.trim() || 'Maharashtra',
+        city: manualMember.city.trim() || editingMember.city || 'Maharashtra',
+        state: manualMember.state.trim() || editingMember.state || 'Maharashtra',
         ratifiedYear: manualMember.ratifiedYear || editingMember.ratifiedYear || '2026',
         isCustom: true,
         updatedAt: new Date().toISOString()
@@ -288,8 +305,9 @@ export default function AdminPage({
       membershipNo: assignedId,
       membershipType: assignedType,
       name: formatDoctorName(manualMember.name),
-      email: manualMember.email.trim().toLowerCase(),
+      email: emailVal.toLowerCase(),
       mobile: manualMember.mobile.trim().replace(/\D/g, ''),
+      website: websiteVal,
       address: manualMember.address.trim(),
       city: manualMember.city.trim() || 'Maharashtra',
       state: manualMember.state.trim() || 'Maharashtra',
@@ -302,17 +320,19 @@ export default function AdminPage({
     setShowAddMemberModal(false);
     setManualMember({
       membershipNo: '',
-      membershipType: 'MOS Member',
+      membershipType: 'NON MOS Member',
       name: '',
       email: '',
       mobile: '',
+      website: '',
       address: '',
-      city: 'Mumbai',
-      state: 'Maharashtra',
+      city: '',
+      state: '',
       ratifiedYear: '2026'
     });
+    setAddedMemberSuccessModal(newMem);
     setUploadStats({ message: `Member ${newMem.name} (#${newMem.membershipNo}) added successfully!` });
-    setTimeout(() => setUploadStats(null), 4000);
+    setTimeout(() => setUploadStats(null), 8000);
   };
 
   // Vendor Filter Memos
@@ -1835,6 +1855,9 @@ export default function AdminPage({
                     onChange={e => setManualMember({ ...manualMember, membershipNo: e.target.value })}
                     id="input-add-member-id"
                   />
+                  <span style={{ fontSize: '0.72rem', color: '#64748b', marginTop: '3px', display: 'block' }}>
+                    Leave blank to automatically assign the next Non-MOS User ID.
+                  </span>
                 </div>
 
                 <div className="form-group">
@@ -1845,8 +1868,8 @@ export default function AdminPage({
                     onChange={e => setManualMember({ ...manualMember, membershipType: e.target.value })}
                     id="select-add-member-type"
                   >
-                    <option value="MOS Member">MOS Member</option>
                     <option value="NON MOS Member">NON MOS Member</option>
+                    <option value="MOS Member">MOS Member</option>
                   </select>
                 </div>
               </div>
@@ -1856,7 +1879,7 @@ export default function AdminPage({
                 <input 
                   type="text"
                   className="form-input"
-                  placeholder="e.g. Dr. Rajesh Deshmukh"
+                  placeholder="e.g. Dr. Satish Shet"
                   required
                   value={manualMember.name}
                   onChange={e => setManualMember({ ...manualMember, name: e.target.value })}
@@ -1866,9 +1889,9 @@ export default function AdminPage({
 
               <div className="form-row">
                 <div className="form-group">
-                  <label className="form-label">Email ID</label>
+                  <label className="form-label">Email ID (Optional)</label>
                   <input 
-                    type="email"
+                    type="text"
                     className="form-input"
                     placeholder="doctor@gmail.com"
                     value={manualMember.email}
@@ -1878,7 +1901,7 @@ export default function AdminPage({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Mobile Number</label>
+                  <label className="form-label">Mobile Number *</label>
                   <input 
                     type="text"
                     className="form-input"
@@ -1890,13 +1913,25 @@ export default function AdminPage({
                 </div>
               </div>
 
+              <div className="form-group">
+                <label className="form-label">Website / Practice Link (Optional)</label>
+                <input 
+                  type="text"
+                  className="form-input"
+                  placeholder="e.g. www.innovisiondrishti.com"
+                  value={manualMember.website}
+                  onChange={e => setManualMember({ ...manualMember, website: e.target.value })}
+                  id="input-add-member-website"
+                />
+              </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">City *</label>
                   <input 
                     type="text"
                     className="form-input"
-                    placeholder="e.g. Pune, Mumbai, Nashik"
+                    placeholder="e.g. Hubli, Pune, Mumbai, Nashik"
                     value={manualMember.city}
                     onChange={e => setManualMember({ ...manualMember, city: e.target.value })}
                     id="input-add-member-city"
@@ -1908,9 +1943,10 @@ export default function AdminPage({
                   <input 
                     type="text"
                     className="form-input"
-                    placeholder="Maharashtra"
+                    placeholder="e.g. Karnataka, Maharashtra"
                     value={manualMember.state}
                     onChange={e => setManualMember({ ...manualMember, state: e.target.value })}
+                    id="input-add-member-state"
                   />
                 </div>
               </div>
@@ -1920,9 +1956,10 @@ export default function AdminPage({
                 <input 
                   type="text"
                   className="form-input"
-                  placeholder="Clinic Name, Road, Area"
+                  placeholder="e.g. Drishti Eye care & research centre, Vidyanagar"
                   value={manualMember.address}
                   onChange={e => setManualMember({ ...manualMember, address: e.target.value })}
+                  id="input-add-member-address"
                 />
               </div>
 
@@ -1944,6 +1981,109 @@ export default function AdminPage({
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: MEMBER ADDED SUCCESS CONFIRMATION & WHATSAPP CARD */}
+      {addedMemberSuccessModal && (
+        <div className="modal-overlay" onClick={() => setAddedMemberSuccessModal(null)}>
+          <div className="modal-card" style={{ maxWidth: '520px' }} onClick={e => e.stopPropagation()}>
+            <div className="modal-header" style={{ background: '#f0fdf4', borderBottom: '1px solid #bbf7d0' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ background: '#dcfce7', color: '#16a34a', width: '36px', height: '36px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CheckCircle2 size={22} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#15803d', margin: 0 }}>
+                    Member Added Successfully!
+                  </h3>
+                  <span style={{ fontSize: '0.78rem', color: '#166534' }}>
+                    Directory authentication & cloud sync active
+                  </span>
+                </div>
+              </div>
+              <button className="modal-close-btn" onClick={() => setAddedMemberSuccessModal(null)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div style={{ padding: '24px' }}>
+              {/* User ID Highlight Card */}
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px', marginBottom: '18px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 700, textTransform: 'uppercase' }}>Assigned Login / User ID</span>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 700, background: addedMemberSuccessModal.membershipType === 'NON MOS Member' ? '#fef3c7' : '#ecfdf5', color: addedMemberSuccessModal.membershipType === 'NON MOS Member' ? '#b45309' : '#059669', padding: '2px 8px', borderRadius: '6px' }}>
+                    {addedMemberSuccessModal.membershipType}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ fontSize: '1.65rem', fontWeight: 800, color: '#0284c7', letterSpacing: '0.5px' }}>
+                    #{addedMemberSuccessModal.membershipNo}
+                  </div>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(addedMemberSuccessModal.membershipNo);
+                      alert(`Copied ID #${addedMemberSuccessModal.membershipNo} to clipboard!`);
+                    }}
+                    style={{ background: '#e0f2fe', color: '#0284c7', border: '1px solid #bae6fd', padding: '6px 14px', borderRadius: '6px', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                    id="btn-copy-user-id"
+                  >
+                    <Copy size={13} />
+                    <span>Copy ID</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Doctor Details Summary */}
+              <div style={{ fontSize: '0.86rem', color: '#334155', lineHeight: '1.7', marginBottom: '18px', background: '#ffffff', border: '1px solid #f1f5f9', borderRadius: '10px', padding: '14px' }}>
+                <div><strong>Doctor Name:</strong> {addedMemberSuccessModal.name}</div>
+                <div><strong>Mobile Number:</strong> +91 {addedMemberSuccessModal.mobile || '—'}</div>
+                {addedMemberSuccessModal.email && <div><strong>Email:</strong> {addedMemberSuccessModal.email}</div>}
+                {addedMemberSuccessModal.website && <div><strong>Website:</strong> {addedMemberSuccessModal.website}</div>}
+                <div><strong>Location:</strong> {[addedMemberSuccessModal.address, addedMemberSuccessModal.city, addedMemberSuccessModal.state].filter(Boolean).join(', ')}</div>
+              </div>
+
+              {/* WhatsApp Message Box */}
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: '#166534', fontWeight: 700, fontSize: '0.84rem' }}>
+                  <span>📲 Ready WhatsApp Message to Share:</span>
+                </div>
+                <p style={{ fontSize: '0.82rem', color: '#14532d', background: '#ffffff', border: '1px solid #dcfce7', borderRadius: '8px', padding: '10px 12px', margin: '0 0 12px 0', lineHeight: '1.5' }}>
+                  {`Dear ${addedMemberSuccessModal.name}, your MOS Connect access has been approved! Your User ID is ${addedMemberSuccessModal.membershipNo}. Please login at https://mosconnect.vercel.app with your User ID (or Mobile Number ${addedMemberSuccessModal.mobile}) and Doctor Name.`}
+                </p>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                  {addedMemberSuccessModal.mobile && (
+                    <a
+                      href={`https://wa.me/91${addedMemberSuccessModal.mobile.replace(/\D/g, '').slice(-10)}?text=${encodeURIComponent(`Dear ${addedMemberSuccessModal.name}, your MOS Connect access has been approved! Your User ID is ${addedMemberSuccessModal.membershipNo}. Please login at https://mosconnect.vercel.app with your User ID (or Mobile Number ${addedMemberSuccessModal.mobile}) and Doctor Name.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ background: '#22c55e', color: '#ffffff', textDecoration: 'none', padding: '8px 16px', borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem', display: 'inline-flex', alignItems: 'center', gap: '6px', boxShadow: '0 1px 3px rgba(34,197,94,0.3)' }}
+                      id="btn-whatsapp-new-member"
+                    >
+                      <span>Send via WhatsApp</span>
+                    </a>
+                  )}
+                  <button
+                    onClick={() => {
+                      const msg = `Dear ${addedMemberSuccessModal.name}, your MOS Connect access has been approved! Your User ID is ${addedMemberSuccessModal.membershipNo}. Please login at https://mosconnect.vercel.app with your User ID (or Mobile Number ${addedMemberSuccessModal.mobile}) and Doctor Name.`;
+                      navigator.clipboard.writeText(msg);
+                      alert('Copied WhatsApp message to clipboard!');
+                    }}
+                    style={{ background: '#f8fafc', color: '#334155', border: '1px solid #cbd5e1', padding: '8px 14px', borderRadius: '8px', fontWeight: 700, fontSize: '0.82rem', cursor: 'pointer' }}
+                  >
+                    <span>Copy Message</span>
+                  </button>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setAddedMemberSuccessModal(null)}
+                style={{ width: '100%', background: '#0284c7', color: '#ffffff', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: 700, fontSize: '0.88rem', cursor: 'pointer' }}
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}

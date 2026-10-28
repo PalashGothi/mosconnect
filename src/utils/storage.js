@@ -843,8 +843,16 @@ export function verifyDoctorLogin(inputMembershipNo = '', inputName = '', inputC
   // 3. Database lookup in Approved Members
   const members = getMembers();
 
-  // Find candidate members matching the provided ID
-  const idMatchedMembers = members.filter(m => matchMembershipId(m.membershipNo, cleanId));
+  // Find candidate members matching the provided ID (MOS numeric ID, USER-xxxx, or registered 10-digit mobile)
+  const idMatchedMembers = members.filter(m => {
+    if (matchMembershipId(m.membershipNo, cleanId)) return true;
+    const cleanInDigits = cleanId.replace(/\D/g, '');
+    const memberDigits = String(m.mobile || '').replace(/\D/g, '');
+    if (cleanInDigits.length === 10 && memberDigits.slice(-10) === cleanInDigits) {
+      return true;
+    }
+    return false;
+  });
 
   if (idMatchedMembers.length === 0) {
     return { 
