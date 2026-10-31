@@ -143,7 +143,10 @@ export default async function handler(req, res) {
           const inTime = new Date(j.updatedAt || j.postedAt || j.createdAt || 0).getTime();
           // Once approved on any device, keep approved!
           const keepStatus = (ex.status === 'approved' || j.status === 'approved') ? 'approved' : (inTime >= exTime ? j.status : ex.status);
-          const keepFlyer = j.flyerImage || ex.flyerImage;
+          // Only keep flyer image in cloud bin if lightweight (<8KB); heavy images stay in local storage
+          const keepFlyer = (j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length < 8000) 
+            ? j.flyerImage 
+            : ((ex.flyerImage && typeof ex.flyerImage === 'string' && ex.flyerImage.length < 8000) ? ex.flyerImage : '');
           const keepApprovedAt = ex.approvedAt || j.approvedAt;
           const keepApprovedBy = ex.approvedBy || j.approvedBy;
           if (inTime >= exTime) {
@@ -193,15 +196,40 @@ export default async function handler(req, res) {
         lastUpdated: Date.now()
       };
 
-      // 92KB Quota Safeguard: Ensure total JSON size never exceeds ExtendsClass 100KB limit
+      // Multi-tier Safeguard: Ensure total JSON size never exceeds ExtendsClass 100KB limit
       let payloadJson = JSON.stringify(mergedPayload);
-      if (payloadJson.length > 92000) {
+
+      // Tier 1: If payload > 65KB, strip any job flyer data URLs (> 5KB)
+      if (payloadJson.length > 65000) {
         mergedPayload.jobs = (mergedPayload.jobs || []).map(j => {
-          if (j && j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.length > 65000) {
+          if (j && j.flyerImage && typeof j.flyerImage === 'string' && (j.flyerImage.startsWith('data:') || j.flyerImage.length > 5000)) {
             return { ...j, flyerImage: '' };
           }
           return j;
         });
+        payloadJson = JSON.stringify(mergedPayload);
+      }
+
+      // Tier 2: If payload > 75KB, strip all job flyer data URLs
+      if (payloadJson.length > 75000) {
+        mergedPayload.jobs = (mergedPayload.jobs || []).map(j => ({ ...j, flyerImage: '' }));
+        payloadJson = JSON.stringify(mergedPayload);
+      }
+
+      // Tier 3: If payload > 80KB, strip heavy listing image data URLs
+      if (payloadJson.length > 80000) {
+        mergedPayload.listings = (mergedPayload.listings || []).map(l => {
+          if (l && l.image && typeof l.image === 'string' && l.image.startsWith('data:')) {
+            return { ...l, image: '', images: [] };
+          }
+          return l;
+        });
+        payloadJson = JSON.stringify(mergedPayload);
+      }
+
+      // Tier 4: If still > 85KB, keep only custom vendors (static vendors v-01 to v-45 exist on all clients)
+      if (payloadJson.length > 85000) {
+        mergedPayload.vendors = (mergedPayload.vendors || []).filter(v => v.isCustom || !String(v.id).match(/^v-\d+$/));
         payloadJson = JSON.stringify(mergedPayload);
       }
 

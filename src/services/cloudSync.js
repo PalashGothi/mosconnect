@@ -116,13 +116,13 @@ function sanitizePayloadForCloud(raw) {
   try {
     const clone = JSON.parse(JSON.stringify(raw));
     
-    // 1. Optimize Job Flyers (preserve crisp compressed flyers up to 65,000 characters / ~45KB)
+    // 1. Optimize Job Flyers (preserve lightweight flyers under 8KB; strip heavy data URLs to protect 100KB cloud bin)
     if (Array.isArray(clone.jobs)) {
       clone.jobs = clone.jobs.map(job => {
         if (!job) return job;
         const j = { ...job };
-        if (j.flyerImage && typeof j.flyerImage === 'string' && j.flyerImage.startsWith('data:') && j.flyerImage.length > 65000) {
-          // Truncate only if truly gigantic to protect the 100KB quota limit
+        if (j.flyerImage && typeof j.flyerImage === 'string' && (j.flyerImage.length > 8000 || j.flyerImage.startsWith('data:'))) {
+          // Heavy base64 flyer stays in localStorage on poster's device; cloud sync stays light
           j.flyerImage = '';
         }
         return j;
@@ -134,11 +134,11 @@ function sanitizePayloadForCloud(raw) {
       clone.listings = clone.listings.map(item => {
         if (!item) return item;
         const l = { ...item };
-        if (l.image && typeof l.image === 'string' && l.image.startsWith('data:') && l.image.length > 30000) {
+        if (l.image && typeof l.image === 'string' && l.image.startsWith('data:') && l.image.length > 15000) {
           l.image = '';
         }
         if (Array.isArray(l.images)) {
-          l.images = l.images.map(img => (typeof img === 'string' && img.startsWith('data:') && img.length > 30000) ? '' : img).filter(Boolean);
+          l.images = l.images.map(img => (typeof img === 'string' && img.startsWith('data:') && img.length > 15000) ? '' : img).filter(Boolean);
         }
         return l;
       });
@@ -168,10 +168,18 @@ function sanitizePayloadForCloud(raw) {
       });
     }
 
-    // 4. Strict Safety Valve: If total payload is still > 92KB, strip heavy base64 to prevent HTTP 413
+    // 4. Strict Multi-tier Safeguard: Guarantee total payload stays strictly under 60-70KB
     let strLen = JSON.stringify(clone).length;
-    if (strLen > 92000 && Array.isArray(clone.jobs)) {
+    if (strLen > 65000 && Array.isArray(clone.jobs)) {
       clone.jobs = clone.jobs.map(j => ({ ...j, flyerImage: '' }));
+      strLen = JSON.stringify(clone).length;
+    }
+    if (strLen > 75000 && Array.isArray(clone.listings)) {
+      clone.listings = clone.listings.map(l => ({ ...l, image: (l.image?.startsWith('data:') ? '' : l.image), images: [] }));
+      strLen = JSON.stringify(clone).length;
+    }
+    if (strLen > 80000 && Array.isArray(clone.vendors)) {
+      clone.vendors = clone.vendors.filter(v => v.isCustom || !String(v.id).match(/^v-\d+$/));
     }
 
     return clone;
@@ -227,6 +235,9 @@ async function executePush(getStateFn) {
       try {
         syncChannel?.postMessage({ type: 'push-success', timestamp: Date.now() });
       } catch (e) {}
+    } else {
+      notifyListeners({ type: 'push-failed', timestamp: Date.now() });
+      console.warn('[CloudSync] Cloud push failed across all endpoints.');
     }
   } catch (err) {
     console.warn('[CloudSync] Network error during pushCloudData:', err);

@@ -493,6 +493,7 @@ export default function App() {
               onDeleteVendor={handleDeleteVendor}
               onUpdateVendor={handleUpdateVendor}
               onLockAdminPanel={handleLockAdminPanel}
+              onForceSync={() => forceSyncNow((cloudRecord) => { applyCloudRecord(cloudRecord); refreshAllState(); })}
             />
           ) : (
             <div style={{ textAlign: 'center', padding: '90px 20px', minHeight: '65vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>

@@ -323,6 +323,20 @@ export function applyCloudRecord(record) {
       if (customUpdated) {
         localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(Array.from(customMap.values())));
       }
+
+      // Check if local device has unpushed custom members (e.g. from Excel upload on laptop)
+      const cloudKeys = new Set((record.customMembers || []).map(m => String(m.membershipNo || '').toLowerCase().trim()));
+      let hasLocalUnpushed = false;
+      localCustom.forEach(lm => {
+        if (!lm || !lm.membershipNo) return;
+        const k = String(lm.membershipNo).toLowerCase().trim();
+        if (!deletedMemberSet.has(k) && !cloudKeys.has(k)) {
+          hasLocalUnpushed = true;
+        }
+      });
+      if (hasLocalUnpushed) {
+        setTimeout(() => triggerCloudSync(true), 800);
+      }
     }
 
     // Filter out any members deleted from cloud
@@ -453,6 +467,39 @@ export function saveCustomMember(member) {
     } else {
       updated = [clean, ...list];
     }
+    localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(updated));
+    return updated;
+  } catch (e) {
+    return [];
+  }
+}
+
+export function saveCustomMembersBulk(membersList) {
+  try {
+    const list = getCustomMembers();
+    const customMap = new Map();
+    list.forEach(m => {
+      if (m && m.membershipNo) {
+        customMap.set(String(m.membershipNo).toLowerCase().trim(), m);
+      }
+    });
+
+    membersList.forEach(member => {
+      if (!member || !member.membershipNo) return;
+      const key = String(member.membershipNo).toLowerCase().trim();
+      const existing = customMap.get(key);
+      const clean = {
+        ...member,
+        name: formatDoctorName(member.name),
+        isCustom: true,
+        updatedAt: new Date().toISOString(),
+        createdAt: member.createdAt || (existing && existing.createdAt) || new Date().toISOString(),
+        membershipType: normalizeMembershipType(member.membershipType)
+      };
+      customMap.set(key, clean);
+    });
+
+    const updated = Array.from(customMap.values());
     localStorage.setItem(STORAGE_KEYS.CUSTOM_MEMBERS, JSON.stringify(updated));
     return updated;
   } catch (e) {
@@ -648,7 +695,7 @@ export function addMembersBulk(newMembersList) {
     }
   });
 
-  newCustom.forEach(cm => saveCustomMember(cm));
+  saveCustomMembersBulk(newCustom);
 
   const merged = Array.from(existingMap.values());
   try {
@@ -657,7 +704,7 @@ export function addMembersBulk(newMembersList) {
     console.error('Failed to save bulk members', e);
   }
 
-  triggerCloudSync();
+  triggerCloudSync(true);
   return { updatedList: merged, addedCount, updatedCount };
 }
 
